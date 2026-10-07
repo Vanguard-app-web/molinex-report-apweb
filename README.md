@@ -2007,17 +2007,16 @@ A continuación se presenta el cuadro resumen del Sprint Planning Meeting, con e
 | Sprint # | Sprint 1 |
 |:--|:--|
 | **Sprint Planning Background** | |
-| Date | 26-09-02 |
+| Date | 26-09-2026 |
 | Time | 7:00 PM |
-| Location | virtual (videollamada del equipo por Google Meet|
+| Location | Virtual (videollamada del equipo por Google Meet) |
 | Prepared By | Gallegos De La Cruz, Giovanni Marcelo |
 | Attendees (to planning meeting) | Gallegos De La Cruz, Giovanni Marcelo / Casalino Berrocal, Luisa Nhiriel / Huerta Cardenas, Brayan Benjamin / Jimenez Saavedra, Antony Alexander / Rivera Rupay, Fabricio Jose |
 | Sprint n - 1 Review Summary | No aplica (primer Sprint). |
 | Sprint n - 1 Retrospective Summary | No aplica (primer Sprint). |
-| Sprint 1 Goal | Implementar y desplegar la primera versión de la Landing Page de Molinex, presentando su propuesta de valor, funcionalidades, beneficios y planes de suscripción. También se busca validar la estructura inicial de la Web Application mediante wireframes, mockups y prototipo interactivo. |
-| Sprint 1 Goal | Our focus is on letting prospective mills evaluate Molinex and choose a subscription plan from the landing page, and on giving authorized mill staff role-based access to the platform.We believe it delivers a clearer understanding of Molinex's value, features and plans to the mill owners and administrators who visit the site, and controlled access to operational information to administrators, technicians and operators.This will be confirmed when a visitor can review the value proposition, benefits, features and the Basic, Professional and Enterprise plans and submit a commercial information request in no more than three steps, and when an administrator can register a user and assign a role, and that user can log in, update their profile and is denied access to functionalities outside their role.|
-|Sprint 1 Velocity | 20 Story Points. Primer Sprint sin velocity histórico: se adopta una capacidad conservadora para un equipo de 5 integrantes. |
-|Sum of Story Points | 20 Story Points (US-01 a US-04, US-35 a US-40) |
+| Sprint 1 Goal | Our focus is on enabling prospective mills to understand Molinex and evaluate its subscription plans through the landing page, while establishing the initial access and user management capabilities for authorized mill staff. We believe this will provide visitors with a clear understanding of Molinex's value proposition, features, benefits and subscription plans, while establishing controlled access for administrators, technicians and operators. This will be confirmed when a visitor can review the value proposition, features, benefits and the Basic, Professional and Enterprise plans, submit a commercial information request, and when authorized staff can register users, assign roles, log in and manage their profiles. |
+| Sprint 1 Velocity | 20 Story Points. Primer Sprint sin velocity histórico: se adopta una capacidad conservadora para un equipo de 5 integrantes. |
+| Sum of Story Points | 20 Story Points (US-35 a US-40, US-01 a US-04) |
 
 #### 5.2.1.2 Aspect Leaders and Collaborators
 
