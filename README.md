@@ -802,46 +802,46 @@ El presente glosario reúne los términos y conceptos utilizados en el dominio d
 
 | # Orden | User Story Id | Título | Descripción | Story Points (1/2/3/5/8) |
 |--:|:--|:--|:--|:--:|
-|1 |US-01|Registrar usuario| Como administrador, quiero registrar usuarios para permitir que el personal autorizado acceda a Molinex.| 3|
-| **2** | UUS-02 |Iniciar sesión | Como administrador, técnico u operador, quiero iniciar sesión para acceder a las funcionalidades autorizadas de la plataforma. | 3|
-| **3** | **US-03**| Gestionar roles y permisos |Como administrador, quiero asignar roles y permisos para controlar el acceso a la información según las responsabilidades del personal. |5|
-| **4** | **US-04**| Gestionar perfil de usuario| Como administrador, técnico u operador, quiero consultar y actualizar mis datos de perfil.| 2|
-| **5** | **US-05** |Registrar recepción de materia prima|Como operador, quiero registrar la recepción de arroz cáscara para controlar la materia prima ingresada.|3 |
-| **6** | **US-06** |Registrar lote de materia prima|Como operador, quiero registrar lotes de materia prima para dar seguimiento a su recorrido en el proceso.|3|
-| **7** | **US-07** |Registrar maquinaria|Como técnico, quiero registrar las máquinas del molino para mantener un inventario actualizado. | 2|
-| **8** | **US-08** |Registrar información de producción|Como operador, quiero registrar los datos de una jornada productiva.|3 |
-| **9** | **US-09** |Registrar resultados de calidad|Como operador, quiero registrar los resultados de calidad de los lotes procesados. |3|
-| **10** | **US-10** |Registrar y consultar merma|Como operador, quiero registrar y consultar la merma generada durante el proceso.|3 |
-| **11** | **US-11** |Registrar mantenimiento preventivo|Como técnico, quiero registrar las actividades de mantenimiento preventivo. |3|
-| **12** | **US-12** |Registrar mantenimiento correctivo|Como técnico, quiero registrar las actividades de mantenimiento correctivo.|3|
-| **13** | **US-13** |Actualizar información de producción|Como operador, quiero actualizar registros productivos incorrectos. |2 |
-| **14** | **US-14** |Consultar estado de maquinaria|Como técnico, quiero consultar el estado de las máquinas para priorizar acciones.|2 |
-| **15** | **US-15** |Consultar % de arroz entero y quebrado|Como operador, quiero consultar estos porcentajes para evaluar el resultado del proceso. |2 |
-| **16** | **US-16** |Consultar procesos productivos|Como administrador, quiero consultar los procesos registrados para conocer el avance operativo.|2 |
-| **17** | **US-17** |Consultar historial de mantenimiento|Como técnico, quiero consultar el historial de mantenimiento de cada máquina.|2 |
-| **18** | **US-18** |Consultar historial de producción|Como administrador, quiero consultar el historial de producción por periodos.|2|
-| **19** | **US-19** |Consultar indicadores de rendimiento|Como administrador, quiero consultar los indicadores de rendimiento del proceso.|3|
-| **20** | **US-20** |Consultar variables operativas|Como técnico, quiero consultar variables operativas para supervisar el comportamiento de las máquinas.	|3|
-| **21** | **US-21** |Detectar anomalías operativas|Como técnico, quiero detectar anomalías en el comportamiento de las máquinas antes de que afecten la producción.|8|
-| **22** | **US-22** |Consultar alertas de posibles fallas|Como técnico, quiero consultar alertas ante posibles fallas para actuar oportunamente.|3|
-| **23** | **US-23** |Consultar historial de anomalías|Como técnico, quiero consultar el historial de anomalías para analizar patrones de recurrencia.|2|
-| **24** | **US-24** |Consultar recomendaciones de mantenimiento|Como técnico, quiero consultar recomendaciones basadas en las anomalías detectadas.|5|
-| **25** | **US-25** |Comparar indicadores de calidad|Como administrador, quiero comparar indicadores entre lotes o periodos.|5|
-| **26** | **US-26** |Identificar desviaciones en indicadores|Como administrador, quiero identificar desviaciones en rendimiento y calidad.|5|
-| **27** | **US-27** |Consultar resumen operativo|Como administrador, quiero consultar un resumen de los principales indicadores.|3|
-| **28** | **US-28** |	Generar reportes de producción|Como administrador, quiero generar reportes de producción por periodo.|5|
-| **29** | **US-29** |Generar reportes de mantenimiento|Como administrador, quiero generar reportes de mantenimiento.|5|
-| **30** | **US-30** |Analizar tendencias operativas|Como administrador, quiero analizar tendencias de producción, rendimiento y merma.|8|
-| **31** | **US-31** |Gestionar recursos de producción mediante API|Como Developer, quiero implementar operaciones RESTful para gestionar información de producción.|5|
-| **32** | **US-32** |Consultar indicadores mediante API|Como Developer, quiero implementar operaciones RESTful para consultar indicadores.|3|
-| **33** | **US-33** |Gestionar mantenimiento mediante API|Como Developer, quiero implementar operaciones RESTful para maquinaria y mantenimiento.|3|
-| **34** | **US-34** |Gestionar anomalías y alertas mediante API|Como Developer, quiero implementar operaciones RESTful para anomalías y alertas.|5|
-| **35** | **US-35** |Conocer la propuesta de valor|Como visitante, quiero conocer la propuesta de valor de Molinex.|1|
-| **36** | **US-36** |Conocer las funcionalidades|Como visitante, quiero conocer las principales funcionalidades de Molinex.|1|
-| **37** | **US-37** |Consultar planes de suscripción|Como visitante, quiero consultar los planes de suscripción disponibles..|1|
-| **38** | **US-38** |Identificar el plan adecuado|Como visitante, quiero conocer los beneficios de cada plan para elegir el más adecuado.|2 |
-| **39** | **US-39** |Conocer los beneficios de Molinex|Como visitante, quiero conocer los beneficios de Molinex para mi molino.|1|
-| **40** | **US-40** |Solicitar información comercial|Como visitante interesado, quiero solicitar información sobre Molinex. |1|
+| 1 | **US-05** | Registrar recepción de materia prima | Como operador, quiero registrar la recepción de arroz cáscara para controlar la materia prima ingresada. | 3 |
+| 2 | **US-06** | Registrar lote de materia prima | Como operador, quiero registrar lotes de materia prima para dar seguimiento a su recorrido en el proceso. | 3 |
+| 3 | **US-08** | Registrar información de producción | Como operador, quiero registrar los datos de una jornada productiva. | 3 |
+| 4 | **US-09** | Registrar resultados de calidad | Como operador, quiero registrar los resultados de calidad de los lotes procesados. | 3 |
+| 5 | **US-10** | Registrar y consultar merma | Como operador, quiero registrar y consultar la merma generada durante el proceso. | 3 |
+| 6 | **US-07** | Registrar maquinaria | Como técnico, quiero registrar las máquinas del molino para mantener un inventario actualizado. | 2 |
+| 7 | **US-11** | Registrar mantenimiento preventivo | Como técnico, quiero registrar las actividades de mantenimiento preventivo. | 3 |
+| 8 | **US-12** | Registrar mantenimiento correctivo | Como técnico, quiero registrar las actividades de mantenimiento correctivo. | 3 |
+| 9 | **US-13** | Actualizar información de producción | Como operador, quiero actualizar registros productivos incorrectos. | 2 |
+| 10 | **US-14** | Consultar estado de maquinaria | Como técnico, quiero consultar el estado de las máquinas para priorizar acciones. | 2 |
+| 11 | **US-15** | Consultar % de arroz entero y quebrado | Como operador, quiero consultar estos porcentajes para evaluar el resultado del proceso. | 2 |
+| 12 | **US-16** | Consultar procesos productivos | Como administrador, quiero consultar los procesos registrados para conocer el avance operativo. | 2 |
+| 13 | **US-17** | Consultar historial de mantenimiento | Como técnico, quiero consultar el historial de mantenimiento de cada máquina. | 2 |
+| 14 | **US-18** | Consultar historial de producción | Como administrador, quiero consultar el historial de producción por periodos. | 2 |
+| 15 | **US-19** | Consultar indicadores de rendimiento | Como administrador, quiero consultar los indicadores de rendimiento del proceso. | 3 |
+| 16 | **US-20** | Consultar variables operativas | Como técnico, quiero consultar variables operativas para supervisar el comportamiento de las máquinas. | 3 |
+| 17 | **US-21** | Detectar anomalías operativas | Como técnico, quiero detectar anomalías en el comportamiento de las máquinas antes de que afecten la producción. | 8 |
+| 18 | **US-22** | Consultar alertas de posibles fallas | Como técnico, quiero consultar alertas ante posibles fallas para actuar oportunamente. | 3 |
+| 19 | **US-23** | Consultar historial de anomalías | Como técnico, quiero consultar el historial de anomalías para analizar patrones de recurrencia. | 2 |
+| 20 | **US-24** | Consultar recomendaciones de mantenimiento | Como técnico, quiero consultar recomendaciones basadas en las anomalías detectadas. | 5 |
+| 21 | **US-25** | Comparar indicadores de calidad | Como administrador, quiero comparar indicadores entre lotes o periodos. | 5 |
+| 22 | **US-26** | Identificar desviaciones en indicadores | Como administrador, quiero identificar desviaciones en rendimiento y calidad. | 5 |
+| 23 | **US-27** | Consultar resumen operativo | Como administrador, quiero consultar un resumen de los principales indicadores. | 3 |
+| 24 | **US-28** | Generar reportes de producción | Como administrador, quiero generar reportes de producción por periodo. | 5 |
+| 25 | **US-29** | Generar reportes de mantenimiento | Como administrador, quiero generar reportes de mantenimiento. | 5 |
+| 26 | **US-30** | Analizar tendencias operativas | Como administrador, quiero analizar tendencias de producción, rendimiento y merma. | 8 |
+| 27 | **US-31** | Gestionar recursos de producción mediante API | Como Developer, quiero implementar operaciones RESTful para gestionar información de producción. | 5 |
+| 28 | **US-32** | Consultar indicadores mediante API | Como Developer, quiero implementar operaciones RESTful para consultar indicadores. | 3 |
+| 29 | **US-33** | Gestionar mantenimiento mediante API | Como Developer, quiero implementar operaciones RESTful para maquinaria y mantenimiento. | 3 |
+| 30 | **US-34** | Gestionar anomalías y alertas mediante API | Como Developer, quiero implementar operaciones RESTful para anomalías y alertas. | 5 |
+| 31 | **US-35** | Conocer la propuesta de valor | Como visitante, quiero conocer la propuesta de valor de Molinex. | 1 |
+| 32 | **US-36** | Conocer las funcionalidades | Como visitante, quiero conocer las principales funcionalidades de Molinex. | 1 |
+| 33 | **US-37** | Consultar planes de suscripción | Como visitante, quiero consultar los planes de suscripción disponibles. | 1 |
+| 34 | **US-38** | Identificar el plan adecuado | Como visitante, quiero conocer los beneficios de cada plan para elegir el más adecuado. | 2 |
+| 35 | **US-39** | Conocer los beneficios de Molinex | Como visitante, quiero conocer los beneficios de Molinex para mi molino. | 1 |
+| 36 | **US-40** | Solicitar información comercial | Como visitante interesado, quiero solicitar información sobre Molinex. | 1 |
+| 37 | **US-01** | Registrar usuario | Como administrador, quiero registrar usuarios para permitir que el personal autorizado acceda a Molinex. | 3 |
+| 38 | **US-02** | Iniciar sesión | Como administrador, técnico u operador, quiero iniciar sesión para acceder a las funcionalidades autorizadas de la plataforma. | 3 |
+| 39 | **US-03** | Gestionar roles y permisos | Como administrador, quiero asignar roles y permisos para controlar el acceso a la información según las responsabilidades del personal. | 5 |
+| 40 | **US-04** | Gestionar perfil de usuario | Como administrador, técnico u operador, quiero consultar y actualizar mis datos de perfil. | 2 |
 
 ![Product Backlog.png](assets/Images%20Chapter%203/Product%20Backlog.png)
 
