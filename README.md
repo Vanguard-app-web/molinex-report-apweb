@@ -2164,6 +2164,25 @@ A continuación se presenta el cuadro resumen del Sprint Planning Meeting, con e
 | **Sprint 2 Velocity** | **23 Story Points.** Se establece una capacidad de 23 Story Points considerando la experiencia obtenida durante el Sprint 1 y la capacidad de trabajo del equipo de 5 integrantes. |
 | **Sum of Story Points** | **23 Story Points (US-05, US-06, US-07, US-11, US-14, US-17, US-19 y US-20)** |
 
+#### 5.2.2.2 Aspect Leaders and Collaborators
+
+| Team Member (Last Name, First Name) | GitHub Username | Aspecto 1: Production Management (US-05, US-06, US-07) | Aspecto 2: Quality & Waste Control (US-11, US-14) | Aspecto 3: Asset & Maintenance (US-17, US-19, US-20) | Aspecto 4: Base compartida, API e Integración |
+|:--|:--:|:--:|:--:|:--:|:--:|
+| Casalino Berrocal, Luisa Nhiriel | lulu22nhiri | C | L | C | C |
+| Gallegos De La Cruz, Giovanni Marcelo | Giova2725 | L | C | C | C |
+| Huerta Cardenas, Brayan Benjamin | Brayanjk22 | C | C | C | C |
+| Jimenez Saavedra, Antony Alexander | saavedraantony-max | C | C | L | C |
+| Rivera Rupay, Fabricio Jose | Fabricio1924 | C | C | C | L |
+
+#### 5.2.2.3 Sprint Backlog 2
+#### 5.2.2.4.Development Evidence for Sprint Review.
+#### 5.2.2.5.Execution Evidence for Sprint Review.
+#### 5.2.2.6.Services Documentation Evidence for Sprint Review.
+#### 5.2.2.7.Software Deployment Evidence for Sprint Review.
+#### 5.2.2.8.Team Collaboration Insights during Sprint.
+
+
+
 
 # Conclusiones
 
