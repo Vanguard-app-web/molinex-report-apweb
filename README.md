@@ -2141,6 +2141,30 @@ Las ramas utilizadas siguieron las siguientes convenciones:
 ![Convenciones de código](assets/Images%20Chapter%205/code-conventions.png)
 
 **Figura:** Convenciones aplicadas durante el desarrollo. Fuente: elaboración propia.
+
+### 5.2.2 Sprint 2
+
+#### 5.2.2.1 Sprint Planning 2
+
+El Sprint 2 continúa el desarrollo de Molinex enfocándose en las funcionalidades operativas de la plataforma. En este Sprint se implementan las historias relacionadas con el registro de la recepción y los lotes de materia prima, la gestión de maquinaria, el registro de producción y resultados de calidad, la gestión de la merma y el mantenimiento preventivo y correctivo.
+
+A continuación se presenta el cuadro resumen del Sprint Planning Meeting, con el Sprint Goal, el velocity establecido y las historias de usuario comprometidas.
+
+| Sprint # | Sprint 2 |
+|:--|:--|
+| **Sprint Planning Background** | |
+| **Date** | 26-10-03 |
+| **Time** | 7:00 PM |
+| **Location** | virtual (videollamada del equipo por Discord) |
+| **Prepared By** | Gallegos De La Cruz, Giovanni Marcelo |
+| **Attendees (to planning meeting)** | Gallegos De La Cruz, Giovanni Marcelo / Casalino Berrocal, Luisa Nhiriel / Huerta Cardenas, Brayan Benjamin / Jimenez Saavedra, Antony Alexander / Rivera Rupay, Fabricio Jose |
+| **Sprint 1 Review Summary** | Se revisó la primera versión de la Landing Page de Molinex, incluyendo la propuesta de valor, funcionalidades, beneficios y planes de suscripción Básico, Profesional y Empresarial. También se revisaron las funcionalidades de acceso y gestión inicial de usuarios desarrolladas durante el Sprint 1. |
+| **Sprint 1 Retrospective Summary** | El equipo identificó como aspectos positivos la distribución de actividades y la coordinación para desarrollar las funcionalidades iniciales. Como oportunidad de mejora, se estableció fortalecer la coordinación entre los integrantes y precisar los criterios de aceptación antes de iniciar el desarrollo de cada historia de usuario. |
+| **Sprint 2 Goal** | **Our focus is on enabling the initial operational management of rice mill information in Molinex. We believe it delivers a structured way for mill personnel to register and manage the information required for production and maintenance activities. This will be confirmed when users can register raw material reception and lots, machinery, production and quality information, waste, and preventive and corrective maintenance records.** |
+| **Sprint 2 Velocity** | **23 Story Points.** Se establece una capacidad de 23 Story Points considerando la experiencia obtenida durante el Sprint 1 y la capacidad de trabajo del equipo de 5 integrantes. |
+| **Sum of Story Points** | **23 Story Points (US-05, US-06, US-07, US-11, US-14, US-17, US-19 y US-20)** |
+
+
 # Conclusiones
 
 ## Conclusiones y recomendaciones
