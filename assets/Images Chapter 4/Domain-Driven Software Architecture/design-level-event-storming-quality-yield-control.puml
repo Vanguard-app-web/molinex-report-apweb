@@ -1,0 +1,68 @@
+@startuml
+!include event-storming-style.puml
+
+title Quality and Yield Control - Design-Level Event Storming
+top to bottom direction
+
+rectangle "Production Records\n[View / Read Model]" as view_quality_input #B9D98A
+rectangle "Production Operator\n[Actor]" as actor_quality #FFF3A6
+rectangle "Record Quality\nResults\n[Command]" as command_quality #A9C7F7
+rectangle "Quality Assessment\n[Aggregate Root]" as aggregate_quality #FFE27A
+rectangle "Quality Results\nRecorded\n[Domain Event]" as event_quality #FFB26B
+rectangle "Yield Indicators and\nRice Composition\n[View / Read Model]" as view_indicators #B9D98A
+
+rectangle "Production Records\n[View / Read Model]" as view_waste_input #B9D98A
+rectangle "Production Operator\n[Actor]" as actor_waste #FFF3A6
+rectangle "Record Production\nWaste\n[Command]" as command_waste #A9C7F7
+rectangle "Waste Record\n[Aggregate Root]" as aggregate_waste #FFE27A
+rectangle "Production Waste\nRecorded\n[Domain Event]" as event_waste #FFB26B
+rectangle "Waste and Yield\n[View / Read Model]" as view_waste #B9D98A
+
+rectangle "Quality Results Recorded\nor Production Waste Recorded\n[Domain Event]" as event_evaluation_source #FFB26B
+rectangle "Evaluate Quality and\nYield Indicators\n[Business Process / Policy]" as policy_evaluate #C9A7E8
+rectangle "Identify Quality or\nYield Deviation\n[Command]" as command_deviation #A9C7F7
+rectangle "Quality Deviation\n[Aggregate Root]" as aggregate_deviation #FFE27A
+rectangle "Quality or Yield\nDeviation Identified\n[Domain Event]" as event_deviation #FFB26B
+rectangle "Quality Comparison\n[View / Read Model]" as view_comparison #B9D98A
+
+rectangle "Quality Dashboard\n[View / Read Model]" as view_dashboard #B9D98A
+rectangle "Administrator /\nProduction Operator\n[Actor]" as actor_dashboard #FFF3A6
+rectangle "Who defines and approves the quality\nand yield reference ranges?\n[Question / Risk]" as risk_ranges #FF8A80
+
+view_quality_input -right[dashed]-> actor_quality
+actor_quality -right-> command_quality
+command_quality -right-> aggregate_quality
+aggregate_quality -right-> event_quality
+event_quality -right-> view_indicators
+
+view_waste_input -right[dashed]-> actor_waste
+actor_waste -right-> command_waste
+command_waste -right-> aggregate_waste
+aggregate_waste -right-> event_waste
+event_waste -right-> view_waste
+
+event_evaluation_source -right-> policy_evaluate
+policy_evaluate -right-> command_deviation
+command_deviation -right-> aggregate_deviation
+aggregate_deviation -right-> event_deviation
+event_deviation -right-> view_comparison
+
+view_dashboard -right[dashed]-> actor_dashboard
+view_dashboard -down[dashed]-> risk_ranges
+
+actor_quality -[hidden]down-> actor_waste
+actor_waste -[hidden]down-> policy_evaluate
+policy_evaluate -[hidden]down-> actor_dashboard
+
+legend bottom
+  |= Color |= EventStorming Element |
+  |<#FFF3A6> | Actor |
+  |<#A9C7F7> | Command |
+  |<#FFE27A> | Aggregate Root |
+  |<#FFB26B> | Domain Event |
+  |<#C9A7E8> | Business Process / Policy |
+  |<#F5A3D7> | External System |
+  |<#B9D98A> | View / Read Model |
+  |<#FF8A80> | Question / Risk |
+endlegend
+@enduml

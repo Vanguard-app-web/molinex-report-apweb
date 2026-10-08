@@ -1,0 +1,54 @@
+@startuml
+!include event-storming-style.puml
+
+title Reporting and Analytics - Design-Level Event Storming
+top to bottom direction
+
+rectangle "Production, Quality, Maintenance,\nand Intelligence Events\n[Domain Events]" as events_operational #FFB26B
+rectangle "Operational Summary\n[View / Read Model]" as view_summary #B9D98A
+rectangle "Administrator\n[Actor]" as actor_summary #FFF3A6
+
+rectangle "Production Events\n[Domain Events]" as events_production #FFB26B
+rectangle "Production Report\n[View / Read Model]" as view_production #B9D98A
+rectangle "Administrator\n[Actor]" as actor_production #FFF3A6
+
+rectangle "Maintenance Events\n[Domain Events]" as events_maintenance #FFB26B
+rectangle "Maintenance Report\n[View / Read Model]" as view_maintenance #B9D98A
+rectangle "Administrator\n[Actor]" as actor_maintenance #FFF3A6
+
+rectangle "Quality and Anomaly Events\n[Domain Events]" as events_trends #FFB26B
+rectangle "Operational Trends\n[View / Read Model]" as view_trends #B9D98A
+rectangle "Administrator\n[Actor]" as actor_trends #FFF3A6
+
+rectangle "Report persistence, versioning, and\nexport format remain undefined\n[Question / Risk]" as risk_reports #FF8A80
+
+events_operational -right-> view_summary
+view_summary -right[dashed]-> actor_summary
+
+events_production -right-> view_production
+view_production -right[dashed]-> actor_production
+
+events_maintenance -right-> view_maintenance
+view_maintenance -right[dashed]-> actor_maintenance
+
+events_trends -right-> view_trends
+view_trends -right[dashed]-> actor_trends
+
+view_production -down[dashed]-> risk_reports
+
+events_operational -[hidden]down-> events_production
+events_production -[hidden]down-> events_maintenance
+events_maintenance -[hidden]down-> events_trends
+
+legend bottom
+  |= Color |= EventStorming Element |
+  |<#FFF3A6> | Actor |
+  |<#A9C7F7> | Command |
+  |<#FFE27A> | Aggregate Root |
+  |<#FFB26B> | Domain Event |
+  |<#C9A7E8> | Business Process / Policy |
+  |<#F5A3D7> | External System |
+  |<#B9D98A> | View / Read Model |
+  |<#FF8A80> | Question / Risk |
+endlegend
+@enduml

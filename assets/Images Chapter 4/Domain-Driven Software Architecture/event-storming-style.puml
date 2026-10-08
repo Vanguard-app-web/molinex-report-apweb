@@ -1,0 +1,19 @@
+skinparam backgroundColor #F7FAFC
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam shadowing false
+skinparam linetype ortho
+skinparam ArrowColor #334E68
+skinparam ArrowThickness 1.4
+skinparam RectangleBorderColor #486581
+skinparam RectangleFontColor #102A43
+skinparam PackageBorderColor #829AB1
+skinparam PackageFontColor #102A43
+skinparam package {
+  BackgroundColor #EDF5FC
+  RoundCorner 12
+}
+skinparam rectangle {
+  RoundCorner 9
+  Padding 10
+}

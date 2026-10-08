@@ -1,0 +1,74 @@
+@startuml
+!include event-storming-style.puml
+
+title Identity and Access Management - Design-Level Event Storming
+top to bottom direction
+
+rectangle "User Administration\n[View / Read Model]" as view_admin_register #B9D98A
+rectangle "Administrator\n[Actor]" as actor_admin_register #FFF3A6
+rectangle "Register User\n[Command]" as command_register #A9C7F7
+rectangle "User\n[Aggregate Root]" as aggregate_register #FFE27A
+rectangle "User Registered\n[Domain Event]" as event_registered #FFB26B
+rectangle "User Directory\n[View / Read Model]" as view_directory_out #B9D98A
+
+rectangle "User Directory\n[View / Read Model]" as view_directory_in #B9D98A
+rectangle "Administrator\n[Actor]" as actor_admin_role #FFF3A6
+rectangle "Assign Role\n[Command]" as command_role #A9C7F7
+rectangle "User\n[Aggregate Root]" as aggregate_role #FFE27A
+rectangle "Role Assigned\n[Domain Event]" as event_role #FFB26B
+rectangle "Role-Based Authorized\nFunctions\n[View / Read Model]" as view_functions #B9D98A
+
+rectangle "Sign-In View\n[View / Read Model]" as view_sign_in #B9D98A
+rectangle "Platform User\n[Actor]" as actor_sign_in #FFF3A6
+rectangle "Authenticate User\n[Command]" as command_authenticate #A9C7F7
+rectangle "User\n[Aggregate Root]" as aggregate_authenticate #FFE27A
+rectangle "User Authenticated\n[Domain Event]" as event_authenticated #FFB26B
+rectangle "Authenticated Session\n[View / Read Model]" as view_session #B9D98A
+
+rectangle "User Profile\n[View / Read Model]" as view_profile_in #B9D98A
+rectangle "Platform User\n[Actor]" as actor_profile #FFF3A6
+rectangle "Update User Profile\n[Command]" as command_profile #A9C7F7
+rectangle "User\n[Aggregate Root]" as aggregate_profile #FFE27A
+rectangle "User Profile Updated\n[Domain Event]" as event_profile #FFB26B
+rectangle "User Profile\n[View / Read Model]" as view_profile_out #B9D98A
+
+view_admin_register -right[dashed]-> actor_admin_register
+actor_admin_register -right-> command_register
+command_register -right-> aggregate_register
+aggregate_register -right-> event_registered
+event_registered -right-> view_directory_out
+
+view_directory_in -right[dashed]-> actor_admin_role
+actor_admin_role -right-> command_role
+command_role -right-> aggregate_role
+aggregate_role -right-> event_role
+event_role -right-> view_functions
+
+view_sign_in -right[dashed]-> actor_sign_in
+actor_sign_in -right-> command_authenticate
+command_authenticate -right-> aggregate_authenticate
+aggregate_authenticate -right-> event_authenticated
+event_authenticated -right-> view_session
+
+view_profile_in -right[dashed]-> actor_profile
+actor_profile -right-> command_profile
+command_profile -right-> aggregate_profile
+aggregate_profile -right-> event_profile
+event_profile -right-> view_profile_out
+
+actor_admin_register -[hidden]down-> actor_admin_role
+actor_admin_role -[hidden]down-> actor_sign_in
+actor_sign_in -[hidden]down-> actor_profile
+
+legend bottom
+  |= Color |= EventStorming Element |
+  |<#FFF3A6> | Actor |
+  |<#A9C7F7> | Command |
+  |<#FFE27A> | Aggregate Root |
+  |<#FFB26B> | Domain Event |
+  |<#C9A7E8> | Business Process / Policy |
+  |<#F5A3D7> | External System |
+  |<#B9D98A> | View / Read Model |
+  |<#FF8A80> | Question / Risk |
+endlegend
+@enduml
