@@ -1,0 +1,286 @@
+@startuml
+left to right direction
+
+package "Molinex.OperationalIntelligence.Interfaces.REST" as Interfaces {
+  class OperationalReadingsController <<Integration Controller>> {
+    +Ingest(resource : SensorReadingResource) : ActionResult
+    +GetHistory() : ActionResult
+  }
+  class AnomaliesController <<REST Controller>> {
+    +GetAll() : ActionResult
+    +Acknowledge(id : Guid) : ActionResult
+  }
+  class AlertsController <<REST Controller>> {
+    +GetAll() : ActionResult
+    +Acknowledge(id : Guid) : ActionResult
+    +Close(id : Guid) : ActionResult
+  }
+  class IntelligenceResourceAssembler <<Assembler>> {
+    +{static} ToCommand(resource : SensorReadingResource) : RegisterOperationalReadingCommand
+    +{static} ToResource(model : OperationalAnomaly) : AnomalyResource
+    +{static} ToResource(model : Alert) : AlertResource
+  }
+  class SensorReadingResource <<Request Resource>> <<(R,#FF7700)>> {
+    +MachineId : Guid
+    +VariableName : string
+    +Value : decimal
+    +UnitSymbol : string
+    +RecordedAt : DateTimeOffset
+  }
+  class AnomalyResource <<Response Resource>> <<(R,#FF7700)>> {
+    +Id : Guid
+    +ReadingId : Guid
+    +VariableName : string
+    +Value : decimal
+    +UnitSymbol : string
+    +Status : string
+  }
+  class AlertResource <<Response Resource>> <<(R,#FF7700)>> {
+    +Id : Guid
+    +AnomalyId : Guid
+    +Priority : string
+    +Status : string
+  }
+}
+
+package "Molinex.OperationalIntelligence.Application" as Application {
+  class IntelligenceCommandService <<Command Service>> {
+    +HandleAsync(command : RegisterOperationalReadingCommand) : Task<OperationalReadingId>
+    +HandleAsync(command : AcknowledgeAnomalyCommand) : Task
+    +HandleAsync(command : AttendAlertCommand) : Task
+  }
+  class IntelligenceQueryService <<Query Service>> {
+    +GetReadingsAsync() : Task<OperationalReading[]>
+    +GetAnomaliesAsync() : Task<OperationalAnomaly[]>
+    +GetAlertsAsync() : Task<Alert[]>
+    +GetRecommendationsAsync() : Task<MaintenanceRecommendation[]>
+  }
+  class RegisterOperationalReadingCommand <<Command>> {
+    +MachineId : Guid
+    +VariableName : string
+    +Value : decimal
+    +UnitSymbol : string
+    +RecordedAt : DateTimeOffset
+  }
+  class AcknowledgeAnomalyCommand <<Command>> {
+    +AnomalyId : Guid
+  }
+  class AttendAlertCommand <<Command>> {
+    +AlertId : Guid
+    +Action : string
+  }
+}
+
+package "Molinex.OperationalIntelligence.Domain.Model" as DomainModel {
+  class OperationalReading <<Aggregate Root>> {
+    -_id : OperationalReadingId
+    -_machineId : MachineId
+    -_measurement : OperationalMeasurement
+    -_recordedAt : ReadingDateTime
+  }
+  class OperationalAnomaly <<Aggregate Root>> {
+    -_id : OperationalAnomalyId
+    -_readingId : OperationalReadingId
+    -_measurement : OperationalMeasurement
+    -_criterion : EvaluationCriterion
+    -_status : AnomalyStatus
+    +Acknowledge() : void
+    +Resolve() : void
+  }
+  class Alert <<Aggregate Root>> {
+    -_id : AlertId
+    -_anomalyId : OperationalAnomalyId
+    -_priority : AlertPriority
+    -_status : AlertStatus
+    +Acknowledge() : void
+    +Close() : void
+  }
+  class OperationalReadingId <<Value Object>> {
+    -_value : Guid
+  }
+  class OperationalAnomalyId <<Value Object>> {
+    -_value : Guid
+  }
+  class AlertId <<Value Object>> {
+    -_value : Guid
+  }
+  class MachineId <<Value Object>> {
+    -_value : Guid
+  }
+  class VariableName <<Value Object>> {
+    -_value : string
+  }
+  class MeasurementValue <<Value Object>> {
+    -_value : decimal
+  }
+  class UnitSymbol <<Value Object>> {
+    -_value : string
+  }
+  class ReadingDateTime <<Value Object>> {
+    -_value : DateTimeOffset
+  }
+  class OperationalMeasurement <<Value Object>> {
+    -_variable : VariableName
+    -_value : MeasurementValue
+    -_unit : UnitSymbol
+  }
+  class EvaluationCriterion <<Value Object>> {
+    -_minimum : MeasurementValue
+    -_maximum : MeasurementValue
+    +IsViolatedBy(value : MeasurementValue) : bool
+  }
+  enum AnomalyStatus <<Enumeration>> {
+    DETECTED
+    ACKNOWLEDGED
+    RESOLVED
+  }
+  enum AlertPriority <<Enumeration>> {
+    LOW
+    MEDIUM
+    HIGH
+    CRITICAL
+  }
+  enum AlertStatus <<Enumeration>> {
+    OPEN
+    ACKNOWLEDGED
+    CLOSED
+  }
+  class AnomalyDetectionService <<Domain Service>> {
+    +Detect(reading : OperationalReading, criterion : EvaluationCriterion) : OperationalAnomaly?
+  }
+  class MaintenanceRecommendation <<Read Model>> {
+    +MachineId : MachineId
+    +AnomalyId : OperationalAnomalyId
+    +SuggestedAction : string
+    +Priority : AlertPriority
+  }
+  interface ISensorGatewayPort <<Port>> {
+    +Translate(resource : SensorReadingResource) : OperationalReading
+  }
+  interface INotificationPort <<Port>> {
+    +SendOperationalAlertAsync(alert : Alert) : Task
+  }
+  interface IOperationalReadingRepository <<Repository>> {
+    +SaveAsync(reading : OperationalReading) : Task
+    +FindByIdAsync(id : OperationalReadingId) : Task<OperationalReading?>
+  }
+  interface IOperationalAnomalyRepository <<Repository>> {
+    +SaveAsync(anomaly : OperationalAnomaly) : Task
+    +FindByIdAsync(id : OperationalAnomalyId) : Task<OperationalAnomaly?>
+  }
+  interface IAlertRepository <<Repository>> {
+    +SaveAsync(alert : Alert) : Task
+    +FindByIdAsync(id : AlertId) : Task<Alert?>
+  }
+  interface IDomainEventPublisher <<Port>> {
+    +PublishAsync(event : object) : Task
+  }
+  class OperationalReadingRecorded <<Domain Event>> {
+    +ReadingId : OperationalReadingId
+    +OccurredAt : DateTimeOffset
+  }
+  class OperationalAnomalyDetected <<Domain Event>> {
+    +AnomalyId : OperationalAnomalyId
+    +OccurredAt : DateTimeOffset
+  }
+  class OperationalAlertGenerated <<Domain Event>> {
+    +AlertId : AlertId
+    +OccurredAt : DateTimeOffset
+  }
+}
+
+package "Molinex.OperationalIntelligence.Infrastructure.Persistence.EFC" as Infrastructure {
+  class IntelligenceDbContext <<EF Core DbContext>> {
+    +OperationalReadings : DbSet<OperationalReading>
+    +OperationalAnomalies : DbSet<OperationalAnomaly>
+    +Alerts : DbSet<Alert>
+    +SaveChangesAsync() : Task<int>
+  }
+  class SensorGatewayAdapter <<Telemetry Adapter>> {
+    +Translate(resource : SensorReadingResource) : OperationalReading
+  }
+  class NotificationDeliveryAdapter <<Notification Adapter>> {
+    -_httpClient : HttpClient
+    +SendOperationalAlertAsync(alert : Alert) : Task
+  }
+  class OperationalReadingRepositoryAdapter <<Repository Adapter>> {
+    -_context : IntelligenceDbContext
+    +SaveAsync(reading : OperationalReading) : Task
+    +FindByIdAsync(id : OperationalReadingId) : Task<OperationalReading?>
+  }
+  class OperationalAnomalyRepositoryAdapter <<Repository Adapter>> {
+    -_context : IntelligenceDbContext
+    +SaveAsync(anomaly : OperationalAnomaly) : Task
+    +FindByIdAsync(id : OperationalAnomalyId) : Task<OperationalAnomaly?>
+  }
+  class AlertRepositoryAdapter <<Repository Adapter>> {
+    -_context : IntelligenceDbContext
+    +SaveAsync(alert : Alert) : Task
+    +FindByIdAsync(id : AlertId) : Task<Alert?>
+  }
+  class DomainEventPublisherAdapter <<Event Publisher Adapter>> {
+    +PublishAsync(event : object) : Task
+  }
+}
+
+OperationalReadingsController ..> IntelligenceCommandService
+OperationalReadingsController ..> IntelligenceQueryService
+OperationalReadingsController ..> IntelligenceResourceAssembler
+AnomaliesController ..> IntelligenceCommandService
+AnomaliesController ..> IntelligenceQueryService
+AnomaliesController ..> IntelligenceResourceAssembler
+AlertsController ..> IntelligenceCommandService
+AlertsController ..> IntelligenceQueryService
+AlertsController ..> IntelligenceResourceAssembler
+IntelligenceResourceAssembler ..> SensorReadingResource : uses
+IntelligenceResourceAssembler ..> AnomalyResource : creates
+IntelligenceResourceAssembler ..> AlertResource : creates
+IntelligenceResourceAssembler ..> RegisterOperationalReadingCommand : creates
+IntelligenceResourceAssembler ..> AcknowledgeAnomalyCommand : creates
+IntelligenceResourceAssembler ..> AttendAlertCommand : creates
+IntelligenceResourceAssembler ..> OperationalAnomaly : uses
+IntelligenceResourceAssembler ..> Alert : uses
+IntelligenceCommandService ..> RegisterOperationalReadingCommand : handles
+IntelligenceCommandService ..> AcknowledgeAnomalyCommand : handles
+IntelligenceCommandService ..> AttendAlertCommand : handles
+IntelligenceCommandService ..> IOperationalReadingRepository
+IntelligenceCommandService ..> IOperationalAnomalyRepository
+IntelligenceCommandService ..> IAlertRepository
+IntelligenceCommandService ..> AnomalyDetectionService
+IntelligenceCommandService ..> INotificationPort
+IntelligenceCommandService ..> IDomainEventPublisher
+IntelligenceQueryService ..> IOperationalReadingRepository
+IntelligenceQueryService ..> IOperationalAnomalyRepository
+IntelligenceQueryService ..> IAlertRepository
+IntelligenceQueryService ..> MaintenanceRecommendation : creates
+OperationalReading *-- OperationalReadingId
+OperationalReading *-- MachineId : references by identity
+OperationalReading *-- OperationalMeasurement
+OperationalReading *-- ReadingDateTime
+OperationalMeasurement *-- VariableName
+OperationalMeasurement *-- MeasurementValue
+OperationalMeasurement *-- UnitSymbol
+OperationalAnomaly *-- OperationalAnomalyId
+OperationalAnomaly *-- OperationalReadingId : references by identity
+OperationalAnomaly *-- OperationalMeasurement
+OperationalAnomaly *-- EvaluationCriterion
+OperationalAnomaly --> AnomalyStatus
+Alert *-- AlertId
+Alert *-- OperationalAnomalyId : references by identity
+Alert --> AlertPriority
+Alert --> AlertStatus
+OperationalReading ..> OperationalReadingRecorded : raises
+OperationalAnomaly ..> OperationalAnomalyDetected : raises
+Alert ..> OperationalAlertGenerated : raises
+SensorGatewayAdapter ..|> ISensorGatewayPort
+NotificationDeliveryAdapter ..|> INotificationPort
+OperationalReadingRepositoryAdapter ..|> IOperationalReadingRepository
+OperationalAnomalyRepositoryAdapter ..|> IOperationalAnomalyRepository
+AlertRepositoryAdapter ..|> IAlertRepository
+DomainEventPublisherAdapter ..|> IDomainEventPublisher
+OperationalReadingRepositoryAdapter --> IntelligenceDbContext
+OperationalAnomalyRepositoryAdapter --> IntelligenceDbContext
+AlertRepositoryAdapter --> IntelligenceDbContext
+@enduml
+
+

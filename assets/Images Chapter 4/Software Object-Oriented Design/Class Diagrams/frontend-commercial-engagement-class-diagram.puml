@@ -1,0 +1,163 @@
+@startuml
+left to right direction
+
+package "Application" {
+  class useCommercialStore <<Pinia Store>> {
+    +plans : Plan[]
+    +valueProposition : ValueProposition?
+    +inquiry : CommercialInquiry?
+    +plansLoaded : boolean
+    +errors : string[]
+    +fetchPlans() : Promise<void>
+    +fetchValueProposition() : Promise<void>
+    +submitInquiry(inquiry : CommercialInquiry) : Promise<void>
+  }
+}
+
+package "Domain Model" {
+  class CommercialInquiry <<Aggregate Root>> {
+    -#id : CommercialInquiryId
+    -#contact : ContactInformation
+    -#message : InquiryMessage
+    -#submittedAt : SubmissionDateTime
+    +id : CommercialInquiryId
+    +contact : ContactInformation
+    +message : InquiryMessage
+    +submittedAt : SubmissionDateTime
+    +submit(contact, message, submittedAt) : CommercialInquiry
+  }
+  class Plan <<Read Model>> {
+    -#id : PlanId
+    -#name : PlanName
+    -#price : PriceLabel
+    -#features : string[]
+    +id : PlanId
+    +name : PlanName
+    +price : PriceLabel
+    +features : string[]
+  }
+  class ValueProposition <<Read Model>> {
+    -#headline : PropositionHeadline
+    -#benefits : string[]
+    +headline : PropositionHeadline
+    +benefits : string[]
+  }
+  class CommercialInquiryId <<Value Object>> {
+    -#value : string
+  }
+  class PlanId <<Value Object>> {
+    -#value : string
+  }
+  class PlanName <<Value Object>> {
+    -#value : string
+  }
+  class PriceLabel <<Value Object>> {
+    -#value : string
+  }
+  class PropositionHeadline <<Value Object>> {
+    -#value : string
+  }
+  class FullName <<Value Object>> {
+    -#value : string
+  }
+  class CompanyName <<Value Object>> {
+    -#value : string
+  }
+  class EmailAddress <<Value Object>> {
+    -#value : string
+    +isValid() : boolean
+  }
+  class PhoneNumber <<Value Object>> {
+    -#value : string
+    +isValid() : boolean
+  }
+  class InquiryMessage <<Value Object>> {
+    -#value : string
+    +isBlank() : boolean
+  }
+  class SubmissionDateTime <<Value Object>> {
+    -#value : Date
+  }
+  class ContactInformation <<Value Object>> {
+    -#fullName : FullName
+    -#email : EmailAddress
+    -#phone : PhoneNumber?
+    -#companyName : CompanyName
+  }
+}
+
+package "Infrastructure" {
+  class CommercialApi <<HTTP Adapter>> {
+    -#plansEndpoint : BaseEndpoint
+    -#valuePropositionEndpoint : BaseEndpoint
+    -#inquiriesEndpoint : BaseEndpoint
+    +getPlans() : Promise<PlanResource[]>
+    +getValueProposition() : Promise<ValuePropositionResource>
+    +createInquiry(resource : CommercialInquiryResource) : Promise<CommercialInquiryResource>
+  }
+  class PlanAssembler <<Assembler>> {
+    +{static} toEntity(resource : PlanResource) : Plan
+    +{static} toEntities(response) : Plan[]
+  }
+  class ValuePropositionAssembler <<Assembler>> {
+    +{static} toEntity(resource : ValuePropositionResource) : ValueProposition
+  }
+  class CommercialInquiryAssembler <<Assembler>> {
+    +{static} toEntity(resource : CommercialInquiryResource) : CommercialInquiry
+    +{static} toResource(entity : CommercialInquiry) : CommercialInquiryResource
+  }
+  interface PlanResource <<Resource>> <<(R,#FF7700)>> {
+    +id : string
+    +name : string
+    +priceLabel : string
+    +features : string[]
+  }
+  interface ValuePropositionResource <<Resource>> <<(R,#FF7700)>> {
+    +headline : string
+    +benefits : string[]
+  }
+  interface CommercialInquiryResource <<Resource>> <<(R,#FF7700)>> {
+    +id : string
+    +fullName : string
+    +email : string
+    +phone : string?
+    +companyName : string
+    +message : string
+    +submittedAt : string
+  }
+}
+
+package "Shared Kernel (reference)" {
+  class BaseApi <<Shared Infrastructure>>
+  class BaseEndpoint <<Shared Infrastructure>>
+}
+
+useCommercialStore o-- Plan
+useCommercialStore o-- ValueProposition
+useCommercialStore o-- CommercialInquiry
+useCommercialStore ..> CommercialApi
+useCommercialStore ..> PlanAssembler
+useCommercialStore ..> ValuePropositionAssembler
+useCommercialStore ..> CommercialInquiryAssembler
+CommercialInquiry *-- CommercialInquiryId
+CommercialInquiry *-- ContactInformation
+CommercialInquiry *-- InquiryMessage
+CommercialInquiry *-- SubmissionDateTime
+ContactInformation *-- FullName
+ContactInformation *-- EmailAddress
+ContactInformation o-- PhoneNumber
+ContactInformation *-- CompanyName
+Plan *-- PlanId
+Plan *-- PlanName
+Plan *-- PriceLabel
+ValueProposition *-- PropositionHeadline
+CommercialApi --|> BaseApi
+CommercialApi *-- BaseEndpoint
+PlanAssembler ..> PlanResource
+PlanAssembler ..> Plan : builds
+ValuePropositionAssembler ..> ValuePropositionResource
+ValuePropositionAssembler ..> ValueProposition : builds
+CommercialInquiryAssembler ..> CommercialInquiryResource
+CommercialInquiryAssembler ..> CommercialInquiry : builds
+@enduml
+

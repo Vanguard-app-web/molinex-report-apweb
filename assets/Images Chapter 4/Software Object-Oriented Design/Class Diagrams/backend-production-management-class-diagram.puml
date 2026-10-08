@@ -1,0 +1,338 @@
+@startuml
+left to right direction
+
+package "Molinex.ProductionManagement.Interfaces.REST" as Interfaces {
+  class RawMaterialReceptionsController <<REST Controller>> {
+    +Create(resource : CreateRawMaterialReceptionResource) : ActionResult
+    +GetById(id : Guid) : ActionResult
+    +GetAll() : ActionResult
+  }
+  class ProductionBatchesController <<REST Controller>> {
+    +Create(resource : CreateProductionBatchResource) : ActionResult
+    +GetById(id : Guid) : ActionResult
+    +GetAvailable() : ActionResult
+  }
+  class ProductionRecordsController <<REST Controller>> {
+    +Create(resource : CreateProductionRecordResource) : ActionResult
+    +Update(id : Guid, resource : UpdateProductionRecordResource) : ActionResult
+    +GetHistory() : ActionResult
+  }
+
+  class CreateRawMaterialReceptionResource <<Request Resource>> <<(R,#FF7700)>> {
+    +ReceivedAt : DateTimeOffset
+    +Supplier : string
+    +Origin : string
+    +Quantity : decimal
+    +Unit : string
+  }
+  class CreateProductionBatchResource <<Request Resource>> <<(R,#FF7700)>> {
+    +Code : string
+    +ReceptionId : Guid
+    +RegisteredAt : DateTimeOffset
+  }
+  class CreateProductionRecordResource <<Request Resource>> <<(R,#FF7700)>> {
+    +BatchId : Guid
+    +ProcessName : string
+    +ProcessedWeight : decimal
+    +Unit : string
+    +StartedAt : DateTimeOffset
+  }
+  class UpdateProductionRecordResource <<Request Resource>> <<(R,#FF7700)>> {
+    +ProcessName : string
+    +ProcessedWeight : decimal
+    +Unit : string
+    +StartedAt : DateTimeOffset
+    +FinishedAt : DateTimeOffset?
+    +Status : string
+  }
+  class RawMaterialReceptionResource <<Response Resource>> <<(R,#FF7700)>> {
+    +Id : Guid
+    +ReceivedAt : DateTimeOffset
+    +Supplier : string
+    +Origin : string
+    +Quantity : decimal
+    +Unit : string
+  }
+  class ProductionBatchResource <<Response Resource>> <<(R,#FF7700)>> {
+    +Id : Guid
+    +Code : string
+    +ReceptionId : Guid
+    +RegisteredAt : DateTimeOffset
+  }
+  class ProductionRecordResource <<Response Resource>> <<(R,#FF7700)>> {
+    +Id : Guid
+    +BatchId : Guid
+    +ProcessName : string
+    +ProcessedWeight : decimal
+    +Unit : string
+    +StartedAt : DateTimeOffset
+    +FinishedAt : DateTimeOffset?
+    +Status : string
+  }
+
+  class ProductionResourceAssembler <<Assembler>> {
+    +{static} ToCommand(resource : CreateRawMaterialReceptionResource) : RecordRawMaterialReceptionCommand
+    +{static} ToCommand(resource : CreateProductionBatchResource) : RegisterProductionBatchCommand
+    +{static} ToCommand(resource : CreateProductionRecordResource) : RegisterProductionRecordCommand
+    +{static} ToCommand(id : Guid, resource : UpdateProductionRecordResource) : UpdateProductionRecordCommand
+    +{static} ToResource(model : RawMaterialReception) : RawMaterialReceptionResource
+    +{static} ToResource(model : ProductionBatch) : ProductionBatchResource
+    +{static} ToResource(model : ProductionRecord) : ProductionRecordResource
+  }
+}
+
+package "Molinex.ProductionManagement.Application" as Application {
+  class ProductionCommandService <<Application Service>> {
+    +HandleAsync(command : RecordRawMaterialReceptionCommand) : Task<RawMaterialReceptionId>
+    +HandleAsync(command : RegisterProductionBatchCommand) : Task<ProductionBatchId>
+    +HandleAsync(command : RegisterProductionRecordCommand) : Task<ProductionRecordId>
+    +HandleAsync(command : UpdateProductionRecordCommand) : Task
+  }
+
+  class ProductionQueryService <<Application Service>> {
+    +GetReceptionByIdAsync(id : RawMaterialReceptionId) : Task<RawMaterialReception?>
+    +GetAvailableReceptionsAsync() : Task<RawMaterialReception[]>
+    +GetBatchByIdAsync(id : ProductionBatchId) : Task<ProductionBatch?>
+    +GetAvailableBatchesAsync() : Task<ProductionBatch[]>
+    +GetProductionHistoryAsync() : Task<ProductionRecord[]>
+  }
+
+  class RecordRawMaterialReceptionCommand <<Command>> {
+    +ReceivedAt : DateTimeOffset
+    +Supplier : string
+    +Origin : string
+    +Quantity : decimal
+    +Unit : string
+  }
+  class RegisterProductionBatchCommand <<Command>> {
+    +Code : string
+    +ReceptionId : Guid
+    +RegisteredAt : DateTimeOffset
+  }
+  class RegisterProductionRecordCommand <<Command>> {
+    +BatchId : Guid
+    +ProcessName : string
+    +ProcessedWeight : decimal
+    +Unit : string
+    +StartedAt : DateTimeOffset
+  }
+  class UpdateProductionRecordCommand <<Command>> {
+    +RecordId : Guid
+    +ProcessName : string
+    +ProcessedWeight : decimal
+    +Unit : string
+    +StartedAt : DateTimeOffset
+    +FinishedAt : DateTimeOffset?
+    +Status : string
+  }
+}
+
+package "Molinex.ProductionManagement.Domain.Model" as DomainModel {
+  class RawMaterialReception <<Aggregate Root>> {
+    -_id : RawMaterialReceptionId
+    -_receivedAt : ReceptionDateTime
+    -_supplier : Supplier
+    -_origin : MaterialOrigin
+    -_quantity : Weight
+    --
+    +Record(receivedAt, supplier, origin, quantity) : RawMaterialReception
+  }
+  class ProductionBatch <<Aggregate Root>> {
+    -_id : ProductionBatchId
+    -_code : BatchCode
+    -_receptionId : RawMaterialReceptionId
+    -_registeredAt : BatchRegistrationDateTime
+    --
+    +Register(code, receptionId, registeredAt) : ProductionBatch
+  }
+  class ProductionRecord <<Aggregate Root>> {
+    -_id : ProductionRecordId
+    -_batchId : ProductionBatchId
+    -_details : ProductionDetails
+    --
+    +Record(batchId, details) : ProductionRecord
+    +UpdateDetails(details : ProductionDetails) : void
+  }
+
+  class RawMaterialReceptionId <<Value Object>> {
+    -_value : Guid
+  }
+  class ProductionBatchId <<Value Object>> {
+    -_value : Guid
+  }
+  class ProductionRecordId <<Value Object>> {
+    -_value : Guid
+  }
+  class ReceptionDateTime <<Value Object>> {
+    -_value : DateTimeOffset
+    +IsNotInFuture() : bool
+  }
+  class BatchRegistrationDateTime <<Value Object>> {
+    -_value : DateTimeOffset
+  }
+  class BatchCode <<Value Object>> {
+    -_value : string
+  }
+  class Supplier <<Value Object>> {
+    -_name : string
+  }
+  class MaterialOrigin <<Value Object>> {
+    -_description : string
+  }
+  class ProductionProcessName <<Value Object>> {
+    -_value : string
+  }
+  class ProductionPeriod <<Value Object>> {
+    -_startedAt : DateTimeOffset
+    -_finishedAt : DateTimeOffset?
+    +IsChronologicallyValid() : bool
+  }
+  class ProductionDetails <<Value Object>> {
+    -_processName : ProductionProcessName
+    -_processedWeight : Weight
+    -_period : ProductionPeriod
+    -_status : ProductionStatus
+  }
+  enum ProductionStatus <<Enumeration>> {
+    REGISTERED
+    IN_PROGRESS
+    COMPLETED
+  }
+
+  interface IRawMaterialReceptionRepository <<Repository>> {
+    +SaveAsync(reception : RawMaterialReception) : Task
+    +FindByIdAsync(id : RawMaterialReceptionId) : Task<RawMaterialReception?>
+  }
+  interface IProductionBatchRepository <<Repository>> {
+    +SaveAsync(batch : ProductionBatch) : Task
+    +FindByIdAsync(id : ProductionBatchId) : Task<ProductionBatch?>
+    +ExistsByCodeAsync(code : BatchCode) : Task<bool>
+  }
+  interface IProductionRecordRepository <<Repository>> {
+    +SaveAsync(record : ProductionRecord) : Task
+    +FindByIdAsync(id : ProductionRecordId) : Task<ProductionRecord?>
+  }
+  interface IDomainEventPublisher <<Port>> {
+    +PublishAsync(event : object) : Task
+  }
+
+  class RawMaterialReceptionRecorded <<Domain Event>> {
+    +ReceptionId : RawMaterialReceptionId
+    +OccurredAt : DateTimeOffset
+  }
+  class ProductionBatchRegistered <<Domain Event>> {
+    +BatchId : ProductionBatchId
+    +ReceptionId : RawMaterialReceptionId
+    +OccurredAt : DateTimeOffset
+  }
+  class ProductionRecordRegistered <<Domain Event>> {
+    +RecordId : ProductionRecordId
+    +BatchId : ProductionBatchId
+    +OccurredAt : DateTimeOffset
+  }
+  class ProductionRecordDetailsUpdated <<Domain Event>> {
+    +RecordId : ProductionRecordId
+    +OccurredAt : DateTimeOffset
+  }
+}
+
+package "Molinex.ProductionManagement.Infrastructure.Persistence.EFC" as Infrastructure {
+  class ProductionDbContext <<EF Core DbContext>> {
+    +RawMaterialReceptions : DbSet<RawMaterialReception>
+    +ProductionBatches : DbSet<ProductionBatch>
+    +ProductionRecords : DbSet<ProductionRecord>
+  }
+  class RawMaterialReceptionRepositoryAdapter <<Repository Adapter>> {
+    -_context : ProductionDbContext
+    +SaveAsync(reception : RawMaterialReception) : Task
+    +FindByIdAsync(id : RawMaterialReceptionId) : Task<RawMaterialReception?>
+  }
+  class ProductionBatchRepositoryAdapter <<Repository Adapter>> {
+    -_context : ProductionDbContext
+    +SaveAsync(batch : ProductionBatch) : Task
+    +FindByIdAsync(id : ProductionBatchId) : Task<ProductionBatch?>
+    +ExistsByCodeAsync(code : BatchCode) : Task<bool>
+  }
+  class ProductionRecordRepositoryAdapter <<Repository Adapter>> {
+    -_context : ProductionDbContext
+    +SaveAsync(record : ProductionRecord) : Task
+    +FindByIdAsync(id : ProductionRecordId) : Task<ProductionRecord?>
+  }
+  class DomainEventPublisherAdapter <<Event Publisher Adapter>> {
+    +PublishAsync(event : object) : Task
+  }
+}
+
+package "Molinex.Shared.Domain.Model.ValueObjects (reference)" as SharedReference {
+  class Weight <<Shared Value Object>>
+}
+
+RawMaterialReceptionsController ..> ProductionResourceAssembler
+ProductionBatchesController ..> ProductionResourceAssembler
+ProductionRecordsController ..> ProductionResourceAssembler
+RawMaterialReceptionsController ..> ProductionCommandService
+RawMaterialReceptionsController ..> ProductionQueryService
+ProductionBatchesController ..> ProductionCommandService
+ProductionBatchesController ..> ProductionQueryService
+ProductionRecordsController ..> ProductionCommandService
+ProductionRecordsController ..> ProductionQueryService
+
+ProductionResourceAssembler ..> CreateRawMaterialReceptionResource : uses
+ProductionResourceAssembler ..> CreateProductionBatchResource : uses
+ProductionResourceAssembler ..> CreateProductionRecordResource : uses
+ProductionResourceAssembler ..> UpdateProductionRecordResource : uses
+ProductionResourceAssembler ..> RawMaterialReceptionResource : creates
+ProductionResourceAssembler ..> ProductionBatchResource : creates
+ProductionResourceAssembler ..> ProductionRecordResource : creates
+ProductionResourceAssembler ..> RecordRawMaterialReceptionCommand : creates
+ProductionResourceAssembler ..> RegisterProductionBatchCommand : creates
+ProductionResourceAssembler ..> RegisterProductionRecordCommand : creates
+ProductionResourceAssembler ..> UpdateProductionRecordCommand : creates
+ProductionResourceAssembler ..> RawMaterialReception : uses
+ProductionResourceAssembler ..> ProductionBatch : uses
+ProductionResourceAssembler ..> ProductionRecord : uses
+
+ProductionCommandService ..> RecordRawMaterialReceptionCommand : handles
+ProductionCommandService ..> RegisterProductionBatchCommand : handles
+ProductionCommandService ..> RegisterProductionRecordCommand : handles
+ProductionCommandService ..> UpdateProductionRecordCommand : handles
+ProductionCommandService ..> IRawMaterialReceptionRepository
+ProductionCommandService ..> IProductionBatchRepository
+ProductionCommandService ..> IProductionRecordRepository
+ProductionCommandService ..> IDomainEventPublisher
+ProductionQueryService ..> IRawMaterialReceptionRepository
+ProductionQueryService ..> IProductionBatchRepository
+ProductionQueryService ..> IProductionRecordRepository
+
+RawMaterialReception *-- RawMaterialReceptionId
+RawMaterialReception *-- ReceptionDateTime
+RawMaterialReception *-- Supplier
+RawMaterialReception *-- MaterialOrigin
+RawMaterialReception *-- Weight
+ProductionBatch *-- ProductionBatchId
+ProductionBatch *-- BatchCode
+ProductionBatch *-- RawMaterialReceptionId : references by identity
+ProductionBatch *-- BatchRegistrationDateTime
+ProductionRecord *-- ProductionRecordId
+ProductionRecord *-- ProductionBatchId : references by identity
+ProductionRecord *-- ProductionDetails
+ProductionDetails *-- ProductionProcessName
+ProductionDetails *-- Weight
+ProductionDetails *-- ProductionPeriod
+ProductionDetails --> ProductionStatus
+
+RawMaterialReception ..> RawMaterialReceptionRecorded : raises
+ProductionBatch ..> ProductionBatchRegistered : raises
+ProductionRecord ..> ProductionRecordRegistered : raises
+ProductionRecord ..> ProductionRecordDetailsUpdated : raises
+
+RawMaterialReceptionRepositoryAdapter ..|> IRawMaterialReceptionRepository
+ProductionBatchRepositoryAdapter ..|> IProductionBatchRepository
+ProductionRecordRepositoryAdapter ..|> IProductionRecordRepository
+DomainEventPublisherAdapter ..|> IDomainEventPublisher
+RawMaterialReceptionRepositoryAdapter --> ProductionDbContext
+ProductionBatchRepositoryAdapter --> ProductionDbContext
+ProductionRecordRepositoryAdapter --> ProductionDbContext
+
+@enduml
+

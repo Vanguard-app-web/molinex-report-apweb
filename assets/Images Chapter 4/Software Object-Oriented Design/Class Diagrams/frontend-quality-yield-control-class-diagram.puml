@@ -1,0 +1,210 @@
+@startuml
+left to right direction
+
+package "Application" {
+  class useQualityStore <<Pinia Store>> {
+    +assessments : QualityAssessment[]
+    +wasteRecords : WasteRecord[]
+    +indicators : YieldIndicator[]
+    +composition : RiceComposition?
+    +comparisons : QualityComparison[]
+    +deviations : QualityDeviation[]
+    +errors : string[]
+    +fetchQualityData() : Promise<void>
+    +recordAssessment(assessment : QualityAssessment) : Promise<void>
+    +recordWaste(record : WasteRecord) : Promise<void>
+    +fetchIndicators() : Promise<void>
+    +fetchComparisons() : Promise<void>
+  }
+}
+
+package "Domain Model" {
+  class QualityAssessment <<Aggregate Root>> {
+    -#id : QualityAssessmentId
+    -#productionRecordId : ProductionRecordId
+    -#measurements : QualityMeasurement[]
+    -#assessedAt : AssessmentDateTime
+    +recordMeasurement(measurement : QualityMeasurement) : void
+    +hasValidPercentages() : boolean
+  }
+  class WasteRecord <<Aggregate Root>> {
+    -#id : WasteRecordId
+    -#productionRecordId : ProductionRecordId
+    -#quantity : Weight
+    -#baseWeight : Weight?
+    -#percentage : Percentage?
+    +calculatePercentage() : Percentage?
+  }
+  class QualityDeviation <<Aggregate Root>> {
+    -#id : QualityDeviationId
+    -#source : DeviationSource
+    -#measurement : QualityMeasurement
+    -#detectedAt : DetectionDateTime
+  }
+  class QualityAssessmentId <<Value Object>> {
+    -#value : string
+  }
+  class WasteRecordId <<Value Object>> {
+    -#value : string
+  }
+  class QualityDeviationId <<Value Object>> {
+    -#value : string
+  }
+  class ProductionRecordId <<Value Object>> {
+    -#value : string
+  }
+  class AssessmentDateTime <<Value Object>> {
+    -#value : Date
+  }
+  class DetectionDateTime <<Value Object>> {
+    -#value : Date
+  }
+  class Percentage <<Value Object>> {
+    -#value : number
+    +isValid() : boolean
+  }
+  class QualityRange <<Value Object>> {
+    -#minimum : Percentage
+    -#maximum : Percentage
+    +contains(value : Percentage) : boolean
+  }
+  class QualityMeasurement <<Value Object>> {
+    -#indicator : QualityIndicator
+    -#value : Percentage
+    -#expectedRange : QualityRange
+    +isOutsideExpectedRange() : boolean
+  }
+  class DeviationSource <<Value Object>> {
+    -#sourceId : string
+    -#sourceType : DeviationSourceType
+  }
+  class YieldIndicator <<Read Model>> {
+    +name : string
+    +value : Percentage
+  }
+  class RiceComposition <<Read Model>> {
+    +wholeGrain : Percentage
+    +brokenGrain : Percentage
+  }
+  class QualityComparison <<Read Model>> {
+    +current : Percentage
+    +previous : Percentage
+  }
+  enum QualityIndicator <<Enumeration>> {
+    WHOLE_GRAIN_PERCENTAGE
+    BROKEN_GRAIN_PERCENTAGE
+    YIELD_PERCENTAGE
+  }
+  enum DeviationSourceType <<Enumeration>> {
+    QUALITY_ASSESSMENT
+    WASTE_RECORD
+  }
+}
+
+package "Infrastructure" {
+  class QualityApi <<HTTP Adapter>> {
+    -#assessmentsEndpoint : BaseEndpoint
+    -#wasteEndpoint : BaseEndpoint
+    -#indicatorsEndpoint : BaseEndpoint
+    -#comparisonsEndpoint : BaseEndpoint
+    -#deviationsEndpoint : BaseEndpoint
+    +getAssessments() : Promise<QualityAssessmentResource[]>
+    +createAssessment(resource : QualityAssessmentResource) : Promise<QualityAssessmentResource>
+    +getWasteRecords() : Promise<WasteRecordResource[]>
+    +createWasteRecord(resource : WasteRecordResource) : Promise<WasteRecordResource>
+    +getIndicators() : Promise<YieldIndicatorResource[]>
+    +getComparisons() : Promise<QualityComparisonResource[]>
+    +getDeviations() : Promise<QualityDeviationResource[]>
+  }
+  class QualityAssessmentAssembler <<Assembler>> {
+    +{static} toEntity(resource : QualityAssessmentResource) : QualityAssessment
+    +{static} toResource(entity : QualityAssessment) : QualityAssessmentResource
+  }
+  class WasteRecordAssembler <<Assembler>> {
+    +{static} toEntity(resource : WasteRecordResource) : WasteRecord
+    +{static} toResource(entity : WasteRecord) : WasteRecordResource
+  }
+  class YieldIndicatorAssembler <<Assembler>> {
+    +{static} toModel(resource : YieldIndicatorResource) : YieldIndicator
+  }
+  class QualityComparisonAssembler <<Assembler>> {
+    +{static} toModel(resource : QualityComparisonResource) : QualityComparison
+  }
+  class QualityDeviationAssembler <<Assembler>> {
+    +{static} toEntity(resource : QualityDeviationResource) : QualityDeviation
+  }
+  interface QualityAssessmentResource <<Resource>> <<(R,#FF7700)>> {
+    +id : string
+    +productionRecordId : string
+    +measurements : object[]
+    +assessedAt : string
+  }
+  interface WasteRecordResource <<Resource>> <<(R,#FF7700)>> {
+    +id : string
+    +productionRecordId : string
+    +quantityValue : number
+    +quantityUnit : string
+    +baseWeightValue : number?
+    +percentage : number?
+  }
+  interface YieldIndicatorResource <<Resource>> <<(R,#FF7700)>> {
+    +name : string
+    +value : number
+  }
+  interface QualityComparisonResource <<Resource>> <<(R,#FF7700)>> {
+    +current : number
+    +previous : number
+  }
+  interface QualityDeviationResource <<Resource>> <<(R,#FF7700)>> {
+    +id : string
+    +sourceId : string
+    +sourceType : string
+    +indicator : string
+    +observedValue : number
+  }
+}
+
+package "Shared Kernel (reference)" {
+  class Weight <<Shared Value Object>>
+  class BaseApi <<Shared Infrastructure>>
+  class BaseEndpoint <<Shared Infrastructure>>
+}
+
+useQualityStore o-- QualityAssessment
+useQualityStore o-- WasteRecord
+useQualityStore o-- YieldIndicator
+useQualityStore o-- RiceComposition
+useQualityStore o-- QualityComparison
+useQualityStore o-- QualityDeviation
+useQualityStore ..> QualityApi
+QualityAssessment *-- QualityAssessmentId
+QualityAssessment *-- ProductionRecordId : references by identity
+QualityAssessment *-- QualityMeasurement
+QualityAssessment *-- AssessmentDateTime
+WasteRecord *-- WasteRecordId
+WasteRecord *-- ProductionRecordId : references by identity
+WasteRecord *-- Weight
+WasteRecord o-- Percentage
+QualityDeviation *-- QualityDeviationId
+QualityDeviation *-- DeviationSource
+QualityDeviation *-- QualityMeasurement
+QualityDeviation *-- DetectionDateTime
+QualityMeasurement *-- Percentage
+QualityMeasurement *-- QualityRange
+QualityMeasurement --> QualityIndicator
+QualityRange *-- Percentage
+DeviationSource --> DeviationSourceType
+QualityApi --|> BaseApi
+QualityApi *-- BaseEndpoint
+QualityAssessmentAssembler ..> QualityAssessmentResource
+QualityAssessmentAssembler ..> QualityAssessment : maps
+WasteRecordAssembler ..> WasteRecordResource
+WasteRecordAssembler ..> WasteRecord : maps
+YieldIndicatorAssembler ..> YieldIndicatorResource
+YieldIndicatorAssembler ..> YieldIndicator : builds
+QualityComparisonAssembler ..> QualityComparisonResource
+QualityComparisonAssembler ..> QualityComparison : builds
+QualityDeviationAssembler ..> QualityDeviationResource
+QualityDeviationAssembler ..> QualityDeviation : builds
+@enduml
+

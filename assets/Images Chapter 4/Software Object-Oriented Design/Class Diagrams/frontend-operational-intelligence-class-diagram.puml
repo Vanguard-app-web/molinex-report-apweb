@@ -1,0 +1,192 @@
+@startuml
+left to right direction
+
+package "Application" {
+  class useIntelligenceStore <<Pinia Store>> {
+    +readings : OperationalReading[]
+    +anomalies : OperationalAnomaly[]
+    +alerts : Alert[]
+    +recommendations : MaintenanceRecommendation[]
+    +errors : string[]
+    +fetchReadings() : Promise<void>
+    +fetchAnomalies() : Promise<void>
+    +fetchAlerts() : Promise<void>
+    +acknowledgeAlert(id : AlertId) : Promise<void>
+    +fetchRecommendations() : Promise<void>
+  }
+}
+
+package "Domain Model" {
+  class OperationalReading <<Aggregate Root>> {
+    -#id : OperationalReadingId
+    -#machineId : MachineId
+    -#measurement : OperationalMeasurement
+    -#recordedAt : ReadingDateTime
+  }
+  class OperationalAnomaly <<Aggregate Root>> {
+    -#id : OperationalAnomalyId
+    -#readingId : OperationalReadingId
+    -#measurement : OperationalMeasurement
+    -#criterion : EvaluationCriterion
+    -#status : AnomalyStatus
+    +acknowledge() : void
+    +resolve() : void
+  }
+  class Alert <<Aggregate Root>> {
+    -#id : AlertId
+    -#anomalyId : OperationalAnomalyId
+    -#priority : AlertPriority
+    -#status : AlertStatus
+    +acknowledge() : void
+    +close() : void
+  }
+  class OperationalReadingId <<Value Object>> {
+    -#value : string
+  }
+  class OperationalAnomalyId <<Value Object>> {
+    -#value : string
+  }
+  class AlertId <<Value Object>> {
+    -#value : string
+  }
+  class MachineId <<Value Object>> {
+    -#value : string
+  }
+  class VariableName <<Value Object>> {
+    -#value : string
+  }
+  class MeasurementValue <<Value Object>> {
+    -#value : number
+  }
+  class UnitSymbol <<Value Object>> {
+    -#value : string
+  }
+  class ReadingDateTime <<Value Object>> {
+    -#value : Date
+  }
+  class OperationalMeasurement <<Value Object>> {
+    -#variable : VariableName
+    -#value : MeasurementValue
+    -#unit : UnitSymbol
+  }
+  class EvaluationCriterion <<Value Object>> {
+    -#minimum : MeasurementValue
+    -#maximum : MeasurementValue
+    +isViolatedBy(value : MeasurementValue) : boolean
+  }
+  class MaintenanceRecommendation <<Read Model>> {
+    +machineId : MachineId
+    +anomalyId : OperationalAnomalyId
+    +suggestedAction : string
+    +priority : AlertPriority
+  }
+  enum AnomalyStatus <<Enumeration>> {
+    DETECTED
+    ACKNOWLEDGED
+    RESOLVED
+  }
+  enum AlertPriority <<Enumeration>> {
+    LOW
+    MEDIUM
+    HIGH
+    CRITICAL
+  }
+  enum AlertStatus <<Enumeration>> {
+    OPEN
+    ACKNOWLEDGED
+    CLOSED
+  }
+}
+
+package "Infrastructure" {
+  class IntelligenceApi <<HTTP Adapter>> {
+    -#readingsEndpoint : BaseEndpoint
+    -#anomaliesEndpoint : BaseEndpoint
+    -#alertsEndpoint : BaseEndpoint
+    -#recommendationsEndpoint : BaseEndpoint
+    +getReadings() : Promise<OperationalReadingResource[]>
+    +getAnomalies() : Promise<OperationalAnomalyResource[]>
+    +getAlerts() : Promise<AlertResource[]>
+    +updateAlert(resource : AlertResource) : Promise<AlertResource>
+    +getRecommendations() : Promise<MaintenanceRecommendationResource[]>
+  }
+  class OperationalReadingAssembler <<Assembler>> {
+    +{static} toEntity(resource : OperationalReadingResource) : OperationalReading
+  }
+  class OperationalAnomalyAssembler <<Assembler>> {
+    +{static} toEntity(resource : OperationalAnomalyResource) : OperationalAnomaly
+  }
+  class AlertAssembler <<Assembler>> {
+    +{static} toEntity(resource : AlertResource) : Alert
+    +{static} toResource(entity : Alert) : AlertResource
+  }
+  class MaintenanceRecommendationAssembler <<Assembler>> {
+    +{static} toModel(resource : MaintenanceRecommendationResource) : MaintenanceRecommendation
+  }
+  interface OperationalReadingResource <<Resource>> <<(R,#FF7700)>> {
+    +id : string
+    +machineId : string
+    +variableName : string
+    +value : number
+    +unitSymbol : string
+    +recordedAt : string
+  }
+  interface OperationalAnomalyResource <<Resource>> <<(R,#FF7700)>> {
+    +id : string
+    +readingId : string
+    +minimum : number
+    +maximum : number
+    +status : string
+  }
+  interface AlertResource <<Resource>> <<(R,#FF7700)>> {
+    +id : string
+    +anomalyId : string
+    +priority : string
+    +status : string
+  }
+  interface MaintenanceRecommendationResource <<Resource>> <<(R,#FF7700)>> {
+    +machineId : string
+    +anomalyId : string
+    +suggestedAction : string
+    +priority : string
+  }
+}
+
+package "Shared Kernel (reference)" {
+  class BaseApi <<Shared Infrastructure>>
+  class BaseEndpoint <<Shared Infrastructure>>
+}
+
+useIntelligenceStore o-- OperationalReading
+useIntelligenceStore o-- OperationalAnomaly
+useIntelligenceStore o-- Alert
+useIntelligenceStore o-- MaintenanceRecommendation
+useIntelligenceStore ..> IntelligenceApi
+OperationalReading *-- OperationalReadingId
+OperationalReading *-- MachineId : references by identity
+OperationalReading *-- OperationalMeasurement
+OperationalReading *-- ReadingDateTime
+OperationalMeasurement *-- VariableName
+OperationalMeasurement *-- MeasurementValue
+OperationalMeasurement *-- UnitSymbol
+OperationalAnomaly *-- OperationalAnomalyId
+OperationalAnomaly *-- OperationalReadingId : references by identity
+OperationalAnomaly *-- OperationalMeasurement
+OperationalAnomaly *-- EvaluationCriterion
+OperationalAnomaly --> AnomalyStatus
+Alert *-- AlertId
+Alert *-- OperationalAnomalyId : references by identity
+Alert --> AlertPriority
+Alert --> AlertStatus
+IntelligenceApi --|> BaseApi
+IntelligenceApi *-- BaseEndpoint
+OperationalReadingAssembler ..> OperationalReadingResource
+OperationalReadingAssembler ..> OperationalReading : builds
+OperationalAnomalyAssembler ..> OperationalAnomalyResource
+OperationalAnomalyAssembler ..> OperationalAnomaly : builds
+AlertAssembler ..> AlertResource
+AlertAssembler ..> Alert : maps
+MaintenanceRecommendationAssembler ..> MaintenanceRecommendationResource
+MaintenanceRecommendationAssembler ..> MaintenanceRecommendation : builds
+@enduml
+
