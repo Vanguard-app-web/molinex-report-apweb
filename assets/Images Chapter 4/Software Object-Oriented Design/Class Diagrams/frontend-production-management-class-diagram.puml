@@ -1,0 +1,204 @@
+@startuml
+left to right direction
+
+package "Application" {
+  class useProductionStore <<Pinia Store>> {
+    +receptions : RawMaterialReception[]
+    +batches : ProductionBatch[]
+    +productionRecords : ProductionRecord[]
+    +errors : string[]
+    +receptionsLoaded : boolean
+    +batchesLoaded : boolean
+    +recordsLoaded : boolean
+    --
+    +fetchReceptions() : Promise<void>
+    +registerReception(reception : RawMaterialReception) : Promise<void>
+    +fetchBatches() : Promise<void>
+    +registerBatch(batch : ProductionBatch) : Promise<void>
+    +fetchProductionRecords() : Promise<void>
+    +registerProductionRecord(record : ProductionRecord) : Promise<void>
+    +updateProductionRecord(record : ProductionRecord) : Promise<void>
+  }
+}
+
+package "Domain Model" {
+  class RawMaterialReception <<Aggregate Root>> {
+    -#id : RawMaterialReceptionId
+    -#receivedAt : ReceptionDateTime
+    -#supplier : Supplier
+    -#origin : MaterialOrigin
+    -#quantity : Weight
+    --
+    +id : RawMaterialReceptionId
+    +receivedAt : ReceptionDateTime
+    +supplier : Supplier
+    +origin : MaterialOrigin
+    +quantity : Weight
+    +record(receivedAt, supplier, origin, quantity) : RawMaterialReception
+  }
+
+  class ProductionBatch <<Aggregate Root>> {
+    -#id : ProductionBatchId
+    -#code : BatchCode
+    -#receptionId : RawMaterialReceptionId
+    -#registeredAt : BatchRegistrationDateTime
+    --
+    +id : ProductionBatchId
+    +code : BatchCode
+    +receptionId : RawMaterialReceptionId
+    +registeredAt : BatchRegistrationDateTime
+    +register(code, receptionId, registeredAt) : ProductionBatch
+  }
+
+  class ProductionRecord <<Aggregate Root>> {
+    -#id : ProductionRecordId
+    -#batchId : ProductionBatchId
+    -#details : ProductionDetails
+    --
+    +id : ProductionRecordId
+    +batchId : ProductionBatchId
+    +details : ProductionDetails
+    +record(batchId, details) : ProductionRecord
+    +updateDetails(details : ProductionDetails) : void
+  }
+
+  class RawMaterialReceptionId <<Value Object>> {
+    -#value : string
+  }
+  class ProductionBatchId <<Value Object>> {
+    -#value : string
+  }
+  class ProductionRecordId <<Value Object>> {
+    -#value : string
+  }
+  class ReceptionDateTime <<Value Object>> {
+    -#value : Date
+    +isNotInFuture() : boolean
+  }
+  class BatchRegistrationDateTime <<Value Object>> {
+    -#value : Date
+  }
+  class BatchCode <<Value Object>> {
+    -#value : string
+  }
+  class Supplier <<Value Object>> {
+    -#name : string
+  }
+  class MaterialOrigin <<Value Object>> {
+    -#description : string
+  }
+  class ProductionProcessName <<Value Object>> {
+    -#value : string
+  }
+  class ProductionPeriod <<Value Object>> {
+    -#startedAt : Date
+    -#finishedAt : Date?
+    +isChronologicallyValid() : boolean
+  }
+  class ProductionDetails <<Value Object>> {
+    -#processName : ProductionProcessName
+    -#processedWeight : Weight
+    -#period : ProductionPeriod
+    -#status : ProductionStatus
+  }
+  enum ProductionStatus <<Enumeration>> {
+    REGISTERED
+    IN_PROGRESS
+    COMPLETED
+  }
+}
+
+package "Infrastructure" {
+  class ProductionApi <<HTTP Adapter>> {
+    -#rawMaterialReceptionsEndpoint : BaseEndpoint
+    -#productionBatchesEndpoint : BaseEndpoint
+    -#productionRecordsEndpoint : BaseEndpoint
+    --
+    +getReceptions() : Promise<RawMaterialReceptionResource[]>
+    +createReception(resource : RawMaterialReceptionResource) : Promise<RawMaterialReceptionResource>
+    +getBatches() : Promise<ProductionBatchResource[]>
+    +createBatch(resource : ProductionBatchResource) : Promise<ProductionBatchResource>
+    +getProductionRecords() : Promise<ProductionRecordResource[]>
+    +createProductionRecord(resource : ProductionRecordResource) : Promise<ProductionRecordResource>
+    +updateProductionRecord(resource : ProductionRecordResource) : Promise<ProductionRecordResource>
+  }
+
+  class RawMaterialReceptionAssembler <<Assembler>> {
+    +{static} toEntity(resource : RawMaterialReceptionResource) : RawMaterialReception
+    +{static} toResource(entity : RawMaterialReception) : RawMaterialReceptionResource
+  }
+  class ProductionBatchAssembler <<Assembler>> {
+    +{static} toEntity(resource : ProductionBatchResource) : ProductionBatch
+    +{static} toResource(entity : ProductionBatch) : ProductionBatchResource
+  }
+  class ProductionRecordAssembler <<Assembler>> {
+    +{static} toEntity(resource : ProductionRecordResource) : ProductionRecord
+    +{static} toResource(entity : ProductionRecord) : ProductionRecordResource
+  }
+
+  interface RawMaterialReceptionResource <<Resource>> <<(R,#FF7700)>> {
+    +id : string
+    +receivedAt : string
+    +supplier : string
+    +origin : string
+    +quantity : number
+    +unit : string
+  }
+  interface ProductionBatchResource <<Resource>> <<(R,#FF7700)>> {
+    +id : string
+    +code : string
+    +receptionId : string
+    +registeredAt : string
+  }
+  interface ProductionRecordResource <<Resource>> <<(R,#FF7700)>> {
+    +id : string
+    +batchId : string
+    +processName : string
+    +processedWeight : number
+    +unit : string
+    +startedAt : string
+    +finishedAt : string?
+    +status : string
+  }
+}
+
+package "Shared Kernel (reference)" {
+  class Weight <<Shared Value Object>>
+  class BaseApi <<Shared Infrastructure>>
+  class BaseEndpoint <<Shared Infrastructure>>
+}
+
+useProductionStore o-- "0..*" RawMaterialReception : holds
+useProductionStore o-- "0..*" ProductionBatch : holds
+useProductionStore o-- "0..*" ProductionRecord : holds
+useProductionStore ..> ProductionApi : uses
+useProductionStore ..> RawMaterialReceptionAssembler : maps through
+useProductionStore ..> ProductionBatchAssembler : maps through
+useProductionStore ..> ProductionRecordAssembler : maps through
+
+RawMaterialReception *-- RawMaterialReceptionId
+RawMaterialReception *-- ReceptionDateTime
+RawMaterialReception *-- Supplier
+RawMaterialReception *-- MaterialOrigin
+RawMaterialReception *-- Weight
+ProductionBatch *-- ProductionBatchId
+ProductionBatch *-- BatchCode
+ProductionBatch *-- RawMaterialReceptionId : references by identity
+ProductionBatch *-- BatchRegistrationDateTime
+ProductionRecord *-- ProductionRecordId
+ProductionRecord *-- ProductionBatchId : references by identity
+ProductionRecord *-- ProductionDetails
+ProductionDetails *-- ProductionProcessName
+ProductionDetails *-- Weight
+ProductionDetails *-- ProductionPeriod
+ProductionDetails --> ProductionStatus
+
+ProductionApi --|> BaseApi
+ProductionApi *-- BaseEndpoint : composes one per resource
+RawMaterialReceptionAssembler ..> RawMaterialReceptionResource : maps
+RawMaterialReceptionAssembler ..> RawMaterialReception : builds
+ProductionBatchAssembler ..> ProductionBatchResource : maps
+ProductionBatchAssembler ..> ProductionBatch : builds
+ProductionRecordAssembler ..> ProductionRecordResource : maps
+ProductionRecordAssembler ..> ProductionRecord : builds
+@enduml

@@ -1,0 +1,142 @@
+@startuml
+left to right direction
+
+package "Application" {
+  class useReportingStore <<Pinia Store>> {
+    +summary : OperationalSummary?
+    +productionRows : ReportRow[]
+    +maintenanceRows : ReportRow[]
+    +trend : OperationalTrend?
+    +period : DateRange?
+    +errors : string[]
+    +fetchSummary(period : DateRange) : Promise<void>
+    +fetchProductionReport(period : DateRange) : Promise<void>
+    +fetchMaintenanceReport(period : DateRange) : Promise<void>
+    +fetchTrend(indicator : MetricName, period : DateRange) : Promise<void>
+  }
+}
+
+package "Domain Model" {
+  class DateRange <<Value Object>> {
+    -#start : Date
+    -#end : Date
+    +isValid() : boolean
+  }
+  class MetricName <<Value Object>> {
+    -#value : string
+  }
+  class MetricAmount <<Value Object>> {
+    -#value : number
+  }
+  class UnitSymbol <<Value Object>> {
+    -#value : string
+  }
+  class MetricValue <<Value Object>> {
+    -#name : MetricName
+    -#value : MetricAmount
+    -#unit : UnitSymbol
+    -#measuredAt : Date
+  }
+  class ReportDimension <<Value Object>> {
+    -#name : string
+    -#value : string
+  }
+  class ReportRow <<Value Object>> {
+    -#dimensions : ReportDimension[]
+    -#metrics : MetricValue[]
+  }
+  class TrendPoint <<Value Object>> {
+    -#recordedAt : Date
+    -#value : MetricAmount
+  }
+  class OperationalSummary <<Read Model>> {
+    +period : DateRange
+    +metrics : MetricValue[]
+  }
+  class ProductionReport <<Read Model>> {
+    +period : DateRange
+    +rows : ReportRow[]
+  }
+  class MaintenanceReport <<Read Model>> {
+    +period : DateRange
+    +rows : ReportRow[]
+  }
+  class OperationalTrend <<Read Model>> {
+    +indicator : MetricName
+    +period : DateRange
+    +points : TrendPoint[]
+  }
+}
+
+package "Infrastructure" {
+  class ReportingApi <<HTTP Adapter>> {
+    -#summaryEndpoint : BaseEndpoint
+    -#reportsEndpoint : BaseEndpoint
+    -#trendsEndpoint : BaseEndpoint
+    +getSummary(period : DateRange) : Promise<OperationalSummaryResource>
+    +getProductionReport(period : DateRange) : Promise<ReportResource>
+    +getMaintenanceReport(period : DateRange) : Promise<ReportResource>
+    +getTrend(indicator : MetricName, period : DateRange) : Promise<OperationalTrendResource>
+  }
+  class OperationalSummaryAssembler <<Assembler>> {
+    +{static} toModel(resource : OperationalSummaryResource) : OperationalSummary
+  }
+  class ReportAssembler <<Assembler>> {
+    +{static} toProductionReport(resource : ReportResource) : ProductionReport
+    +{static} toMaintenanceReport(resource : ReportResource) : MaintenanceReport
+  }
+  class OperationalTrendAssembler <<Assembler>> {
+    +{static} toModel(resource : OperationalTrendResource) : OperationalTrend
+  }
+  interface OperationalSummaryResource <<Resource>> <<(R,#FF7700)>> {
+    +start : string
+    +end : string
+    +metrics : object[]
+  }
+  interface ReportResource <<Resource>> <<(R,#FF7700)>> {
+    +start : string
+    +end : string
+    +rows : object[]
+  }
+  interface OperationalTrendResource <<Resource>> <<(R,#FF7700)>> {
+    +indicator : string
+    +start : string
+    +end : string
+    +points : object[]
+  }
+}
+
+package "Shared Kernel (reference)" {
+  class BaseApi <<Shared Infrastructure>>
+  class BaseEndpoint <<Shared Infrastructure>>
+}
+
+useReportingStore o-- OperationalSummary
+useReportingStore o-- ReportRow
+useReportingStore o-- OperationalTrend
+useReportingStore ..> ReportingApi
+OperationalSummary *-- DateRange
+OperationalSummary *-- MetricValue
+ProductionReport *-- DateRange
+ProductionReport *-- ReportRow
+MaintenanceReport *-- DateRange
+MaintenanceReport *-- ReportRow
+OperationalTrend *-- MetricName
+OperationalTrend *-- DateRange
+OperationalTrend *-- TrendPoint
+MetricValue *-- MetricName
+MetricValue *-- MetricAmount
+MetricValue *-- UnitSymbol
+ReportRow *-- ReportDimension
+ReportRow *-- MetricValue
+ReportingApi --|> BaseApi
+ReportingApi *-- BaseEndpoint
+OperationalSummaryAssembler ..> OperationalSummaryResource
+OperationalSummaryAssembler ..> OperationalSummary : builds
+ReportAssembler ..> ReportResource
+ReportAssembler ..> ProductionReport : builds
+ReportAssembler ..> MaintenanceReport : builds
+OperationalTrendAssembler ..> OperationalTrendResource
+OperationalTrendAssembler ..> OperationalTrend : builds
+@enduml
+

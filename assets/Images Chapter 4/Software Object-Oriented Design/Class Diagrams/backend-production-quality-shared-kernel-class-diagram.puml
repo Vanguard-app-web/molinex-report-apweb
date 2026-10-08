@@ -1,0 +1,22 @@
+@startuml
+
+package "Molinex.Shared.Domain.Model.ValueObjects" as DomainModel {
+  class Weight <<Value Object>> {
+    -_value : decimal
+    -_unit : MeasurementUnit
+    --
+    +Create(value : decimal, unit : MeasurementUnit) : Weight
+    +IsPositive() : bool
+    +IsNonNegative() : bool
+    +ConvertTo(unit : MeasurementUnit) : Weight
+  }
+
+  enum MeasurementUnit <<Enumeration>> {
+    KILOGRAM
+    METRIC_TON
+  }
+}
+
+Weight --> "1" MeasurementUnit
+@enduml
+

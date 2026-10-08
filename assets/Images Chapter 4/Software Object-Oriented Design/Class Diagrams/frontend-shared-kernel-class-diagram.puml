@@ -1,0 +1,53 @@
+@startuml
+
+package "Domain Model" {
+  class Weight <<Value Object>> {
+    -#value : number
+    -#unit : MeasurementUnit
+    --
+    +value : number
+    +unit : MeasurementUnit
+    +create(value : number, unit : MeasurementUnit) : Weight
+    +isPositive() : boolean
+    +isNonNegative() : boolean
+  }
+
+  enum MeasurementUnit <<Enumeration>> {
+    KILOGRAM
+    METRIC_TON
+  }
+}
+
+package "Infrastructure" {
+  abstract class BaseApi <<Base HTTP Adapter>> {
+    -#http : AxiosInstance
+    --
+    +http : AxiosInstance
+    #configureInterceptors() : void
+  }
+
+  class BaseEndpoint <<Base HTTP Endpoint>> {
+    -#http : AxiosInstance
+    -#endpointPath : string
+    --
+    +getAll() : Promise
+    +getById(id) : Promise
+    +create(resource) : Promise
+    +update(id, resource) : Promise
+    +delete(id) : Promise
+  }
+
+  class AuthenticationInterceptor <<HTTP Interceptor>> {
+    +onRequest(config : AxiosRequestConfig) : AxiosRequestConfig
+  }
+
+  class ApiErrorHandler <<Error Mapper>> {
+    +{static} toMessages(error : AxiosError) : string[]
+  }
+}
+
+Weight --> "1" MeasurementUnit
+BaseApi ..> AuthenticationInterceptor : configures
+BaseApi ..> ApiErrorHandler : delegates failures to
+BaseEndpoint ..> BaseApi : receives configured HTTP client from
+@enduml
