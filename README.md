@@ -1579,6 +1579,7 @@ El diagrama de contexto presenta a Molinex como un único sistema de software, m
 
 ### 4.6.3 Software Architecture Container Diagrams
 
+El diagrama de contenedores proyecta la arquitectura final de Molinex. La Landing Page redirige a la Web Application alojada en Microsoft Azure y envía solicitudes comerciales a la RESTful API; la Web Application entrega la SPA desarrollada con Vue.js y PrimeVue, que consume la API en ASP.NET Core. La persistencia se modela como una base de datos relacional cuya selección entre MySQL y PostgreSQL permanece pendiente.
 
 <p align="center">
   <img src="assets/Images%20Chapter%204/Domain-Driven%20Software%20Architecture/C4%20Model/container-diagram.svg" alt="Software Architecture Container Diagram de Molinex" width="100%">
