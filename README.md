@@ -1589,11 +1589,11 @@ El diagrama de contenedores proyecta la arquitectura final de Molinex. La Landin
 
 ### 4.6.4 Software Architecture Components Diagrams
 
-Los diagramas de componentes se organizan por producto de software y por límite funcional. Para cada producto se presenta primero una vista general y luego una vista detallada por Bounded Context, además de la estructura compartida correspondiente. Esta separación evita mezclar los límites propios de Angular con los del monolito modular de Spring Boot.
+Los diagramas de componentes se organizan por producto de software y por límite funcional. Para cada producto se presenta primero una vista general y luego una vista detallada por Bounded Context, además del Shared Kernel correspondiente. 
 
 #### Frontend Component Diagrams
 
-La vista general muestra las áreas funcionales de la Web Application y su acceso a la RESTful API. En las vistas detalladas, cada área se organiza mediante los límites Presentation, Application, Domain e Infrastructure. El Frontend Shared Module reúne capacidades transversales de interfaz, sesión y comunicación HTTP; únicamente Weight y MeasurementUnit corresponden al modelo compartido entre Producción y Calidad.
+La vista general muestra los siete Bounded Contexts del frontend, el Shared Kernel y su acceso a la RESTful API. En cada vista detallada, Presentation enumera los componentes y vistas de Vue, Application presenta el store de Pinia, Domain agrupa el modelo e Infrastructure identifica el cliente HTTP y los assemblers. El Shared Kernel reúne en un solo límite la presentación común, la infraestructura HTTP reutilizable y los objetos de valor Weight y MeasurementUnit compartidos por Production Management y Quality and Yield Control.
 
 ##### Frontend Component Overview
 
@@ -1659,17 +1659,17 @@ La vista general muestra las áreas funcionales de la Web Application y su acces
 
 **Figura: Reporting and Analytics Frontend Component Diagram. Fuente: elaboración propia en Structurizr.**
 
-##### Frontend Shared Module Components
+##### Frontend Shared Kernel Components
 
 <p align="center">
-  <img src="assets/Images%20Chapter%204/Domain-Driven%20Software%20Architecture/C4%20Model/frontend-shared-module-component-diagram.svg" alt="Frontend Shared Module Component Diagram" width="100%">
+  <img src="assets/Images%20Chapter%204/Domain-Driven%20Software%20Architecture/C4%20Model/frontend-shared-kernel-component-diagram.svg" alt="Frontend Shared Kernel Component Diagram" width="100%">
 </p>
 
-**Figura: Frontend Shared Module Component Diagram. Fuente: elaboración propia en Structurizr.**
+**Figura: Frontend Shared Kernel Component Diagram. Fuente: elaboración propia en Structurizr.**
 
 #### Backend Component Diagrams
 
-La vista general representa los módulos de los Bounded Contexts que conviven dentro de la RESTful API, sus eventos en proceso y los sistemas externos planificados. Cada vista detallada separa Interfaces, Application, Domain e Infrastructure, de modo que las dependencias técnicas apunten hacia contratos controlados por el dominio. El Production-Quality Shared Kernel constituye una excepción intencional: contiene solo objetos de valor de Domain, por lo que no se inventan capas de Interfaces, Application o Infrastructure.
+La vista general representa los siete módulos de los Bounded Contexts que conviven dentro de la RESTful API, el Shared Kernel, sus eventos en proceso y los sistemas externos planificados. Cada vista detallada separa Interfaces, Application, Domain e Infrastructure; Domain conserva un único componente Model, mientras Infrastructure describe la persistencia y los adaptadores previstos. 
 
 ##### Backend Component Overview
 

@@ -19,28 +19,34 @@ intelligenceModule = component "Operational Intelligence" "Core module for readi
 reportingModule = component "Reporting and Analytics" "Read-side module for summaries, reports and operational trends." "ASP.NET Core Module" {
     tags "Backend Context" "Read Side"
 }
-sharedKernel = component "Production-Quality Shared Kernel" "Contains only Weight and MeasurementUnit, shared by Production and Quality." "C# Value Objects" {
+sharedKernel = component "Shared Kernel" "Contains Weight and MeasurementUnit, shared by Production Management and Quality and Yield Control." "C# Value Objects" {
     tags "Shared Kernel"
 }
 
 group "Commercial Engagement" {
     group "Interfaces" {
-        commercialInterfaces = component "Commercial REST Interface" "Plan catalog and commercial inquiry controllers, resources and assemblers." "ASP.NET Core Web API" {
+        planCatalogInterfaces = component "Plan Catalog REST Interface" "PlanController, plan resources and assemblers expose the available plan catalog and value proposition." "ASP.NET Core Web API" {
+            tags "Backend Interfaces"
+        }
+        commercialInquiryInterfaces = component "Commercial Inquiry REST Interface" "CommercialInquiryController, request resources and assemblers receive visitor contact requests." "ASP.NET Core Web API" {
             tags "Backend Interfaces"
         }
     }
     group "Application" {
-        commercialApplication = component "Commercial Application Services" "Handles SubmitCommercialInquiry and the GetPlanCatalog and GetValueProposition queries." "C# Application Services" {
+        commercialCommandServices = component "Commercial Command Services" "SubmitCommercialInquiryService validates and coordinates commercial inquiry submission." "C# Command Services" {
+            tags "Backend Application Layer"
+        }
+        commercialQueryServices = component "Commercial Query Services" "GetPlanCatalogService and GetValuePropositionService answer public offer queries." "C# Query Services" {
             tags "Backend Application Layer"
         }
     }
     group "Domain" {
-        commercialDomain = component "Commercial Domain Model" "CommercialInquiry aggregate, contact value objects, domain event and repository contracts." "C# Domain Model" {
+        commercialDomain = component "Commercial Model" "CommercialInquiry, Plan and ValueProposition: represent the public offer and the commercial contact workflow." "C# Model" {
             tags "Backend Domain"
         }
     }
     group "Infrastructure" {
-        commercialInfrastructure = component "Commercial Persistence Adapter" "Implements inquiry and plan repository contracts with JPA and relational mappings." "Entity Framework Core" {
+        commercialInfrastructure = component "commercial/infrastructure" "CommercialDbContext configuration, inquiry and plan repository adapters, relational mappings and domain-event publication." "Entity Framework Core" {
             tags "Backend Infrastructure"
         }
     }
@@ -48,22 +54,31 @@ group "Commercial Engagement" {
 
 group "Identity and Access Management" {
     group "Interfaces" {
-        identityInterfaces = component "Identity REST Interface" "Authentication, user, role and profile controllers, resources and assemblers." "ASP.NET Core Web API and Authentication" {
+        authenticationInterfaces = component "Authentication REST Interface" "AuthenticationController, credential resources and assemblers expose sign-in and account-registration operations." "ASP.NET Core Web API and Authentication" {
+            tags "Backend Interfaces"
+        }
+        userAdministrationInterfaces = component "User Administration REST Interface" "UsersController, role and permission resources and assemblers expose administrative operations." "ASP.NET Core Web API" {
+            tags "Backend Interfaces"
+        }
+        profileInterfaces = component "Profile REST Interface" "ProfileController, profile resources and assemblers expose the current user's profile operations." "ASP.NET Core Web API" {
             tags "Backend Interfaces"
         }
     }
     group "Application" {
-        identityApplication = component "Identity Application Services" "Handles registration, authentication, role assignment, profile updates and identity queries." "C# Application Services" {
+        identityCommandServices = component "Identity Command Services" "Coordinates account registration, authentication, role assignment and profile updates." "C# Command Services" {
+            tags "Backend Application Layer"
+        }
+        identityQueryServices = component "Identity Query Services" "Answers user, role, permission and profile queries." "C# Query Services" {
             tags "Backend Application Layer"
         }
     }
     group "Domain" {
-        identityDomain = component "Identity Domain Model" "User aggregate, identity value objects, authorization policies, domain events and repository contracts." "C# Domain Model" {
+        identityDomain = component "Identity Model" "User, Profile, Role, Permission and AuthenticatedPrincipal: represent accounts, authorization and published identity." "C# Model" {
             tags "Backend Domain"
         }
     }
     group "Infrastructure" {
-        identityInfrastructure = component "Identity Security and Persistence Adapters" "Implements repositories, password hashing, token issuing and notification delivery ports." "Entity Framework Core and ASP.NET Core Authentication" {
+        identityInfrastructure = component "iam/infrastructure" "IdentityDbContext configuration, repository adapters, password hashing, token issuing and notification-delivery adapters." "Entity Framework Core and ASP.NET Core Authentication" {
             tags "Backend Infrastructure"
         }
     }
@@ -71,22 +86,31 @@ group "Identity and Access Management" {
 
 group "Production Management" {
     group "Interfaces" {
-        productionInterfaces = component "Production REST Interface" "Reception, batch and production record controllers, resources and assemblers." "ASP.NET Core Web API" {
+        rawMaterialReceptionInterfaces = component "Raw Material Reception REST Interface" "RawMaterialReceptionsController, resources and assemblers expose reception operations." "ASP.NET Core Web API" {
+            tags "Backend Interfaces"
+        }
+        productionBatchInterfaces = component "Production Batch REST Interface" "ProductionBatchesController, resources and assemblers expose batch operations." "ASP.NET Core Web API" {
+            tags "Backend Interfaces"
+        }
+        productionRecordInterfaces = component "Production Record REST Interface" "ProductionRecordsController, resources and assemblers expose production-record operations and history." "ASP.NET Core Web API" {
             tags "Backend Interfaces"
         }
     }
     group "Application" {
-        productionApplication = component "Production Application Services" "Handles production commands, process queries, history queries and domain event publication." "C# Command and Query Services" {
+        productionCommandServices = component "Production Command Services" "Coordinates commands for raw material receptions, production batches and production records." "C# Command Services" {
+            tags "Backend Application Layer"
+        }
+        productionQueryServices = component "Production Query Services" "Answers process, available reception, available batch and production-history queries." "C# Query Services" {
             tags "Backend Application Layer"
         }
     }
     group "Domain" {
-        productionDomain = component "Production Domain Model" "RawMaterialReception, ProductionBatch and ProductionRecord aggregates, value objects, events and repository contracts." "C# Domain Model" {
+        productionDomain = component "Production Model" "RawMaterialReception, ProductionBatch and ProductionRecord: model reception, batching and the production process." "C# Model" {
             tags "Backend Domain"
         }
     }
     group "Infrastructure" {
-        productionInfrastructure = component "Production Persistence Adapter" "Implements production repositories and in-process domain event publication." "Entity Framework Core" {
+        productionInfrastructure = component "production/infrastructure" "ProductionDbContext configuration, reception, batch and record repository adapters, relational mappings and domain-event publication." "Entity Framework Core" {
             tags "Backend Infrastructure"
         }
     }
@@ -94,22 +118,31 @@ group "Production Management" {
 
 group "Quality and Yield Control" {
     group "Interfaces" {
-        qualityInterfaces = component "Quality REST Interface" "Quality, waste, yield and comparison controllers, resources and assemblers." "ASP.NET Core Web API" {
+        qualityAssessmentInterfaces = component "Quality Assessment REST Interface" "QualityAssessmentsController, resources and assemblers expose quality-result operations." "ASP.NET Core Web API" {
+            tags "Backend Interfaces"
+        }
+        wasteRecordInterfaces = component "Waste Record REST Interface" "WasteRecordsController, resources and assemblers expose waste-recording operations." "ASP.NET Core Web API" {
+            tags "Backend Interfaces"
+        }
+        yieldAnalysisInterfaces = component "Yield Analysis REST Interface" "YieldIndicatorsController and comparison resources expose indicators, comparisons and deviations." "ASP.NET Core Web API" {
             tags "Backend Interfaces"
         }
     }
     group "Application" {
-        qualityApplication = component "Quality Application Services" "Handles quality commands, indicator queries, comparisons and deviation identification." "C# Command and Query Services" {
+        qualityCommandServices = component "Quality Command Services" "Coordinates quality assessment, waste recording and deviation-identification commands." "C# Command Services" {
+            tags "Backend Application Layer"
+        }
+        qualityQueryServices = component "Quality Query Services" "Answers quality-result, yield-indicator and comparison queries." "C# Query Services" {
             tags "Backend Application Layer"
         }
     }
     group "Domain" {
-        qualityDomain = component "Quality and Yield Domain Model" "QualityAssessment, WasteRecord and QualityDeviation aggregates, value objects, events and repository contracts." "C# Domain Model" {
+        qualityDomain = component "Quality Model" "QualityAssessment, WasteRecord, QualityDeviation, YieldIndicator and RiceComposition: model quality and yield results." "C# Model" {
             tags "Backend Domain"
         }
     }
     group "Infrastructure" {
-        qualityInfrastructure = component "Quality Persistence Adapter" "Implements quality repositories and in-process domain event publication." "Entity Framework Core" {
+        qualityInfrastructure = component "quality/infrastructure" "QualityDbContext configuration, quality and waste repository adapters, relational mappings and domain-event publication." "Entity Framework Core" {
             tags "Backend Infrastructure"
         }
     }
@@ -117,22 +150,28 @@ group "Quality and Yield Control" {
 
 group "Asset and Maintenance Management" {
     group "Interfaces" {
-        maintenanceInterfaces = component "Maintenance REST Interface" "Machine and maintenance controllers, resources and assemblers." "ASP.NET Core Web API" {
+        machineInterfaces = component "Machine REST Interface" "MachinesController, machine resources and assemblers expose inventory and status operations." "ASP.NET Core Web API" {
+            tags "Backend Interfaces"
+        }
+        maintenanceRecordInterfaces = component "Maintenance Record REST Interface" "MaintenanceRecordsController, resources and assemblers expose preventive, corrective and history operations." "ASP.NET Core Web API" {
             tags "Backend Interfaces"
         }
     }
     group "Application" {
-        maintenanceApplication = component "Asset and Maintenance Application Services" "Handles machine registration, maintenance recording, status and history queries." "C# Command and Query Services" {
+        maintenanceCommandServices = component "Maintenance Command Services" "Coordinates machine registration and preventive or corrective maintenance recording." "C# Command Services" {
+            tags "Backend Application Layer"
+        }
+        maintenanceQueryServices = component "Maintenance Query Services" "Answers machine status, inventory and maintenance-history queries." "C# Query Services" {
             tags "Backend Application Layer"
         }
     }
     group "Domain" {
-        maintenanceDomain = component "Asset and Maintenance Domain Model" "Machine and MaintenanceRecord aggregates, references, events and repository contracts." "C# Domain Model" {
+        maintenanceDomain = component "Maintenance Model" "Machine, MaintenanceRecord, TechnicianReference and AnomalyReference: model assets and maintenance work." "C# Model" {
             tags "Backend Domain"
         }
     }
     group "Infrastructure" {
-        maintenanceInfrastructure = component "Maintenance Persistence Adapter" "Implements machine and maintenance repositories and publishes in-process events." "Entity Framework Core" {
+        maintenanceInfrastructure = component "maintenance/infrastructure" "MaintenanceDbContext configuration, machine and maintenance repository adapters, relational mappings and domain-event publication." "Entity Framework Core" {
             tags "Backend Infrastructure"
         }
     }
@@ -140,22 +179,28 @@ group "Asset and Maintenance Management" {
 
 group "Operational Intelligence" {
     group "Interfaces" {
-        intelligenceInterfaces = component "Operational Intelligence Interface" "Telemetry ingestion and monitoring controllers, resources and assemblers." "ASP.NET Core Web API and Integration Endpoints" {
+        telemetryIngestionInterfaces = component "Telemetry Ingestion Interface" "OperationalReadingsController and ingestion resources receive planned sensor measurements." "ASP.NET Core Integration Endpoint" {
+            tags "Backend Interfaces"
+        }
+        monitoringInterfaces = component "Monitoring REST Interface" "AnomaliesController, AlertsController, resources and assemblers expose monitoring and alert-attention operations." "ASP.NET Core Web API" {
             tags "Backend Interfaces"
         }
     }
     group "Application" {
-        intelligenceApplication = component "Operational Intelligence Application Services" "Coordinates reading registration, anomaly detection, alert generation and monitoring queries." "C# Command and Query Services" {
+        intelligenceCommandServices = component "Operational Intelligence Command Services" "Coordinates reading registration, anomaly detection, alert generation and alert-attention commands." "C# Command Services" {
+            tags "Backend Application Layer"
+        }
+        intelligenceQueryServices = component "Operational Intelligence Query Services" "Answers reading-history, anomaly, alert and recommendation queries." "C# Query Services" {
             tags "Backend Application Layer"
         }
     }
     group "Domain" {
-        intelligenceDomain = component "Operational Intelligence Domain Model" "OperationalReading, OperationalAnomaly and Alert aggregates, criteria, events and repository contracts." "C# Domain Model" {
+        intelligenceDomain = component "Operational Intelligence Model" "OperationalReading, OperationalAnomaly, Alert, DetectionCriterion and AnomalyDetectionService: model monitoring and alerting." "C# Model" {
             tags "Backend Domain"
         }
     }
     group "Infrastructure" {
-        intelligenceInfrastructure = component "Telemetry, Notification and Persistence Adapters" "Adapts sensor messages, implements repositories and delivers operational notifications." "Entity Framework Core and Integration Adapters" {
+        intelligenceInfrastructure = component "intelligence/infrastructure" "IntelligenceDbContext configuration, telemetry, repository and notification adapters, relational mappings and event publication." "Entity Framework Core and Integration Adapters" {
             tags "Backend Infrastructure"
         }
     }
@@ -163,30 +208,33 @@ group "Operational Intelligence" {
 
 group "Reporting and Analytics" {
     group "Interfaces" {
-        reportingInterfaces = component "Reporting REST Interface" "Operational summary, report and trend query controllers and response assemblers." "ASP.NET Core Web API" {
+        reportingInterfaces = component "Reporting REST Interface" "ReportsController, summary, report and trend resources and assemblers expose read-only queries." "ASP.NET Core Web API" {
             tags "Backend Interfaces"
         }
     }
     group "Application" {
-        reportingApplication = component "Reporting Query Services" "Handles report queries and updates projections from operational domain events." "C# Query Services and Event Handlers" {
+        reportingQueryServices = component "Reporting Query Services" "Answers operational summary, production report, maintenance report and trend queries." "C# Query Services" {
+            tags "Backend Application Layer" "Read Side"
+        }
+        reportingProjectionHandlers = component "Reporting Projection Handlers" "Consumes published operational events and updates reporting projections." "C# Event Handlers" {
             tags "Backend Application Layer" "Read Side"
         }
     }
     group "Domain" {
-        reportingDomain = component "Reporting Read Model" "ReportRow, MetricValue, DateRange, TrendPoint and projection repository contracts; no aggregate roots." "C# Read Models" {
+        reportingDomain = component "Reporting Model" "OperationalSummary, ReportRow, ReportDimension, MetricValue, DateRange and TrendPoint: define read-only projections." "C# Read Models" {
             tags "Backend Domain" "Read Side"
         }
     }
     group "Infrastructure" {
-        reportingInfrastructure = component "Reporting Projection Adapter" "Implements read repositories and stores denormalized reporting projections." "Entity Framework Core" {
+        reportingInfrastructure = component "reporting/infrastructure" "ReportingDbContext configuration, projection repository adapters and denormalized relational mappings." "Entity Framework Core" {
             tags "Backend Infrastructure" "Read Side"
         }
     }
 }
 
-group "Production-Quality Shared Kernel" {
+group "Shared Kernel" {
     group "Domain" {
-        sharedKernelDomain = component "Shared Kernel Domain Model" "Defines only the Weight and MeasurementUnit value objects shared by Production and Quality." "C# Value Objects" {
+        sharedKernelDomain = component "Shared Kernel Model" "Weight and MeasurementUnit: value objects shared by Production Management and Quality and Yield Control." "C# Value Objects" {
             tags "Backend Domain" "Shared Kernel"
         }
     }
