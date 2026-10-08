@@ -1,0 +1,101 @@
+@startuml
+skinparam backgroundColor #F7FAFC
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam shadowing false
+skinparam linetype ortho
+skinparam ArrowColor #334E68
+skinparam ArrowThickness 1.4
+skinparam RectangleBorderColor #486581
+skinparam RectangleFontColor #102A43
+skinparam rectangle {
+  RoundCorner 9
+  Padding 10
+}
+
+title Big Picture Event Storming - Molinex
+caption General business flow using only Actors, Domain Events, and External Systems.
+
+top to bottom direction
+
+rectangle "Visitor\n[Actor]" as actorVisitor #FFF3A6
+rectangle "Commercial Inquiry\nSubmitted" as eventInquiry #FFB26B
+
+rectangle "Manager / Administrator\n[Actor]" as actorAdmin #FFF3A6
+rectangle "User\nRegistered" as eventUserRegistered #FFB26B
+rectangle "Role\nAssigned" as eventRoleAssigned #FFB26B
+
+rectangle "Authorized User\n[Actor]" as actorUser #FFF3A6
+rectangle "User\nAuthenticated" as eventAuthenticated #FFB26B
+
+rectangle "Production Operator\n[Actor]" as actorProduction #FFF3A6
+rectangle "Raw Material Reception\nRecorded" as eventReception #FFB26B
+rectangle "Production Batch\nRegistered" as eventBatch #FFB26B
+rectangle "Production Information\nRecorded" as eventProduction #FFB26B
+
+rectangle "Production Operator\n[Actor]" as actorQuality #FFF3A6
+rectangle "Quality Results\nRecorded" as eventQuality #FFB26B
+rectangle "Production Waste\nRecorded" as eventWaste #FFB26B
+rectangle "Yield Indicators\nCalculated" as eventYield #FFB26B
+rectangle "Quality or Yield Deviation\nIdentified" as eventDeviation #FFB26B
+
+rectangle "Maintenance Technician\n[Actor]" as actorMaintenance #FFF3A6
+rectangle "Machine\nRegistered" as eventMachine #FFB26B
+rectangle "Maintenance\nRecorded" as eventMaintenance #FFB26B
+
+rectangle "Rice Mill Sensor Gateway\n[External System - Planned]" as externalSensors #F5A3D7
+rectangle "Operational Variable\nRecorded" as eventVariable #FFB26B
+rectangle "Operational Anomaly\nDetected" as eventAnomaly #FFB26B
+rectangle "Operational Alert\nGenerated" as eventAlert #FFB26B
+rectangle "Maintenance Recommendation\nGenerated" as eventRecommendation #FFB26B
+rectangle "Notification Delivery Service\n[External System - Planned]" as externalNotifications #F5A3D7
+rectangle "Operational Notification\nDelivered" as eventNotification #FFB26B
+
+rectangle "Manager / Administrator\n[Actor]" as actorProductionReporting #FFF3A6
+rectangle "Production Report\nGenerated" as eventProductionReport #FFB26B
+rectangle "Manager / Administrator\n[Actor]" as actorMaintenanceReporting #FFF3A6
+rectangle "Maintenance Report\nGenerated" as eventMaintenanceReport #FFB26B
+
+actorVisitor -right-> eventInquiry
+actorAdmin -right-> eventUserRegistered
+eventUserRegistered -right-> eventRoleAssigned
+actorUser -right-> eventAuthenticated
+
+actorProduction -right-> eventReception
+eventReception -right-> eventBatch
+eventBatch -right-> eventProduction
+
+actorQuality -right-> eventQuality
+eventQuality -right-> eventWaste
+eventWaste -right-> eventYield
+eventYield -right-> eventDeviation
+
+actorMaintenance -right-> eventMachine
+eventMachine -right-> eventMaintenance
+
+externalSensors -right-> eventVariable
+eventVariable -right-> eventAnomaly
+eventAnomaly -right-> eventAlert
+eventAnomaly -down-> eventRecommendation
+eventAlert -right-> externalNotifications
+externalNotifications -right-> eventNotification
+
+actorProductionReporting -right-> eventProductionReport
+actorMaintenanceReporting -right-> eventMaintenanceReport
+
+actorVisitor -[hidden]down-> actorAdmin
+actorAdmin -[hidden]down-> actorUser
+actorUser -[hidden]down-> actorProduction
+actorProduction -[hidden]down-> actorQuality
+actorQuality -[hidden]down-> actorMaintenance
+actorMaintenance -[hidden]down-> externalSensors
+externalSensors -[hidden]down-> actorProductionReporting
+actorProductionReporting -[hidden]down-> actorMaintenanceReporting
+
+legend bottom
+  |= Color |= EventStorming Element |
+  |<#FFF3A6> | Actor |
+  |<#FFB26B> | Domain Event |
+  |<#F5A3D7> | External System |
+endlegend
+@enduml
