@@ -7,11 +7,11 @@ systemContext molinex "MolinexSystemContext" {
 
 container molinex "MolinexContainers" {
     include visitor administrator maintenanceTechnician productionOperator
-    include molinex.landingPage molinex.webApplication molinex.apiApplication molinex.database
+    include molinex.landingPage molinex.webHost molinex.webApplication molinex.apiApplication molinex.database
     include sensorGateway notificationService
-    autoLayout lr
+    autoLayout tb
     title "Molinex Platform - Container Diagram"
-    description "Applications and data store that make up Molinex, plus its planned external integrations."
+    description "Projected applications, data store and external integrations that make up Molinex."
 }
 
 component molinex.webApplication "MolinexFrontendComponents" {

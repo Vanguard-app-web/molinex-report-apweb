@@ -25,8 +25,12 @@ workspace "Molinex Platform" "C4 model for the Molinex rice mill operational man
                 tags "Landing Page"
             }
 
-            webApplication = container "Web Application" "Provides role-based operational management and analytics through a responsive browser experience." "Vue, JavaScript and PrimeVue" {
+            webHost = container "Web Application" "Hosts and delivers the Molinex Single-Page Application to its users." "Microsoft Azure" {
                 tags "Web Application"
+            }
+
+            webApplication = container "Single-Page Application" "Provides role-based operational management and analytics through a responsive browser experience." "Vue.js, JavaScript and PrimeVue" {
+                tags "SPA"
                 !include frontend-components.dsl
             }
 
@@ -35,7 +39,7 @@ workspace "Molinex Platform" "C4 model for the Molinex rice mill operational man
                 !include backend-components.dsl
             }
 
-            database = container "Molinex Database" "Stores operational information while preserving logical ownership by backend module." "MySQL" {
+            database = container "Relational Database" "Stores operational information while preserving logical ownership by backend module." "MySQL or PostgreSQL (TBD)" {
                 tags "Database"
             }
         }
@@ -73,6 +77,10 @@ workspace "Molinex Platform" "C4 model for the Molinex rice mill operational man
             element "Web Application" {
                 shape webBrowser
                 background #B9DDF2
+            }
+            element "SPA" {
+                shape webBrowser
+                background #DCEEF8
             }
             element "Backend Application" {
                 background #5B9CCB
