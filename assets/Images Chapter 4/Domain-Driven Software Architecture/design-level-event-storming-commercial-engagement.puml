@@ -1,0 +1,33 @@
+@startuml
+!include event-storming-style.puml
+
+title Commercial Engagement - Design-Level Event Storming
+top to bottom direction
+
+rectangle "Plan Catalog and\nValue Proposition\n[View / Read Model]" as view_offer #B9D98A
+rectangle "Visitor\n[Actor]" as actor_visitor #FFF3A6
+rectangle "Submit Commercial\nInquiry\n[Command]" as command_submit #A9C7F7
+rectangle "Commercial Inquiry\n[Aggregate Root]" as aggregate_inquiry #FFE27A
+rectangle "Commercial Inquiry\nSubmitted\n[Domain Event]" as event_submitted #FFB26B
+rectangle "Commercial Inquiry\nStatus\n[View / Read Model]" as view_status #B9D98A
+rectangle "Subscription, payment, rice mill onboarding,\nand plan activation remain undefined\n[Question / Risk]" as risk_subscription #FF8A80
+
+view_offer -right[dashed]-> actor_visitor
+actor_visitor -right-> command_submit
+command_submit -right-> aggregate_inquiry
+aggregate_inquiry -right-> event_submitted
+event_submitted -right-> view_status
+event_submitted -down[dashed]-> risk_subscription
+
+legend bottom
+  |= Color |= EventStorming Element |
+  |<#FFF3A6> | Actor |
+  |<#A9C7F7> | Command |
+  |<#FFE27A> | Aggregate Root |
+  |<#FFB26B> | Domain Event |
+  |<#C9A7E8> | Business Process / Policy |
+  |<#F5A3D7> | External System |
+  |<#B9D98A> | View / Read Model |
+  |<#FF8A80> | Question / Risk |
+endlegend
+@enduml
