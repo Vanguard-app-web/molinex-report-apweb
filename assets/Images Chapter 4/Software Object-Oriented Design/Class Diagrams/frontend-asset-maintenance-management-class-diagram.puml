@@ -1,0 +1,158 @@
+@startuml
+left to right direction
+
+package "Application" {
+  class useMaintenanceStore <<Pinia Store>> {
+    +machines : Machine[]
+    +maintenanceRecords : MaintenanceRecord[]
+    +errors : string[]
+    +machinesLoaded : boolean
+    +historyLoaded : boolean
+    +fetchMachines() : Promise<void>
+    +registerMachine(machine : Machine) : Promise<void>
+    +updateMachine(machine : Machine) : Promise<void>
+    +fetchMaintenanceHistory(machineId : MachineId?) : Promise<void>
+    +recordMaintenance(record : MaintenanceRecord) : Promise<void>
+  }
+}
+
+package "Domain Model" {
+  class Machine <<Aggregate Root>> {
+    -#id : MachineId
+    -#code : MachineCode
+    -#name : MachineName
+    -#model : MachineModel
+    -#status : MachineStatus
+    -#statusChangedAt : StatusChangeDateTime
+    +id : MachineId
+    +code : MachineCode
+    +name : MachineName
+    +model : MachineModel
+    +status : MachineStatus
+    +changeStatus(status, changedAt) : void
+  }
+  class MaintenanceRecord <<Aggregate Root>> {
+    -#id : MaintenanceRecordId
+    -#machineId : MachineId
+    -#type : MaintenanceType
+    -#performedAt : MaintenanceDateTime
+    -#description : MaintenanceDescription
+    -#responsible : TechnicianReference
+    -#anomalyReference : AnomalyReference?
+    +recordPreventive(...) : MaintenanceRecord
+    +recordCorrective(...) : MaintenanceRecord
+  }
+  class MachineId <<Value Object>> {
+    -#value : string
+  }
+  class MaintenanceRecordId <<Value Object>> {
+    -#value : string
+  }
+  class MachineCode <<Value Object>> {
+    -#value : string
+  }
+  class MachineName <<Value Object>> {
+    -#value : string
+  }
+  class MachineModel <<Value Object>> {
+    -#value : string
+  }
+  class StatusChangeDateTime <<Value Object>> {
+    -#value : Date
+  }
+  class MaintenanceDateTime <<Value Object>> {
+    -#value : Date
+  }
+  class MaintenanceDescription <<Value Object>> {
+    -#value : string
+    +isBlank() : boolean
+  }
+  class TechnicianReference <<Value Object>> {
+    -#principalId : string
+    -#displayName : string
+  }
+  class AnomalyReference <<Value Object>> {
+    -#anomalyId : string
+  }
+  enum MachineStatus <<Enumeration>> {
+    OPERATIONAL
+    REQUIRES_ATTENTION
+    UNDER_MAINTENANCE
+    OUT_OF_SERVICE
+  }
+  enum MaintenanceType <<Enumeration>> {
+    PREVENTIVE
+    CORRECTIVE
+  }
+}
+
+package "Infrastructure" {
+  class MaintenanceApi <<HTTP Adapter>> {
+    -#machinesEndpoint : BaseEndpoint
+    -#maintenanceRecordsEndpoint : BaseEndpoint
+    +getMachines() : Promise<MachineResource[]>
+    +createMachine(resource : MachineResource) : Promise<MachineResource>
+    +updateMachine(resource : MachineResource) : Promise<MachineResource>
+    +getMaintenanceRecords() : Promise<MaintenanceRecordResource[]>
+    +createMaintenanceRecord(resource : MaintenanceRecordResource) : Promise<MaintenanceRecordResource>
+  }
+  class MachineAssembler <<Assembler>> {
+    +{static} toEntity(resource : MachineResource) : Machine
+    +{static} toResource(entity : Machine) : MachineResource
+    +{static} toEntities(response) : Machine[]
+  }
+  class MaintenanceRecordAssembler <<Assembler>> {
+    +{static} toEntity(resource : MaintenanceRecordResource) : MaintenanceRecord
+    +{static} toResource(entity : MaintenanceRecord) : MaintenanceRecordResource
+  }
+  interface MachineResource <<Resource>> <<(R,#FF7700)>> {
+    +id : string
+    +code : string
+    +name : string
+    +model : string
+    +status : string
+    +statusChangedAt : string
+  }
+  interface MaintenanceRecordResource <<Resource>> <<(R,#FF7700)>> {
+    +id : string
+    +machineId : string
+    +type : string
+    +performedAt : string
+    +description : string
+    +technicianId : string
+    +technicianName : string
+    +anomalyId : string?
+  }
+}
+
+package "Shared Kernel (reference)" {
+  class BaseApi <<Shared Infrastructure>>
+  class BaseEndpoint <<Shared Infrastructure>>
+}
+
+useMaintenanceStore o-- Machine
+useMaintenanceStore o-- MaintenanceRecord
+useMaintenanceStore ..> MaintenanceApi
+useMaintenanceStore ..> MachineAssembler
+useMaintenanceStore ..> MaintenanceRecordAssembler
+Machine *-- MachineId
+Machine *-- MachineCode
+Machine *-- MachineName
+Machine *-- MachineModel
+Machine --> MachineStatus
+Machine *-- StatusChangeDateTime
+MaintenanceRecord *-- MaintenanceRecordId
+MaintenanceRecord *-- MachineId : references by identity
+MaintenanceRecord --> MaintenanceType
+MaintenanceRecord *-- MaintenanceDateTime
+MaintenanceRecord *-- MaintenanceDescription
+MaintenanceRecord *-- TechnicianReference
+MaintenanceRecord o-- AnomalyReference
+MaintenanceApi --|> BaseApi
+MaintenanceApi *-- BaseEndpoint
+MachineAssembler ..> MachineResource
+MachineAssembler ..> Machine : builds
+MaintenanceRecordAssembler ..> MaintenanceRecordResource
+MaintenanceRecordAssembler ..> MaintenanceRecord : builds
+@enduml
+

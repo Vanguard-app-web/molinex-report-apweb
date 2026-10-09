@@ -1,0 +1,203 @@
+@startuml
+left to right direction
+
+package "Application" {
+  class useIamStore <<Pinia Store>> {
+    +currentSession : AuthenticatedSession?
+    +users : User[]
+    +roles : Role[]
+    +permissions : Permission[]
+    +usersLoaded : boolean
+    +errors : string[]
+    +signIn(command : SignInCommand) : Promise<void>
+    +signUp(command : SignUpCommand) : Promise<void>
+    +signOut() : void
+    +fetchUsers() : Promise<void>
+    +assignRole(userId : UserId, role : Role) : Promise<void>
+    +updateProfile(userId : UserId, profile : UserProfile) : Promise<void>
+  }
+  class SignInCommand <<Command>> {
+    +email : string
+    +password : string
+  }
+  class SignUpCommand <<Command>> {
+    +email : string
+    +password : string
+    +fullName : string
+  }
+}
+
+package "Domain Model" {
+  class User <<Aggregate Root>> {
+    -#id : UserId
+    -#email : EmailAddress
+    -#profile : UserProfile
+    -#role : Role
+    -#status : AccountStatus
+    +id : UserId
+    +email : EmailAddress
+    +profile : UserProfile
+    +role : Role
+    +status : AccountStatus
+    +assignRole(role : Role) : void
+    +updateProfile(profile : UserProfile) : void
+  }
+  class UserId <<Value Object>> {
+    -#value : string
+  }
+  class EmailAddress <<Value Object>> {
+    -#value : string
+    +isValid() : boolean
+  }
+  class FullName <<Value Object>> {
+    -#value : string
+  }
+  class JobTitle <<Value Object>> {
+    -#value : string
+  }
+  class PhoneNumber <<Value Object>> {
+    -#value : string
+  }
+  class UserProfile <<Value Object>> {
+    -#fullName : FullName
+    -#jobTitle : JobTitle
+    -#phoneNumber : PhoneNumber
+  }
+  class Role <<Value Object>> {
+    -#type : RoleType
+    -#permissions : Permission[]
+    +allows(permission : Permission) : boolean
+  }
+  class AuthenticatedSession <<Value Object>> {
+    -#userId : UserId
+    -#token : AccessToken
+    -#role : Role
+    +isAuthenticated() : boolean
+  }
+  class AccessToken <<Value Object>> {
+    -#value : string
+  }
+  enum RoleType <<Enumeration>> {
+    ADMINISTRATOR
+    MAINTENANCE_TECHNICIAN
+    PRODUCTION_OPERATOR
+  }
+  enum Permission <<Enumeration>> {
+    MANAGE_USERS
+    MANAGE_PRODUCTION
+    MANAGE_MAINTENANCE
+    VIEW_OPERATIONAL_INFORMATION
+    VIEW_REPORTS
+  }
+  enum AccountStatus <<Enumeration>> {
+    ACTIVE
+    INACTIVE
+    LOCKED
+  }
+}
+
+package "Infrastructure" {
+  class IamApi <<HTTP Adapter>> {
+    -#signInEndpoint : BaseEndpoint
+    -#signUpEndpoint : BaseEndpoint
+    -#usersEndpoint : BaseEndpoint
+    -#profileEndpoint : BaseEndpoint
+    +signIn(request : SignInRequest) : Promise<SignInResource>
+    +signUp(request : SignUpRequest) : Promise<UserResource>
+    +getUsers() : Promise<UserResource[]>
+    +updateProfile(resource : UserResource) : Promise<UserResource>
+  }
+  class SignInAssembler <<Assembler>> {
+    +{static} toRequest(command : SignInCommand) : SignInRequest
+    +{static} toSession(resource : SignInResource) : AuthenticatedSession
+  }
+  class SignUpAssembler <<Assembler>> {
+    +{static} toRequest(command : SignUpCommand) : SignUpRequest
+    +{static} toEntity(resource : UserResource) : User
+  }
+  class UserAssembler <<Assembler>> {
+    +{static} toEntity(resource : UserResource) : User
+    +{static} toResource(entity : User) : UserResource
+    +{static} toEntities(response) : User[]
+  }
+  interface SignInRequest <<Resource>> <<(R,#FF7700)>> {
+    +email : string
+    +password : string
+  }
+  interface SignUpRequest <<Resource>> <<(R,#FF7700)>> {
+    +email : string
+    +password : string
+    +fullName : string
+  }
+  interface SignInResource <<Resource>> <<(R,#FF7700)>> {
+    +userId : string
+    +token : string
+    +role : string
+    +permissions : string[]
+  }
+  interface UserResource <<Resource>> <<(R,#FF7700)>> {
+    +id : string
+    +email : string
+    +fullName : string
+    +jobTitle : string
+    +phoneNumber : string
+    +role : string
+    +permissions : string[]
+    +status : string
+  }
+  class TokenStorage <<Storage Adapter>> {
+    +save(token : AccessToken) : void
+    +get() : AccessToken?
+    +clear() : void
+  }
+  class authenticationGuard <<Router Guard>> {
+    +canActivate() : boolean
+  }
+  class iamInterceptor <<HTTP Interceptor>> {
+    +onRequest(config) : object
+  }
+}
+
+package "Shared Kernel (reference)" {
+  class BaseApi <<Shared Infrastructure>>
+  class BaseEndpoint <<Shared Infrastructure>>
+}
+
+useIamStore o-- User
+useIamStore o-- AuthenticatedSession
+useIamStore ..> IamApi
+useIamStore ..> SignInAssembler
+useIamStore ..> SignUpAssembler
+useIamStore ..> UserAssembler
+useIamStore ..> TokenStorage
+useIamStore ..> SignInCommand : handles
+useIamStore ..> SignUpCommand : handles
+SignInAssembler ..> SignInCommand : uses
+SignInAssembler ..> SignInRequest : creates
+SignInAssembler ..> SignInResource : uses
+SignInAssembler ..> AuthenticatedSession : creates
+SignUpAssembler ..> SignUpCommand : uses
+SignUpAssembler ..> SignUpRequest : creates
+SignUpAssembler ..> UserResource : uses
+SignUpAssembler ..> User : creates
+UserAssembler ..> UserResource : maps
+UserAssembler ..> User : maps
+User *-- UserId
+User *-- EmailAddress
+User *-- UserProfile
+User *-- Role
+User --> AccountStatus
+UserProfile *-- FullName
+UserProfile *-- JobTitle
+UserProfile *-- PhoneNumber
+Role *-- RoleType
+Role *-- Permission
+AuthenticatedSession *-- UserId : references by identity
+AuthenticatedSession *-- AccessToken
+AuthenticatedSession *-- Role
+IamApi --|> BaseApi
+IamApi *-- BaseEndpoint
+authenticationGuard ..> useIamStore
+iamInterceptor ..> TokenStorage
+@enduml
+

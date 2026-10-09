@@ -1,0 +1,70 @@
+@startuml
+!include event-storming-style.puml
+
+title Operational Intelligence - Design-Level Event Storming
+top to bottom direction
+
+rectangle "Rice Mill Sensor Gateway\n[External System]" as external_sensor #F5A3D7
+rectangle "Operational Variable\nEntry View\n[View / Read Model]" as view_manual_reading #B9D98A
+rectangle "Maintenance Technician\n[Actor]" as actor_manual_reading #FFF3A6
+rectangle "Record Operational\nVariable\n[Command]" as command_reading #A9C7F7
+rectangle "Operational Reading\n[Aggregate Root]" as aggregate_reading #FFE27A
+rectangle "Operational Variable\nRecorded\n[Domain Event]" as event_reading #FFB26B
+rectangle "Operational Variables\n[View / Read Model]" as view_variables #B9D98A
+
+rectangle "Operational Variable\nRecorded\n[Domain Event]" as event_reading_policy #FFB26B
+rectangle "Evaluate Operational\nCriteria\n[Business Process / Policy]" as policy_evaluate #C9A7E8
+rectangle "Detect Operational\nAnomaly\n[Command]" as command_anomaly #A9C7F7
+rectangle "Operational Anomaly\n[Aggregate Root]" as aggregate_anomaly #FFE27A
+rectangle "Operational Anomaly\nDetected\n[Domain Event]" as event_anomaly #FFB26B
+rectangle "Anomaly History and\nMaintenance Recommendations\n[View / Read Model]" as view_anomalies #B9D98A
+
+rectangle "Operational Anomaly\nDetected\n[Domain Event]" as event_anomaly_policy #FFB26B
+rectangle "Generate Alert When\nAttention Is Required\n[Business Process / Policy]" as policy_alert #C9A7E8
+rectangle "Generate Operational\nAlert\n[Command]" as command_alert #A9C7F7
+rectangle "Alert\n[Aggregate Root]" as aggregate_alert #FFE27A
+rectangle "Operational Alert\nGenerated\n[Domain Event]" as event_alert #FFB26B
+rectangle "Notification Delivery Service\n[External System]" as external_notification #F5A3D7
+
+rectangle "Operational Monitoring\n[View / Read Model]" as view_monitoring #B9D98A
+rectangle "Maintenance Technician\n[Actor]" as actor_monitoring #FFF3A6
+rectangle "Source, frequency, thresholds, and alert\nlifecycle require business validation\n[Question / Risk]" as risk_intelligence #FF8A80
+
+external_sensor -right-> command_reading
+view_manual_reading -right[dashed]-> actor_manual_reading
+actor_manual_reading -right-> command_reading
+command_reading -right-> aggregate_reading
+aggregate_reading -right-> event_reading
+event_reading -right-> view_variables
+
+event_reading_policy -right-> policy_evaluate
+policy_evaluate -right-> command_anomaly
+command_anomaly -right-> aggregate_anomaly
+aggregate_anomaly -right-> event_anomaly
+event_anomaly -right-> view_anomalies
+
+event_anomaly_policy -right-> policy_alert
+policy_alert -right-> command_alert
+command_alert -right-> aggregate_alert
+aggregate_alert -right-> event_alert
+event_alert -right-> external_notification
+
+view_monitoring -right[dashed]-> actor_monitoring
+view_monitoring -down[dashed]-> risk_intelligence
+
+command_reading -[hidden]down-> policy_evaluate
+policy_evaluate -[hidden]down-> policy_alert
+policy_alert -[hidden]down-> actor_monitoring
+
+legend bottom
+  |= Color |= EventStorming Element |
+  |<#FFF3A6> | Actor |
+  |<#A9C7F7> | Command |
+  |<#FFE27A> | Aggregate Root |
+  |<#FFB26B> | Domain Event |
+  |<#C9A7E8> | Business Process / Policy |
+  |<#F5A3D7> | External System |
+  |<#B9D98A> | View / Read Model |
+  |<#FF8A80> | Question / Risk |
+endlegend
+@enduml

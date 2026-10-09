@@ -1,0 +1,60 @@
+@startuml
+!include event-storming-style.puml
+
+title Asset and Maintenance Management - Design-Level Event Storming
+top to bottom direction
+
+rectangle "Machine Registration\nView\n[View / Read Model]" as view_machine_registration #B9D98A
+rectangle "Maintenance Technician\n[Actor]" as actor_machine #FFF3A6
+rectangle "Register Machine\n[Command]" as command_machine #A9C7F7
+rectangle "Machine\n[Aggregate Root]" as aggregate_machine #FFE27A
+rectangle "Machine Registered\n[Domain Event]" as event_machine #FFB26B
+rectangle "Machine Catalog and\nStatus\n[View / Read Model]" as view_machine_status #B9D98A
+
+rectangle "Maintenance Schedule and\nMachine Status\n[View / Read Model]" as view_preventive #B9D98A
+rectangle "Maintenance Technician\n[Actor]" as actor_preventive #FFF3A6
+rectangle "Record Preventive\nMaintenance\n[Command]" as command_preventive #A9C7F7
+rectangle "Maintenance Record\n[Aggregate Root]" as aggregate_preventive #FFE27A
+rectangle "Preventive Maintenance\nRecorded\n[Domain Event]" as event_preventive #FFB26B
+rectangle "Maintenance History\n[View / Read Model]" as view_history_preventive #B9D98A
+
+rectangle "Pending Anomalies and\nMachine Status\n[View / Read Model]" as view_corrective #B9D98A
+rectangle "Maintenance Technician\n[Actor]" as actor_corrective #FFF3A6
+rectangle "Record Corrective\nMaintenance\n[Command]" as command_corrective #A9C7F7
+rectangle "Maintenance Record\n[Aggregate Root]" as aggregate_corrective #FFE27A
+rectangle "Corrective Maintenance\nRecorded\n[Domain Event]" as event_corrective #FFB26B
+rectangle "Maintenance History\n[View / Read Model]" as view_history_corrective #B9D98A
+
+view_machine_registration -right[dashed]-> actor_machine
+actor_machine -right-> command_machine
+command_machine -right-> aggregate_machine
+aggregate_machine -right-> event_machine
+event_machine -right-> view_machine_status
+
+view_preventive -right[dashed]-> actor_preventive
+actor_preventive -right-> command_preventive
+command_preventive -right-> aggregate_preventive
+aggregate_preventive -right-> event_preventive
+event_preventive -right-> view_history_preventive
+
+view_corrective -right[dashed]-> actor_corrective
+actor_corrective -right-> command_corrective
+command_corrective -right-> aggregate_corrective
+aggregate_corrective -right-> event_corrective
+event_corrective -right-> view_history_corrective
+
+actor_machine -[hidden]down-> actor_preventive
+actor_preventive -[hidden]down-> actor_corrective
+
+legend bottom
+  |= Color |= EventStorming Element |
+  |<#FFF3A6> | Actor |
+  |<#A9C7F7> | Command |
+  |<#FFE27A> | Aggregate Root |
+  |<#FFB26B> | Domain Event |
+  |<#C9A7E8> | Business Process / Policy |
+  |<#F5A3D7> | External System |
+  |<#B9D98A> | View / Read Model |
+  |<#FF8A80> | Question / Risk |
+endlegend
+@enduml

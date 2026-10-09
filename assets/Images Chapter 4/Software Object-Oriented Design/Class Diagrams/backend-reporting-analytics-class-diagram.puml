@@ -1,0 +1,210 @@
+@startuml
+left to right direction
+
+package "Molinex.ReportingAnalytics.Interfaces.REST" as Interfaces {
+  class ReportsController <<REST Controller>> {
+    +GetSummary(from : DateOnly, to : DateOnly) : ActionResult
+    +GetProductionReport(from : DateOnly, to : DateOnly) : ActionResult
+    +GetMaintenanceReport(from : DateOnly, to : DateOnly) : ActionResult
+    +GetTrend(indicator : string, from : DateOnly, to : DateOnly) : ActionResult
+  }
+  class ReportingResourceAssembler <<Assembler>> {
+    +{static} ToSummaryQuery(from : DateOnly, to : DateOnly) : GetOperationalSummaryQuery
+    +{static} ToReportQuery(reportType : string, from : DateOnly, to : DateOnly) : GenerateReportQuery
+    +{static} ToTrendQuery(indicator : string, from : DateOnly, to : DateOnly) : GetOperationalTrendQuery
+    +{static} ToResource(model : OperationalSummary) : OperationalSummaryResource
+    +{static} ToResource(model : ProductionReport) : ReportResource
+    +{static} ToResource(model : MaintenanceReport) : ReportResource
+    +{static} ToResource(model : OperationalTrend) : OperationalTrendResource
+    +{static} ToResource(model : MetricValue) : MetricResource
+    +{static} ToResource(model : ReportRow) : ReportRowResource
+    +{static} ToResource(model : TrendPoint) : TrendPointResource
+  }
+  class OperationalSummaryResource <<Response Resource>> <<(R,#FF7700)>> {
+    +From : DateOnly
+    +To : DateOnly
+    +Metrics : MetricResource[]
+  }
+  class ReportResource <<Response Resource>> <<(R,#FF7700)>> {
+    +ReportType : string
+    +From : DateOnly
+    +To : DateOnly
+    +Rows : ReportRowResource[]
+  }
+  class OperationalTrendResource <<Response Resource>> <<(R,#FF7700)>> {
+    +Indicator : string
+    +From : DateOnly
+    +To : DateOnly
+    +Points : TrendPointResource[]
+  }
+  class MetricResource <<Response Resource>> <<(R,#FF7700)>> {
+    +Name : string
+    +Value : decimal
+    +Unit : string
+    +MeasuredAt : DateTimeOffset
+  }
+  class ReportRowResource <<Response Resource>> <<(R,#FF7700)>> {
+    +Dimensions : string[]
+    +Metrics : MetricResource[]
+  }
+  class TrendPointResource <<Response Resource>> <<(R,#FF7700)>> {
+    +RecordedAt : DateTimeOffset
+    +Value : decimal
+  }
+}
+
+package "Molinex.ReportingAnalytics.Application" as Application {
+  class ReportingQueryService <<Query Service>> {
+    +GetOperationalSummaryAsync(period : DateRange) : Task<OperationalSummary>
+    +GenerateProductionReportAsync(period : DateRange) : Task<ProductionReport>
+    +GenerateMaintenanceReportAsync(period : DateRange) : Task<MaintenanceReport>
+    +GetOperationalTrendAsync(indicator : MetricName, period : DateRange) : Task<OperationalTrend>
+  }
+  class ReportingProjectionHandler <<Event Handler>> {
+    +HandleAsync(event : PublishedDomainEvent) : Task
+  }
+  class GetOperationalSummaryQuery <<Query>> {
+    +From : DateOnly
+    +To : DateOnly
+  }
+  class GenerateReportQuery <<Query>> {
+    +ReportType : string
+    +From : DateOnly
+    +To : DateOnly
+  }
+  class GetOperationalTrendQuery <<Query>> {
+    +Indicator : string
+    +From : DateOnly
+    +To : DateOnly
+  }
+}
+
+package "Molinex.ReportingAnalytics.Domain.Model" as DomainModel {
+  class PublishedDomainEvent <<Published Language>> {
+    +EventName : string
+    +AggregateReference : Guid
+    +OccurredAt : DateTimeOffset
+    +PayloadVersion : int
+  }
+  class DateRange <<Value Object>> {
+    -_start : DateOnly
+    -_end : DateOnly
+    +IsValid() : bool
+  }
+  class MetricName <<Value Object>> {
+    -_value : string
+  }
+  class MetricAmount <<Value Object>> {
+    -_value : decimal
+  }
+  class UnitSymbol <<Value Object>> {
+    -_value : string
+  }
+  class MetricValue <<Value Object>> {
+    -_name : MetricName
+    -_value : MetricAmount
+    -_unit : UnitSymbol
+    -_measuredAt : DateTimeOffset
+  }
+  class ReportDimension <<Value Object>> {
+    -_name : string
+    -_value : string
+  }
+  class ReportRow <<Value Object>> {
+    -_dimensions : ReportDimension[]
+    -_metrics : MetricValue[]
+  }
+  class TrendPoint <<Value Object>> {
+    -_recordedAt : DateTimeOffset
+    -_value : MetricAmount
+  }
+  class OperationalSummary <<Read Model>> {
+    +Period : DateRange
+    +Metrics : MetricValue[]
+  }
+  class ProductionReport <<Read Model>> {
+    +Period : DateRange
+    +Rows : ReportRow[]
+  }
+  class MaintenanceReport <<Read Model>> {
+    +Period : DateRange
+    +Rows : ReportRow[]
+  }
+  class OperationalTrend <<Read Model>> {
+    +Indicator : MetricName
+    +Period : DateRange
+    +Points : TrendPoint[]
+  }
+  interface IReportingProjectionStore <<Projection Store>> {
+    +SaveMetricAsync(metric : MetricValue) : Task
+    +FindMetricsAsync(period : DateRange) : Task<MetricValue[]>
+    +FindProductionRowsAsync(period : DateRange) : Task<ReportRow[]>
+    +FindMaintenanceRowsAsync(period : DateRange) : Task<ReportRow[]>
+    +FindTrendAsync(indicator : MetricName, period : DateRange) : Task<TrendPoint[]>
+  }
+}
+
+package "Molinex.ReportingAnalytics.Infrastructure.Persistence.EFC" as Infrastructure {
+  class ReportingDbContext <<EF Core DbContext>> {
+    +Metrics : DbSet<MetricValue>
+    +ReportRows : DbSet<ReportRow>
+    +TrendPoints : DbSet<TrendPoint>
+    +SaveChangesAsync() : Task<int>
+  }
+  class ReportingProjectionStoreAdapter <<Projection Store Adapter>> {
+    -_context : ReportingDbContext
+    +SaveMetricAsync(metric : MetricValue) : Task
+    +FindMetricsAsync(period : DateRange) : Task<MetricValue[]>
+    +FindProductionRowsAsync(period : DateRange) : Task<ReportRow[]>
+    +FindMaintenanceRowsAsync(period : DateRange) : Task<ReportRow[]>
+    +FindTrendAsync(indicator : MetricName, period : DateRange) : Task<TrendPoint[]>
+  }
+}
+
+ReportsController ..> ReportingResourceAssembler
+ReportsController ..> ReportingQueryService
+ReportingResourceAssembler ..> OperationalSummaryResource : creates
+ReportingResourceAssembler ..> ReportResource : creates
+ReportingResourceAssembler ..> OperationalTrendResource : creates
+ReportingResourceAssembler ..> MetricResource : creates
+ReportingResourceAssembler ..> ReportRowResource : creates
+ReportingResourceAssembler ..> TrendPointResource : creates
+ReportingResourceAssembler ..> GetOperationalSummaryQuery : creates
+ReportingResourceAssembler ..> GenerateReportQuery : creates
+ReportingResourceAssembler ..> GetOperationalTrendQuery : creates
+ReportingResourceAssembler ..> OperationalSummary : uses
+ReportingResourceAssembler ..> ProductionReport : uses
+ReportingResourceAssembler ..> MaintenanceReport : uses
+ReportingResourceAssembler ..> OperationalTrend : uses
+ReportingResourceAssembler ..> MetricValue : uses
+ReportingResourceAssembler ..> ReportRow : uses
+ReportingResourceAssembler ..> TrendPoint : uses
+OperationalSummaryResource *-- "0..*" MetricResource
+ReportResource *-- "0..*" ReportRowResource
+ReportRowResource *-- "0..*" MetricResource
+OperationalTrendResource *-- "0..*" TrendPointResource
+ReportingQueryService ..> GetOperationalSummaryQuery : handles
+ReportingQueryService ..> GenerateReportQuery : handles
+ReportingQueryService ..> GetOperationalTrendQuery : handles
+ReportingQueryService ..> IReportingProjectionStore
+ReportingProjectionHandler ..> IReportingProjectionStore
+ReportingProjectionHandler ..> PublishedDomainEvent
+OperationalSummary *-- DateRange
+OperationalSummary *-- MetricValue
+ProductionReport *-- DateRange
+ProductionReport *-- ReportRow
+MaintenanceReport *-- DateRange
+MaintenanceReport *-- ReportRow
+OperationalTrend *-- MetricName
+OperationalTrend *-- DateRange
+OperationalTrend *-- TrendPoint
+MetricValue *-- MetricName
+MetricValue *-- MetricAmount
+MetricValue *-- UnitSymbol
+ReportRow *-- ReportDimension
+ReportRow *-- MetricValue
+ReportingProjectionStoreAdapter ..|> IReportingProjectionStore
+ReportingProjectionStoreAdapter --> ReportingDbContext
+@enduml
+
+

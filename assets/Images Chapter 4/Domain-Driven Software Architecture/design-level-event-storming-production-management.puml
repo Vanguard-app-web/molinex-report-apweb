@@ -1,0 +1,76 @@
+@startuml
+!include event-storming-style.puml
+
+title Production Management - Design-Level Event Storming
+top to bottom direction
+
+rectangle "Raw Material Reception\nForm\n[View / Read Model]" as view_reception #B9D98A
+rectangle "Production Operator\n[Actor]" as actor_reception #FFF3A6
+rectangle "Record Raw Material\nReception\n[Command]" as command_reception #A9C7F7
+rectangle "Raw Material Reception\n[Aggregate Root]" as aggregate_reception #FFE27A
+rectangle "Raw Material Reception\nRecorded\n[Domain Event]" as event_reception #FFB26B
+rectangle "Available Raw Material\nReceptions\n[View / Read Model]" as view_receptions #B9D98A
+
+rectangle "Available Raw Material\nReceptions\n[View / Read Model]" as view_receptions_in #B9D98A
+rectangle "Production Operator\n[Actor]" as actor_batch #FFF3A6
+rectangle "Register Production\nBatch\n[Command]" as command_batch #A9C7F7
+rectangle "Production Batch\n[Aggregate Root]" as aggregate_batch #FFE27A
+rectangle "Production Batch\nRegistered\n[Domain Event]" as event_batch #FFB26B
+rectangle "Available Production\nBatches\n[View / Read Model]" as view_batches #B9D98A
+
+rectangle "Available Production\nBatches\n[View / Read Model]" as view_batches_in #B9D98A
+rectangle "Production Operator\n[Actor]" as actor_record #FFF3A6
+rectangle "Record Production\nInformation\n[Command]" as command_record #A9C7F7
+rectangle "Production Record\n[Aggregate Root]" as aggregate_record #FFE27A
+rectangle "Production Information\nRecorded\n[Domain Event]" as event_recorded #FFB26B
+rectangle "Production Processes\nand History\n[View / Read Model]" as view_history #B9D98A
+
+rectangle "Production Processes\nand History\n[View / Read Model]" as view_history_in #B9D98A
+rectangle "Production Operator\n[Actor]" as actor_update #FFF3A6
+rectangle "Update Production\nInformation\n[Command]" as command_update #A9C7F7
+rectangle "Production Record\n[Aggregate Root]" as aggregate_update #FFE27A
+rectangle "Production Information\nUpdated\n[Domain Event]" as event_updated #FFB26B
+rectangle "Production Processes\nand History\n[View / Read Model]" as view_history_out #B9D98A
+rectangle "Correction audit and indicator recalculation\nrules require validation\n[Question / Risk]" as risk_corrections #FF8A80
+
+view_reception -right[dashed]-> actor_reception
+actor_reception -right-> command_reception
+command_reception -right-> aggregate_reception
+aggregate_reception -right-> event_reception
+event_reception -right-> view_receptions
+
+view_receptions_in -right[dashed]-> actor_batch
+actor_batch -right-> command_batch
+command_batch -right-> aggregate_batch
+aggregate_batch -right-> event_batch
+event_batch -right-> view_batches
+
+view_batches_in -right[dashed]-> actor_record
+actor_record -right-> command_record
+command_record -right-> aggregate_record
+aggregate_record -right-> event_recorded
+event_recorded -right-> view_history
+
+view_history_in -right[dashed]-> actor_update
+actor_update -right-> command_update
+command_update -right-> aggregate_update
+aggregate_update -right-> event_updated
+event_updated -right-> view_history_out
+event_updated -down[dashed]-> risk_corrections
+
+actor_reception -[hidden]down-> actor_batch
+actor_batch -[hidden]down-> actor_record
+actor_record -[hidden]down-> actor_update
+
+legend bottom
+  |= Color |= EventStorming Element |
+  |<#FFF3A6> | Actor |
+  |<#A9C7F7> | Command |
+  |<#FFE27A> | Aggregate Root |
+  |<#FFB26B> | Domain Event |
+  |<#C9A7E8> | Business Process / Policy |
+  |<#F5A3D7> | External System |
+  |<#B9D98A> | View / Read Model |
+  |<#FF8A80> | Question / Risk |
+endlegend
+@enduml
