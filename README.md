@@ -63,30 +63,36 @@ Proyecto<br>
 
 | Versión | Fecha | Autor | Descripción de la modificación |
 |:--:|:--:|:--|:--|
-| AV1 |  |  ||
-|0.1|14/09|Luisa Casalino|Desarrolle los segmentos objetivos y el análisis competitivo de Molinex.|
-|0.2|14/09|Antony Jimenez|descripción inicial de la startup y se configuró la estructura inicial del proyecto.|
+| **AV1** |  |  | **Documentación del análisis, diseño e implementación de la Landing Page.** |
+|0.1|14/09|Luisa Casalino|Se desarrollaron los segmentos objetivo y el análisis competitivo de Molinex.|
+|0.2|14/09|Antony Jimenez|Se incorporó la descripción inicial de la startup y se configuró la estructura inicial del proyecto.|
 |0.3|15/09|Brayan Huerta|Se realizaron correcciones y actualizaciones relacionadas con la descripción de la startup, perfiles del equipo y análisis de entrevistas.|
-|0.4|16/09|Antony Jimenez Saavedra|Se incorporo el registro de entrevistas, análisis de entrevistas y User Task Matrix.|
-|0.5|16/09|Luisa Nhiriel Casalino|Se agregaron User Person, User Journey Map, Empathy Mapping y Ubiquitous Language.|
+|0.4|16/09|Antony Jimenez Saavedra|Se incorporó el registro de entrevistas, el análisis de entrevistas y la User Task Matrix.|
+|0.5|16/09|Luisa Nhiriel Casalino|Se agregaron User Persona, User Journey Map, Empathy Mapping y Ubiquitous Language.|
 |0.6|17/09|Antony Jimenez Saavedra|Se actualizaron los perfiles de los integrantes y se incorporaron evidencias adicionales del proyecto.|
 |0.7|17/09|Brayan Huerta|Se realizaron correcciones en hipótesis, perfiles del equipo y análisis de entrevistas.|
 |0.8|17/09|Fabricio Rivera|Se incorporaron Style Guidelines, Information Architecture, Big Picture Event Storming, Design-Level Event Storming, arquitectura de software y diagramas de clases.|
 |0.9|18/09|Fabricio Rivera|Se agregó el diagrama de base de datos y se completaron elementos del diseño técnico.|
 |1.0|18/09|Giovanni Gallegos|Se agregaron los wireflows, wireframes, prototipo de aplicación web y evidencias de la Landing Page.|
 |1.1|19/09|Giovanni Gallegos|Se completaron las secciones del informe correspondientes a AV1 y se agregaron evidencias.|
-|1.2|19/09|Equipo Vanguard|Consolidación y revisión de las secciones del informe correspondientes a la evaluación AV1.|<div style="page-break-after: always;"></div>
+|1.2|19/09|Equipo Vanguard|Consolidación y revisión de las secciones del informe correspondientes a la evaluación AV1.|
+| **TB1** |  |  | **Implementación, integración y despliegue de la primera versión funcional de la Web Application.** |
+|1.3|08/10|Equipo Vanguard|Se actualizaron el Product Backlog, el Sprint Planning y el Sprint Backlog, y se documentaron las observaciones aplicadas a los modelos EventStorming, C4 y diagramas de clases.|
+|1.4|09/10|Equipo Vanguard|Se documentaron la implementación de la Web Application, la API simulada, las pruebas, el despliegue en Azure y las contribuciones del Sprint 2.|
+|1.5|09/10|Fabricio Rivera|Se incorporaron los GitHub Insights de AV1 y TB1, las evidencias funcionales y los anexos de acceso rápido.|
+
+<div style="page-break-after: always;"></div>
 
 ## Project Report Collaboration Insights
 
 ## AV1
 
-Para el desarrollo del informe perteneciente a la entrega TB1, se dividió la implementación de las diferentes secciones y actividades del proyecto Molinex entre los integrantes del equipo. La distribución presentada a continuación se basa en las actividades registradas mediante ramas y commits en el repositorio del proyecto.
+Para el desarrollo del informe correspondiente a la entrega AV1, se distribuyeron las diferentes secciones y actividades del proyecto Molinex entre los integrantes del equipo. La distribución presentada a continuación se basa en las actividades registradas mediante ramas y commits en los repositorios del proyecto.
 
 | Integrante | Tareas Designadas |
 | --- | --- |
 | **Antony Alexander Jimenez Saavedra** | Registro y análisis de entrevistas, Interview Record, Interview Analysis, User Task Matrix, Lean UX Canvas, Product Backlog, Impact Mapping, Mapping, enlace del Backlog y Sprint Backlog. |
-| **Luisa Nhiriel Casalino Berrocal** | User Person, User Journey Map, Empathy Mapping, Ubiquitous Language, User Stories, Sprint Planning 1, Aspect Leaders and Collaborators y Student Outcome. |
+| **Luisa Nhiriel Casalino Berrocal** | User Persona, User Journey Map, Empathy Mapping, Ubiquitous Language, User Stories, Sprint Planning 1, Aspect Leaders and Collaborators y Student Outcome. |
 | **Giovanni Marcelo Gallegos De La Cruz** | Wireframes de la aplicación web, Wireflows, prototipo de aplicación web, evidencias de la Landing Page, documentación de diseño y consolidación de secciones del informe para AV1. |
 | **Brayan Benjamin Huerta Cardenas** | Análisis de la Landing Page, wireframe y mockup de la Landing Page, perfiles de integrantes, correcciones de la descripción de la startup y ajustes del análisis de entrevistas. |
 | **Fabricio Jose Rivera Rupay** | Style Guidelines, Information Architecture, Big Picture Event Storming, Design-Level Event Storming, arquitectura de software, diagramas de clases y diagrama de base de datos. |
@@ -96,12 +102,14 @@ Para el desarrollo del informe perteneciente a la entrega TB1, se dividió la im
 
 - Project Report: `https://github.com/Vanguard-app-web/molinex-report-apweb`
 - Landing Page: `https://github.com/Vanguard-app-web/molinex-website-apweb`
-- Frontend Web Application: repositorio pendiente de creación (fuera del alcance de despliegue de este AV1).
-- RESTful API: repositorio pendiente de creación (fuera del alcance de despliegue de este AV1).
+- Web Application: `https://github.com/Vanguard-app-web/molinex-webapp`
+- Mock Web Service: `https://github.com/Vanguard-app-web/molinex-platform`
+
+La RESTful API definitiva será implementada en un sprint posterior. Durante el Sprint 2, `molinex-platform` proporciona una API simulada desplegable para integrar y validar la Web Application.
 
 ### Entrega AV1
 
-Durante la entrega AV1 se avanzó en la elaboración y consolidación de los principales artefactos del proyecto Molinex. Se desarrollaron los perfiles de los integrantes, el análisis de entrevistas, User Person, User Journey Map, Empathy Mapping, User Task Matrix, Lean UX Canvas, User Stories, Product Backlog e Impact Mapping. Asimismo, se trabajó en el diseño de la solución mediante Style Guidelines, Information Architecture, Big Picture Event Storming, Design-Level Event Storming, wireframes, wireflows y el prototipo de la aplicación web.
+Durante la entrega AV1 se avanzó en la elaboración y consolidación de los principales artefactos del proyecto Molinex. Se desarrollaron los perfiles de los integrantes, el análisis de entrevistas, User Persona, User Journey Map, Empathy Mapping, User Task Matrix, Lean UX Canvas, User Stories, Product Backlog e Impact Mapping. Asimismo, se trabajó en el diseño de la solución mediante Style Guidelines, Information Architecture, Big Picture Event Storming, Design-Level Event Storming, wireframes, wireflows y el prototipo de la aplicación web.
 
 También se desarrollaron elementos relacionados con la arquitectura y el diseño técnico, como el modelo C4, diagramas de clases y diagrama de base de datos. Finalmente, se incorporaron evidencias de la Landing Page, Sprint Planning 1, Sprint Backlog, Aspect Leaders and Collaborators, Student Outcome y demás secciones requeridas para la consolidación del informe de la AV1.
 
@@ -118,7 +126,35 @@ El trabajo se realizó de manera colaborativa mediante ramas y commits en el rep
 
 #### Evidencias de colaboración y commits
 
-El equipo gestionó el desarrollo del informe mediante ramas de GitHub bajo el modelo GitFlow, con una rama `feature/` por cada sección y su posterior integración en `develop` mediante `git flow feature finish`. La evidencia visual de las ramas utilizadas, el historial de commits y los GitHub Insights del repositorio se presenta en la sección 5.2.1.8 (Team Collaboration Insights during Sprint).
+El equipo gestionó el informe y la Landing Page mediante ramas de GitHub bajo el modelo GitFlow. Los siguientes gráficos muestran las contribuciones registradas durante la entrega AV1.
+
+![Contribuciones al informe durante AV1](assets/evidence/collaboration/av1-report-insights.png)
+
+**Figura:** GitHub Insights del repositorio del informe durante AV1. Fuente: elaboración propia a partir de GitHub.
+
+![Contribuciones a la Landing Page durante AV1](assets/evidence/collaboration/av1-website-insights.png)
+
+**Figura:** GitHub Insights del repositorio de la Landing Page durante AV1. Fuente: elaboración propia a partir de GitHub.
+
+## TB1
+
+Para TB1, el equipo implementó la primera versión funcional de la Web Application, la integró con la API simulada, publicó ambos productos en Azure y completó la documentación del Sprint 2.
+
+| Integrante | Contribución principal en TB1 |
+| --- | --- |
+| **Antony Alexander Jimenez Saavedra** | Implementación del bounded context Asset & Maintenance para maquinaria y mantenimientos preventivos y correctivos. |
+| **Luisa Nhiriel Casalino Berrocal** | Implementación del bounded context Quality & Waste para resultados de calidad y registros de merma. |
+| **Giovanni Marcelo Gallegos De La Cruz** | Implementación del bounded context Production Management para recepciones, lotes, procesos e historial de producción. |
+| **Brayan Benjamin Huerta Cardenas** | Implementación del shell compartido, navegación adaptable, tema visual e internacionalización EN/ES. |
+| **Fabricio Jose Rivera Rupay** | Configuración del proyecto, Shared Kernel, integración con la API simulada, preparación de versiones, despliegue en Azure y consolidación del informe. |
+
+La Web Application se desarrolló mediante ramas `feature/*`, Pull Requests hacia `develop`, ramas `release/*` y Conventional Commits. Los GitHub Insights registran contribuciones de los cinco integrantes durante TB1.
+
+![Contribuciones a la Web Application durante TB1, parte 1](assets/evidence/collaboration/tb1-report-insights-part-1.png)
+
+![Contribuciones a la Web Application durante TB1, parte 2](assets/evidence/collaboration/tb1-report-insights-part-2.png)
+
+**Figura:** GitHub Insights del repositorio `molinex-webapp` durante TB1. Fuente: elaboración propia a partir de GitHub.
 
 <div style="page-break-after: always;"></div>
 
@@ -200,11 +236,21 @@ El equipo gestionó el desarrollo del informe mediante ramas de GitHub bajo el m
     - [5.2.1.6 Services Documentation Evidence for Sprint Review](#5216-services-documentation-evidence-for-sprint-review)
     - [5.2.1.7 Software Deployment Evidence for Sprint Review](#5217-software-deployment-evidence-for-sprint-review)
     - [5.2.1.8 Team Collaboration Insights during Sprint](#5218-team-collaboration-insights-during-sprint)
+  - [5.2.2 Sprint 2](#522-sprint-2)
+    - [5.2.2.1 Sprint Planning 2](#5221-sprint-planning-2)
+    - [5.2.2.2 Aspect Leaders and Collaborators](#5222-aspect-leaders-and-collaborators)
+    - [5.2.2.3 Sprint Backlog 2](#5223-sprint-backlog-2)
+    - [5.2.2.4 Development Evidence for Sprint Review](#5224-development-evidence-for-sprint-review)
+    - [5.2.2.5 Execution Evidence for Sprint Review](#5225-execution-evidence-for-sprint-review)
+    - [5.2.2.6 Services Documentation Evidence for Sprint Review](#5226-services-documentation-evidence-for-sprint-review)
+    - [5.2.2.7 Software Deployment Evidence for Sprint Review](#5227-software-deployment-evidence-for-sprint-review)
+    - [5.2.2.8 Team Collaboration Insights during Sprint](#5228-team-collaboration-insights-during-sprint)
 - [Conclusiones](#conclusiones)
 - [Conclusiones y recomendaciones](#conclusiones-y-recomendaciones)
 - [Bibliografía](#bibliografía)
 - [Anexos](#anexos)
-- [Anexo A. Videos de Exposiciones](#anexo-a-videos-de-exposiciones)
+  - [Anexo A. Enlaces de acceso rápido](#anexo-a-enlaces-de-acceso-rápido)
+  - [Anexo B. Videos de Exposiciones](#anexo-b-videos-de-exposiciones)
 
 <div style="page-break-after: always;"></div>
 
@@ -220,8 +266,8 @@ En el siguiente cuadro se describe las acciones realizadas y enunciados de concl
 
 |Criterio específico | Acciones realizadas | Conclusiones |
 | :--- | :--- | :--- |
-| **Trabaja en equipo para proporcionar liderazgo en forma conjunta** | **Casalino Berrocal, Luisa Nhiriel**<br>**AV1:** Coordiné la distribución de roles del equipo en la reunión de planificación, ajusté las secciones del informe según las correcciones del docente sobre el alcance de Molinex y lideré la grabación del video "About The Team", presentando la visión general del proyecto.<br>**TB1:** Lideré la sesión de estimación y priorización del Sprint Planning 2 en Discord, guiando al equipo en la asignación de responsabilidades para el desarrollo de la interfaz de la Web Application (Vue.js / PrimeVue) y asumiendo la conducción del módulo de control de calidad y desperdicios.<br><br>**Gallegos De La Cruz, Giovanni Marcelo**<br>**AV1:** Lideré la discusión técnica sobre la arquitectura del software en las reuniones virtuales, corrigiendo las inconsistencias observadas en las secciones del dominio y orientando al equipo hacia decisiones conjuntas sobre la Landing Page.<br>**TB1:** Conduje el Sprint Planning 2 en Discord presentando el Sprint Goal y la velocidad del equipo, guiando la adopción del framework Vue.js con PrimeVue y liderando el diseño técnico e implementación del módulo de gestión de producción (US-05, US-06, US-07).<br><br>**Huerta Cardenas, Brayan Benjamin**<br>**AV1:** Propuse y guié la definición del alcance del dominio y la gestión de materia prima durante las reuniones de planificación, reestructurando las historias de usuario iniciales tras la retroalimentación del AV1 y representando al equipo en la presentación en video.<br>**TB1:** Asumí el liderazgo en el refinamiento del Product Backlog para el Sprint 2, coordinando en llamadas grupales el desglose de Historias de Usuario a Work-Items y liderando la implementación del módulo de recepción de materia prima e inventarios.<br><br>**Jimenez Saavedra, Antony Alexander**<br>**AV1:** Lideré la definición del Product Backlog en las sesiones grupales, corrigiendo la redacción de los criterios de aceptación del AV1 y coordinando con mis compañeros el desglose de las historias del Sprint 1.<br>**TB1:** Asumí el liderazgo de la gestión técnica del repositorio en GitHub, definiendo las políticas de ramas (GitFlow), estandarizando las directrices para Conventional Commits y supervisando las revisiones de código (Pull Requests) del equipo.<br><br>**Rivera Rupay, Fabricio Jose**<br>**AV1:** Conduje las reuniones de planificación, aplicando las observaciones del docente respecto a la propuesta de valor y planes de suscripción, y representé esa visión refinada en la presentación en video del equipo.<br>**TB1:** Lideré el seguimiento del cumplimiento del Sprint Goal 2 mediante Daily Standups en Discord y coordiné la consolidación general del informe final del TB1, garantizando que el despliegue actualizado de la Landing Page cumpla con los estándares exigidos. | Como conclusión de este primer avance, identificamos que ejercer liderazgo compartido desde el inicio del proyecto evita que un solo integrante concentre las decisiones: cada miembro asumió en algún momento la conducción de una actividad (planificación, definición de alcance, backlog o presentación en video), lo cual fortaleció el sentido de corresponsabilidad del equipo. Esta forma de liderazgo distribuido nos permitió avanzar con una dirección clara desde el Sprint 1 y sienta una base sólida para que, en las siguientes entregas, el liderazgo continúe rotando según la naturaleza de cada actividad.<br><br>**TB1:** En la entrega TB1, consolidamos la rotación de liderazgo en la parte técnica y de gestión. La conducción compartida en la arquitectura de Frontend (Vue.js/PrimeVue), el flujo de trabajo en GitHub mediante GitFlow y el seguimiento diario del Sprint 2 permitieron resolver bloqueos técnicos con agilidad. Esto demostró que distribuir las responsabilidades fortalece la autonomía del equipo ante entregables de mayor complejidad técnica. |
-| **Crea un entorno colaborativo e inclusivo, establece metas, planifica tareas y cumple objetivos.** | **Casalino Berrocal, Luisa Nhiriel**<br>**AV1:** Estructuré el Sprint Planning 1 y el Sprint Backlog, subsanando los detalles señalados por el docente para establecer metas de Sprint claras y organizar las tareas del equipo de manera equitativa.<br>**TB1:** Diseñé y desarrollé las vistas de la Web Application en Vue.js para el módulo de Quality & Waste Control (US-11 y US-14), articulando con mis compañeros las llamadas de API mockeadas y el flujo de navegación de las pruebas de calidad.<br><br>**Gallegos De La Cruz, Giovanni Marcelo**<br>**AV1:** Desglosé las tareas técnicas (Work-Items) del primer Sprint, corregí los esquemas del sistema y documenté los requisitos, manteniendo al equipo alineado mediante actualizaciones constantes por WhatsApp y Discord.<br>**TB1:** Implementé la estructura base de componentes e integración con PrimeVue en la Web Application, cumpliendo los Work-Items asignados para la gestión de lotes y fases de producción en el Sprint Backlog 2.<br><br>**Huerta Cardenas, Brayan Benjamin**<br>**AV1:** Definí formalmente las Historias de Usuario (US-01 a US-04 y US-31 a US-36), corrigiendo sus descripciones en inglés y español según la retroalimentación del AV1 para fijar metas objetivas y medibles.<br>**TB1:** Desarrollé e integré los componentes y formularios del módulo de recepción de materia prima (US-05 y US-06) en la aplicación web, verificando en llamadas grupales que la navegación estuviera sincronizada con los demás módulos.<br><br>**Jimenez Saavedra, Antony Alexander**<br>**AV1:** Colaboré en la reestructuración del informe tras las observaciones del docente, ajustando los planes de suscripción y aportando las referencias bibliográficas que respaldan la propuesta del sistema.<br>**TB1:** Implementé componentes de la interfaz gráfica en la Web Application, aprobé los Pull Requests del equipo en GitHub garantizando la integración continua del código y documenté las evidencias de desarrollo en el informe.<br><br>**Rivera Rupay, Fabricio Jose**<br>**AV1:** Consolidé el trabajo del equipo en el repositorio Git, revisando que se aplicaran las correcciones indicadas y que los entregables cumplieran con las métricas exigidas para el envío del Avance 1.<br>**TB1:** Actualicé y desplegué la nueva versión de la Landing Page en el servidor de Hosting, verificando el cumplimiento del Definition of Done (DoD) para cada una de las historias de usuario desarrolladas en el Sprint 2. | La construcción de un entorno colaborativo e inclusivo ha sido clave desde este primer avance: cada integrante planificó y cumplió tareas concretas (Sprint Planning, Sprint Backlog, Historias de Usuario, documentación de requisitos y consolidación del repositorio) que en conjunto permitieron alcanzar la meta del Sprint 1. Mantenernos alineados mediante canales de comunicación constantes reforzó la sensación de pertenencia y corresponsabilidad del equipo, sentando las bases para que en las próximas entregas sigamos estableciendo metas conjuntas y cumpliendo los objetivos planificados.<br><br>**TB1:** Durante el desarrollo del TB1, el trabajo colaborativo permitió cumplir satisfactoriamente con la primera versión de la Web Application y la actualización del Landing Page. La distribución equitativa de los Work-Items, sumada a la asistencia mutua en Discord para solucionar errores de layout e integración con PrimeVue, aseguró el cumplimiento del 100% de las historias de usuario comprometidas en el Sprint 2. |
+| **Trabaja en equipo para proporcionar liderazgo en forma conjunta** | **Casalino Berrocal, Luisa Nhiriel**<br>**AV1:** Coordinó actividades de planificación y documentación del equipo.<br>**TB1:** Lideró el bounded context Quality & Waste Control e integró las funcionalidades US-11 y US-14 mediante el Pull Request #5.<br><br>**Gallegos De La Cruz, Giovanni Marcelo**<br>**AV1:** Participó en la definición técnica y en los artefactos UX/UI de la Web Application.<br>**TB1:** Lideró Production Management e integró los flujos US-05 a US-10 mediante el Pull Request #4.<br><br>**Huerta Cardenas, Brayan Benjamin**<br>**AV1:** Participó en la definición del alcance y la documentación de la solución.<br>**TB1:** Lideró la integración del shell compartido, el tema visual, la navegación adaptable y la internacionalización EN/ES mediante el Pull Request #7.<br><br>**Jimenez Saavedra, Antony Alexander**<br>**AV1:** Participó en la definición y organización del Product Backlog.<br>**TB1:** Lideró Asset & Maintenance e integró las funcionalidades US-17, US-19 y US-20 mediante el Pull Request #6.<br><br>**Rivera Rupay, Fabricio Jose**<br>**AV1:** Lideró la documentación de arquitectura y la consolidación técnica del informe.<br>**TB1:** Lideró la configuración del proyecto, el Shared Kernel, la integración con la API simulada, las versiones y el despliegue en Azure mediante los Pull Requests #1, #2, #3, #8, #9 y #10. | En TB1, el liderazgo se distribuyó según los bounded contexts y las responsabilidades de integración. Cada líder coordinó un alcance identificable y los Pull Requests permitieron integrar los resultados en una versión funcional común. |
+| **Crea un entorno colaborativo e inclusivo, establece metas, planifica tareas y cumple objetivos.** | El equipo definió un Sprint Goal y distribuyó las historias entre Production Management, Quality & Waste Control, Asset & Maintenance y la base compartida. Luisa Casalino integró calidad y merma; Giovanni Gallegos integró recepciones, lotes y producción; Brayan Huerta integró el shell compartido e i18n; Antony Jimenez integró maquinaria y mantenimiento; y Fabricio Rivera preparó la arquitectura base, la integración, las versiones, el despliegue y la consolidación documental. Los cambios se trabajaron mediante ramas feature, Conventional Commits y Pull Requests hacia develop. | La distribución por bounded contexts permitió trabajar en paralelo y cumplir las historias comprometidas del Sprint 2. La revisión mediante Pull Requests y las pruebas automatizadas facilitaron la integración de los aportes de los cinco integrantes, mientras que GitHub Insights dejó evidencia verificable de su participación. |
 <div style="page-break-after: always;"></div>
 
 # Capítulo I Introducción
@@ -1932,9 +1978,10 @@ El modelado se separa por producto de software y por límite funcional. Cada Bou
 | Producto | Tecnologías | Herramientas principales |
 |:--|:--|:--|
 | Landing Page | HTML5, CSS3, JavaScript | WebStorm |
-| Web Application | Vue, HTML5, CSS3, JavaScript, Material Design, PrimeVue | WebStorm |
-| RESTful API | ASP.NET Core, Entity Framework Core, C# | Rider |
-| Database | MySQL Server | MySQL Workbench |
+| Web Application | Vue 3, Vite, Pinia, Vue Router, Axios, PrimeVue, Vue I18n, JavaScript | WebStorm |
+| Mock Web Service | Node.js, JSON Server | WebStorm |
+| RESTful API definitiva (proyectada) | ASP.NET Core, Entity Framework Core, C# | Rider |
+| Base de datos productiva (proyectada) | Base de datos relacional | Herramienta por definir |
 
 ### 5.1.2 Source Code Management
 
@@ -1942,8 +1989,10 @@ El proyecto Molinex utiliza **Git** y **GitHub** como sistema de control de vers
 
 - Informe del proyecto: [molinex-report-apweb](https://github.com/Vanguard-app-web/molinex-report-apweb)
 - Landing Page: [molinex-website-apweb](https://github.com/Vanguard-app-web/molinex-website-apweb)
+- Web Application: [molinex-webapp](https://github.com/Vanguard-app-web/molinex-webapp)
+- Mock Web Service: [molinex-platform](https://github.com/Vanguard-app-web/molinex-platform)
 
-Los repositorios de la Web Application y el RESTful API se crearán en una etapa posterior del proyecto, ya que su implementación y despliegue no forman parte del alcance de esta entrega (AV1).
+La RESTful API definitiva se implementará en una etapa posterior. Para TB1, el repositorio `molinex-platform` contiene la API simulada utilizada por la Web Application.
 
 **GitFlow.** Cada repositorio sigue el modelo de ramificación GitFlow, con las ramas `main` (versiones estables) y `develop` (integración continua) como base, y las siguientes ramas de soporte:
 
@@ -1953,7 +2002,7 @@ Los repositorios de la Web Application y el RESTful API se crearán en una etapa
 | Release | `release/` | Preparación de una nueva versión antes de fusionarla a `main` y `develop` |
 | Hotfix | `hotfix/` | Corrección urgente aplicada directamente sobre `main` |
 
-El equipo gestiona estas ramas mediante la extensión `git-flow` (línea de comandos) y el plugin **Git Flow Helper** de Rider.
+El equipo gestiona estas ramas mediante la extensión `git-flow` y los complementos Git Flow disponibles en Rider y WebStorm.
 
 **Conventional Commits.** Los mensajes de commit siguen la convención `tipo(alcance opcional): descripción`, utilizando tipos como `feat` (nueva funcionalidad), `chore` (tareas de mantenimiento) y `docs` (cambios de documentación).
 
@@ -1964,7 +2013,7 @@ El equipo gestiona estas ramas mediante la extensión `git-flow` (línea de coma
 | Área | Convenciones |
 |:--|:--|
 | HTML/CSS/JavaScript (Landing Page) | Clases CSS en kebab-case, variables y funciones JavaScript en camelCase, indentación de 2 espacios |
-| Vue (Web Application) | Convenciones de la Vue Style Guide oficial: componentes en PascalCase, props en camelCase; componentes de interfaz basados en PrimeVue con Material Design |
+| Vue (Web Application) | Convenciones de la Vue Style Guide oficial: componentes en PascalCase, props en camelCase y componentes de interfaz basados en PrimeVue con el tema y los tokens visuales de Molinex |
 | C# / ASP.NET Core (RESTful API) | Convenciones oficiales de C#: PascalCase para clases, métodos y propiedades; camelCase para variables locales y parámetros |
 | Control de versiones | Conventional Commits para los mensajes de commit; Semantic Versioning para el versionado de releases |
 
@@ -1974,9 +2023,9 @@ La Landing Page de Molinex está desplegada mediante **GitHub Pages**, sirviendo
 
 **URL de despliegue:** [https://vanguard-app-web.github.io/molinex-website-apweb/](https://vanguard-app-web.github.io/molinex-website-apweb/)
 
-El flujo de despliegue sigue el modelo GitFlow: los cambios se integran en `develop` a través de ramas `feature/`, y se publican en producción únicamente al fusionar una rama `release/` hacia `main`, momento en el cual GitHub Pages sirve automáticamente la nueva versión.
+El flujo de despliegue sigue el modelo GitFlow: los cambios se integran en `develop` a través de ramas `feature/` y las versiones estables se publican desde `main`.
 
-La Web Application y el RESTful API no cuentan con configuración de despliegue en esta entrega, dado que su implementación se definió como fuera del alcance del AV1.
+La Web Application se publica en **Azure Static Web Apps** mediante GitHub Actions y el Mock Web Service se ejecuta en **Azure App Service**. La configuración productiva de la SPA consume la API simulada a través de HTTPS. La RESTful API definitiva permanece fuera del alcance de TB1.
 
 ## 5.2 Landing Page, Services & Applications Implementation
 
@@ -2182,11 +2231,127 @@ L = Líder del aspecto, C = Colaborador.
 
 **Figura:** Tablero de Trello del Sprint 2 con las historias comprometidas y sus tareas. Fuente: elaboración propia.
 
-#### 5.2.2.4.Development Evidence for Sprint Review.
-#### 5.2.2.5.Execution Evidence for Sprint Review.
-#### 5.2.2.6.Services Documentation Evidence for Sprint Review.
-#### 5.2.2.7.Software Deployment Evidence for Sprint Review.
-#### 5.2.2.8.Team Collaboration Insights during Sprint.
+#### 5.2.2.4 Development Evidence for Sprint Review
+
+El código del Sprint 2 se encuentra en los repositorios [molinex-webapp](https://github.com/Vanguard-app-web/molinex-webapp) y [molinex-platform](https://github.com/Vanguard-app-web/molinex-platform). La Web Application fue desarrollada con Vue 3, Vite, Pinia, Vue Router, Axios, PrimeVue y Vue I18n. Su estructura se organiza por bounded contexts y por las capas Domain, Application, Infrastructure y Presentation.
+
+| Pull Request | Rama | Responsable | Alcance integrado |
+|:--:|:--|:--|:--|
+| [#1](https://github.com/Vanguard-app-web/molinex-webapp/pull/1) | `feature/project-setup` | Fabricio1924 | Configuración inicial de Vue, Vite, dependencias, variables de entorno y JSON Server. |
+| [#2](https://github.com/Vanguard-app-web/molinex-webapp/pull/2) | `feature/architecture-scaffold` | Fabricio1924 | Esqueleto DDD de los bounded contexts y sus capas. |
+| [#3](https://github.com/Vanguard-app-web/molinex-webapp/pull/3) | `feature/shared-kernel-api-foundation` | Fabricio1924 | Shared Kernel, cliente HTTP base y fundamentos de integración. |
+| [#4](https://github.com/Vanguard-app-web/molinex-webapp/pull/4) | `feature/sprint2-production-management` | Giova2725 | Recepciones, lotes, procesos, trazabilidad e historial de producción. |
+| [#5](https://github.com/Vanguard-app-web/molinex-webapp/pull/5) | `feature/sprint2-quality-waste-control` | lulu22nhiri | Registro de resultados de calidad y control de merma. |
+| [#6](https://github.com/Vanguard-app-web/molinex-webapp/pull/6) | `feature/sprint2-asset-maintenance` | saavedraantony-max | Inventario de maquinaria y mantenimientos preventivos y correctivos. |
+| [#7](https://github.com/Vanguard-app-web/molinex-webapp/pull/7) | `feature/sprint2-shared-shell-i18n` | brayanjk22 | Shell adaptable, tema visual, navegación e internacionalización EN/ES. |
+| [#8](https://github.com/Vanguard-app-web/molinex-webapp/pull/8) | `feature/api-integration-sprint-2` | Fabricio1924 | Corrección de imports del Shared Kernel e integración de las vistas con la API. |
+| [#9](https://github.com/Vanguard-app-web/molinex-webapp/pull/9) | `feature/release-readiness` | Fabricio1924 | README, ADR, licencia, guía de contribución y preparación de la versión `0.1.0`. |
+| [#10](https://github.com/Vanguard-app-web/molinex-webapp/pull/10) | `feature/azure-deployment` | Fabricio1924 | Configuración de la URL productiva del Mock Web Service. |
+
+![Pull Requests cerrados de la Web Application](assets/Images%20Chapter%205/Sprint%202/github-pull-requests.png)
+
+**Figura:** Diez Pull Requests integrados en el repositorio `molinex-webapp`. Fuente: elaboración propia a partir de GitHub.
+
+La versión entregada de la Web Application es `0.1.1`. Las pruebas automatizadas del dominio y de los assemblers finalizaron con 10 pruebas aprobadas y ninguna prueba fallida. La compilación de producción se realiza con `npm run build` y genera los archivos estáticos publicados por Azure Static Web Apps.
+
+#### 5.2.2.5 Execution Evidence for Sprint Review
+
+La evidencia corresponde a la Web Application desplegada en [Azure Static Web Apps](https://red-sand-0da76971e.1.azurestaticapps.net). Las vistas consumen los recursos publicados por `molinex-platform` y permiten consultar y registrar información de los bounded contexts implementados.
+
+| Historias de usuario | Funcionalidad evidenciada | Resultado observado |
+|:--|:--|:--|
+| US-05, US-06 y US-07 | Flujo de recepción, lote y proceso productivo | La vista general relaciona recepciones, lotes y procesos, y muestra la trazabilidad de los lotes. |
+| US-05 | Consulta y registro de recepción de materia prima | Se muestran las recepciones registradas y el formulario valida los datos necesarios para crear una nueva recepción. |
+| US-11 | Resultados de calidad | Se presentan las evaluaciones y los indicadores de grano entero, grano quebrado y rendimiento. |
+| US-14 | Registro y consulta de merma | Se muestran los registros de merma, la cantidad total y el porcentaje promedio, con filtros por lote y fecha. |
+| US-17 | Registro y consulta de maquinaria | Se presenta el inventario de máquinas y su estado operativo. |
+| US-19 y US-20 | Mantenimiento preventivo y correctivo | Se visualiza el historial de mantenimiento y el formulario de registro correctivo. |
+
+![Vista general de operaciones de producción](assets/Images%20Chapter%205/Sprint%202/production-overview.png)
+
+**Figura:** Trazabilidad entre recepciones, lotes y procesos productivos. Fuente: elaboración propia.
+
+![Recepciones de materia prima](assets/Images%20Chapter%205/Sprint%202/raw-material-receptions.png)
+
+**Figura:** Consulta de recepciones de materia prima. Fuente: elaboración propia.
+
+![Registro de recepción de materia prima](assets/Images%20Chapter%205/Sprint%202/register-raw-material.png)
+
+**Figura:** Formulario de registro de una recepción de materia prima. Fuente: elaboración propia.
+
+![Resultados de calidad](assets/Images%20Chapter%205/Sprint%202/quality-results.png)
+
+**Figura:** Consulta de resultados de calidad del proceso productivo. Fuente: elaboración propia.
+
+![Registros de merma](assets/Images%20Chapter%205/Sprint%202/production-waste.png)
+
+**Figura:** Consulta y filtrado de los registros de merma. Fuente: elaboración propia.
+
+![Inventario de maquinaria](assets/Images%20Chapter%205/Sprint%202/machinery.png)
+
+**Figura:** Inventario de maquinaria y estados operativos. Fuente: elaboración propia.
+
+![Historial de mantenimiento](assets/Images%20Chapter%205/Sprint%202/maintenance.png)
+
+**Figura:** Historial de mantenimientos preventivos y correctivos. Fuente: elaboración propia.
+
+![Registro de mantenimiento correctivo](assets/Images%20Chapter%205/Sprint%202/record-corrective-maintenance.png)
+
+**Figura:** Formulario de registro de mantenimiento correctivo. Fuente: elaboración propia.
+
+#### 5.2.2.6 Services Documentation Evidence for Sprint Review
+
+Durante el Sprint 2 se empleó una API simulada con JSON Server para integrar la Web Application. Este servicio constituye una solución temporal para la demostración del alcance implementado; la RESTful API definitiva y su documentación Swagger/OpenAPI corresponden a un sprint posterior.
+
+Base URL del Mock Web Service:
+
+[https://molinex-platform-apweb-vanguard-dgbuf3dpftf3cbd8.canadacentral-01.azurewebsites.net](https://molinex-platform-apweb-vanguard-dgbuf3dpftf3cbd8.canadacentral-01.azurewebsites.net)
+
+| Recurso | Endpoint desplegado | Historias relacionadas |
+|:--|:--|:--|
+| Estado del servicio | [`/api/v1/health`](https://molinex-platform-apweb-vanguard-dgbuf3dpftf3cbd8.canadacentral-01.azurewebsites.net/api/v1/health) | Integración técnica |
+| Recepciones de materia prima | [`/api/v1/raw-material-receptions`](https://molinex-platform-apweb-vanguard-dgbuf3dpftf3cbd8.canadacentral-01.azurewebsites.net/api/v1/raw-material-receptions) | US-05 |
+| Lotes de producción | [`/api/v1/production-batches`](https://molinex-platform-apweb-vanguard-dgbuf3dpftf3cbd8.canadacentral-01.azurewebsites.net/api/v1/production-batches) | US-06 |
+| Procesos productivos | [`/api/v1/production-records`](https://molinex-platform-apweb-vanguard-dgbuf3dpftf3cbd8.canadacentral-01.azurewebsites.net/api/v1/production-records) | US-07 |
+| Evaluaciones de calidad | [`/api/v1/quality-assessments`](https://molinex-platform-apweb-vanguard-dgbuf3dpftf3cbd8.canadacentral-01.azurewebsites.net/api/v1/quality-assessments) | US-11 |
+| Registros de merma | [`/api/v1/waste-records`](https://molinex-platform-apweb-vanguard-dgbuf3dpftf3cbd8.canadacentral-01.azurewebsites.net/api/v1/waste-records) | US-14 |
+| Maquinaria | [`/api/v1/machines`](https://molinex-platform-apweb-vanguard-dgbuf3dpftf3cbd8.canadacentral-01.azurewebsites.net/api/v1/machines) | US-17 |
+| Mantenimiento | [`/api/v1/maintenance-records`](https://molinex-platform-apweb-vanguard-dgbuf3dpftf3cbd8.canadacentral-01.azurewebsites.net/api/v1/maintenance-records) | US-19 y US-20 |
+
+El repositorio [molinex-platform](https://github.com/Vanguard-app-web/molinex-platform) contiene `db.json`, las rutas versionadas bajo `/api/v1` y el servidor Node.js utilizado para el despliegue.
+
+#### 5.2.2.7 Software Deployment Evidence for Sprint Review
+
+La Web Application y el Mock Web Service fueron publicados como productos independientes en Azure. Esta separación permite desplegar la SPA y el servicio de datos de manera autónoma.
+
+| Producto | Plataforma | Versión | URL pública |
+|:--|:--|:--:|:--|
+| Web Application | Azure Static Web Apps | `0.1.1` | [Abrir Web Application](https://red-sand-0da76971e.1.azurestaticapps.net) |
+| Mock Web Service | Azure App Service | `0.1.0` | [Abrir Mock Web Service](https://molinex-platform-apweb-vanguard-dgbuf3dpftf3cbd8.canadacentral-01.azurewebsites.net) |
+
+El workflow `azure-static-web-apps-red-sand-0da76971e.yml` compila la Web Application y suministra la licencia de PrimeUI mediante el secreto `VITE_PRIME_UI_LICENSE_KEY`. El Mock Web Service se despliega desde el repositorio `molinex-platform` y expone los recursos consumidos mediante HTTPS.
+
+![Web Application desplegada en Azure](assets/Images%20Chapter%205/Sprint%202/production-overview.png)
+
+**Figura:** Web Application desplegada en Azure Static Web Apps con su dirección pública visible. Fuente: elaboración propia.
+
+#### 5.2.2.8 Team Collaboration Insights during Sprint
+
+Durante el Sprint 2, el equipo utilizó GitFlow y Conventional Commits. Las ramas `feature/*` se integraron en `develop` mediante Pull Requests; posteriormente, las ramas `release/v0.1.0` y `release/v0.1.1` permitieron publicar versiones estables en `main`.
+
+| Integrante | Usuario de GitHub | Aporte integrado |
+|:--|:--|:--|
+| Rivera Rupay, Fabricio Jose | Fabricio1924 | Base del proyecto, arquitectura, Shared Kernel, integración, releases y despliegue. |
+| Gallegos De La Cruz, Giovanni Marcelo | Giova2725 | Production Management. |
+| Huerta Cardenas, Brayan Benjamin | brayanjk22 | Shell compartido, tema e internacionalización. |
+| Casalino Berrocal, Luisa Nhiriel | lulu22nhiri | Quality & Waste Control. |
+| Jimenez Saavedra, Antony Alexander | saavedraantony-max | Asset & Maintenance. |
+
+![GitHub Insights de la Web Application, parte 1](assets/evidence/collaboration/tb1-report-insights-part-1.png)
+
+![GitHub Insights de la Web Application, parte 2](assets/evidence/collaboration/tb1-report-insights-part-2.png)
+
+**Figura:** Contribuciones de los cinco integrantes al repositorio `molinex-webapp` durante TB1. Fuente: elaboración propia a partir de GitHub.
 
 
 
@@ -2195,16 +2360,18 @@ L = Líder del aspecto, C = Colaborador.
 
 ## Conclusiones y recomendaciones
 
-Durante el AV1, el equipo de Molinex consolidó las bases estratégicas, de diseño y de arquitectura del proyecto. Se completó el análisis del problema y del mercado (entrevistas, análisis competitivo, Lean UX Canvas), la investigación de usuarios (User Personas, Empathy Mapping, User Journey Mapping, User Task Matrix), la definición del producto (Product Backlog, Impact Mapping, User Stories) y el diseño de la solución (Style Guidelines, Information Architecture, Big Picture y Design-Level EventStorming, wireframes, wireflows y prototipos de la Landing Page y la Web Application). A nivel técnico, se definió la arquitectura de software mediante el modelo C4 (diagramas de contexto, contenedores y componentes), el diagrama de clases y el diseño de la base de datos relacional en MySQL.
+Durante AV1, el equipo de Molinex consolidó las bases estratégicas, de experiencia de usuario y de arquitectura de la solución. Se desarrollaron los artefactos de investigación, Lean UX, Product Backlog, EventStorming, diseño de interfaces y modelo C4, y se implementó y publicó la primera versión de la Landing Page.
 
-En la fase de implementación, el equipo priorizó el desarrollo y despliegue de la Landing Page de Molinex, componente definido como alcance de esta entrega, mientras que la Web Application y el RESTful API quedaron diseñados y documentados para su implementación en una etapa posterior. El trabajo se organizó mediante Git y GitHub bajo el modelo GitFlow, con ramas `feature/` por cada artefacto y mensajes de commit siguiendo la convención Conventional Commits, lo que permitió una colaboración ordenada entre los cinco integrantes del equipo.
+Durante TB1 se implementó la primera versión funcional de la Web Application con Vue 3, Vite, Pinia, PrimeVue y Vue I18n. El alcance del Sprint 2 comprende recepciones de materia prima, lotes y procesos productivos, resultados de calidad, merma, maquinaria y mantenimiento preventivo y correctivo. La solución se organizó por bounded contexts y capas DDD, y se integró con una API simulada desplegable basada en JSON Server.
+
+La Web Application versión `0.1.1` fue publicada en Azure Static Web Apps y el Mock Web Service versión `0.1.0` en Azure App Service. Las pruebas automatizadas finalizaron con 10 casos aprobados. Los Pull Requests y GitHub Insights evidencian la participación de los cinco integrantes y la integración del trabajo mediante GitFlow y Conventional Commits.
 
 Como recomendaciones para las siguientes entregas, el equipo identifica:
 
-- Completar la creación de los repositorios de la Web Application y el RESTful API bajo la organización Vanguard-app-web, replicando la disciplina de GitFlow y Conventional Commits ya aplicada en la Landing Page.
-- Implementar los módulos definidos en el Design-Level EventStorming y el diagrama de clases, validando que la arquitectura de contenedores (Vue + PrimeVue en el frontend, ASP.NET Core + Entity Framework Core en el backend) se mantenga consistente con lo documentado.
-- Desplegar el RESTful API y documentar sus endpoints mediante Swagger UI, verificando que las rutas implementadas coincidan con las diseñadas en la sección 5.2.1.6.
-- Incorporar pruebas de integración entre la Web Application y el RESTful API antes de las siguientes entregas, dado que varias historias de usuario (registro, login, gestión de roles) dependen de esa integración.
+- Sustituir progresivamente la API simulada por la RESTful API definitiva desarrollada con ASP.NET Core y documentada mediante Swagger/OpenAPI.
+- Incorporar la base de datos productiva y mantener la correspondencia entre los contratos de los endpoints, los agregados del dominio y los modelos de lectura del frontend.
+- Ampliar las pruebas automatizadas y de integración para cubrir los bounded contexts restantes y los flujos de gestión de identidad y acceso.
+- Mantener GitFlow, Conventional Commits, Pull Requests y versionado semántico para preservar la trazabilidad del trabajo colaborativo.
 
 <div style="page-break-after: always;"></div>
 
@@ -2244,10 +2411,57 @@ Vue.js. (s.f.). *Vue.js Guide*. https://vuejs.org/guide/introduction.html
 
 # Anexos
 
-## Anexo A. Videos de Exposiciones
+## Anexo A. Enlaces de acceso rápido
+
+### Productos desplegados
+
+| Producto | Enlace |
+|:--|:--|
+| Landing Page | [Abrir Landing Page](https://vanguard-app-web.github.io/molinex-website-apweb/) |
+| Web Application | [Abrir Web Application](https://red-sand-0da76971e.1.azurestaticapps.net) |
+| Mock Web Service | [Abrir Mock Web Service](https://molinex-platform-apweb-vanguard-dgbuf3dpftf3cbd8.canadacentral-01.azurewebsites.net/) |
+
+### Vistas principales de la Web Application
+
+| Vista | Enlace directo |
+|:--|:--|
+| Operaciones de producción | [Abrir `/production`](https://red-sand-0da76971e.1.azurestaticapps.net/production) |
+| Recepciones de materia prima | [Abrir `/production/receptions`](https://red-sand-0da76971e.1.azurestaticapps.net/production/receptions) |
+| Lotes de producción | [Abrir `/production/batches`](https://red-sand-0da76971e.1.azurestaticapps.net/production/batches) |
+| Procesos productivos | [Abrir `/production/records`](https://red-sand-0da76971e.1.azurestaticapps.net/production/records) |
+| Historial de producción | [Abrir `/production/history`](https://red-sand-0da76971e.1.azurestaticapps.net/production/history) |
+| Resultados de calidad | [Abrir `/quality`](https://red-sand-0da76971e.1.azurestaticapps.net/quality) |
+| Registros de merma | [Abrir `/quality/waste`](https://red-sand-0da76971e.1.azurestaticapps.net/quality/waste) |
+| Inventario de maquinaria | [Abrir `/assets/machinery`](https://red-sand-0da76971e.1.azurestaticapps.net/assets/machinery) |
+| Historial de mantenimiento | [Abrir `/assets/maintenance`](https://red-sand-0da76971e.1.azurestaticapps.net/assets/maintenance) |
+
+### Recursos del Mock Web Service
+
+| Recurso | Enlace directo |
+|:--|:--|
+| Estado del servicio | [Abrir `/api/v1/health`](https://molinex-platform-apweb-vanguard-dgbuf3dpftf3cbd8.canadacentral-01.azurewebsites.net/api/v1/health) |
+| Recepciones de materia prima | [Abrir `/api/v1/raw-material-receptions`](https://molinex-platform-apweb-vanguard-dgbuf3dpftf3cbd8.canadacentral-01.azurewebsites.net/api/v1/raw-material-receptions) |
+| Lotes de producción | [Abrir `/api/v1/production-batches`](https://molinex-platform-apweb-vanguard-dgbuf3dpftf3cbd8.canadacentral-01.azurewebsites.net/api/v1/production-batches) |
+| Procesos productivos | [Abrir `/api/v1/production-records`](https://molinex-platform-apweb-vanguard-dgbuf3dpftf3cbd8.canadacentral-01.azurewebsites.net/api/v1/production-records) |
+| Evaluaciones de calidad | [Abrir `/api/v1/quality-assessments`](https://molinex-platform-apweb-vanguard-dgbuf3dpftf3cbd8.canadacentral-01.azurewebsites.net/api/v1/quality-assessments) |
+| Registros de merma | [Abrir `/api/v1/waste-records`](https://molinex-platform-apweb-vanguard-dgbuf3dpftf3cbd8.canadacentral-01.azurewebsites.net/api/v1/waste-records) |
+| Maquinaria | [Abrir `/api/v1/machines`](https://molinex-platform-apweb-vanguard-dgbuf3dpftf3cbd8.canadacentral-01.azurewebsites.net/api/v1/machines) |
+| Mantenimientos | [Abrir `/api/v1/maintenance-records`](https://molinex-platform-apweb-vanguard-dgbuf3dpftf3cbd8.canadacentral-01.azurewebsites.net/api/v1/maintenance-records) |
+
+### Repositorios
+
+| Producto | Repositorio |
+|:--|:--|
+| Project Report | [Vanguard-app-web/molinex-report-apweb](https://github.com/Vanguard-app-web/molinex-report-apweb) |
+| Landing Page | [Vanguard-app-web/molinex-website-apweb](https://github.com/Vanguard-app-web/molinex-website-apweb) |
+| Web Application | [Vanguard-app-web/molinex-webapp](https://github.com/Vanguard-app-web/molinex-webapp) |
+| Mock Web Service | [Vanguard-app-web/molinex-platform](https://github.com/Vanguard-app-web/molinex-platform) |
+
+## Anexo B. Videos de Exposiciones
 
 | Entrega | Título | Enlace |
 |:--|:--|:--|
 | AV1 | Video de exposición del proyecto | [Ver video](https://upcedupe-my.sharepoint.com/:v:/g/personal/u202420031_upc_edu_pe/IQDe6HjgK534RoKJUdNr7jlUAeca07gXpLXC7_NkXEK444Y?e=faXkz9) |
 | AV1 | Video de demostración de la Landing Page | [Ver video](https://upcedupe-my.sharepoint.com/:v:/g/personal/u202420031_upc_edu_pe/IQBG3ToqxvMbR7DzQq0B5yLIAU1bxtjN3nuWse2Z3NQ_Ik8?e=exijmP) |
 | AV1 | Video del prototipo en Figma | [Ver video](https://upcedupe-my.sharepoint.com/:v:/g/personal/u202420031_upc_edu_pe/IQAuKZpedDkkTr19h5yiaO6hAbRvnrzfZpqPXLHV-w8nY5E?e=2iIVyT) |
+| TB1 | Video de exposición y demostración | [Ver video](https://upcedupe-my.sharepoint.com/:v:/g/personal/u202423883_upc_edu_pe/IQDzs8rzIXmAT5CmAadE7oyvAZIinlAtknqZdx4s19rWHL0?e=4bjecK) |
