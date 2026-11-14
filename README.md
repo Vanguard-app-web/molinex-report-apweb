@@ -2499,6 +2499,7 @@ Los aspectos del Sprint 3 son los Web Services (producción y calidad; mantenimi
 | Jimenez Saavedra, Antony Alexander | saavedraantony-max | C | C| L | C | C |
 | Rivera Rupay, Fabricio Jose | Fabricio1924 | C | C | C | C | L |
 
+
 ### 5.2.3.4.Development Evidence for Sprint Review.
 ### 5.2.3.5.Execution Evidence for Sprint Review.
 ### 5.2.3.6.Services Documentation Evidence for Sprint Review.
@@ -2506,6 +2507,7 @@ Los aspectos del Sprint 3 son los Web Services (producción y calidad; mantenimi
 ### 5.2.3.8.Team Collaboration Insights during Sprint.
 ### 5.3. Validation Interviews.
 ### 5.3.1. Diseño de Entrevistas.
+
 #### Objetivo general
 
 Validar la propuesta de valor y las funcionalidades principales de Molinex mediante sesiones de validación dirigidas a los tres segmentos de usuarios identificados. Estas sesiones se realizarán después de presentar la Landing Page y la Web Application, con la finalidad de evaluar la comprensión de la propuesta de valor, la utilidad de las funcionalidades, la facilidad de uso y la experiencia de interacción de los participantes, así como identificar oportunidades de mejora.
@@ -2659,6 +2661,15 @@ Asimismo, solicitamos su autorización para grabar la sesión en video, únicame
 
 Muchas gracias por su tiempo y por compartir su experiencia. Sus respuestas nos permitirán mejorar la facilidad de uso de Molinex y comprobar si sus funcionalidades se adaptan a las necesidades de los operarios de maquinaria y producción.
 
+### 5.3.2. Registro de Entrevistas.
+| Nombre y apellido	 | Contexto | Distrito | Segmento | Duración |Resumen descriptivo| Screenshot |Link|
+|:---|:--|:--|:--|:----|:----|:-----------|:--|
+| Yeisen Maculupu Beckam | Entrevista realizada por Antony Jimenez Saavedra para conocer las necesidades y experiencias relacionadas con la gestión de molinos arroceros. | Piura | Segmento1: Gerentes o administradores | 0:00 - 5:05 | Durante la entrevista, Jason, administrador de un molino arrocero, destacó la utilidad de Molinex para gestionar la producción y el mantenimiento de maquinaria, especialmente para anticipar fallas y evitar interrupciones. Asimismo, sugirió agregar precios al registro de materia prima, incorporar filtros de búsqueda y mejorar algunos detalles de la interfaz. En general, consideró que la aplicación es funcional y beneficiosa para el molino. |![Registo 1-cap5.png](assets/Screenshot%20of%20the%20interview/Registo%201-cap5.png)            |https://upcedupe-my.sharepoint.com/:v:/g/personal/u202420031_upc_edu_pe/IQDk-auXMJy3TauRlpsRkVs5Ae_am6uFEoqAHHow4fr19hc?e=rkMsyE&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D
+
+### 5.3.3. Evaluaciones según heurísticas.
+
+
+### 5.4. Video About-the-Product.
 
 
 
