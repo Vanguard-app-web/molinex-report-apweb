@@ -2470,23 +2470,23 @@ Durante el Sprint 2, el equipo utilizó GitFlow y Conventional Commits. Las rama
 
 ### 5.2.3. Sprint 3
 ### 5.2.3.1.Sprint Planning 3.
-El Sprint 3 reemplaza la API simulada con JSON Server por la primera versión de los Web Services RESTful de Molinex, implementados con Spring Boot y Spring Data JPA y documentados con OpenAPI/Swagger, e integra la Web Application con ellos. Además, incorpora las historias de consulta de indicadores y de estado de maquinaria, el inicio de sesión y la persistencia de las solicitudes comerciales de la Landing Page.
+El Sprint 3 tiene como objetivo integrar la Web Application desarrollada en Vue 3 con la primera versión de los servicios RESTful de Molinex en C# y ASP.NET Core, con persistencia mediante Entity Framework Core y documentación Swagger/OpenAPI. El alcance planificado incluye la consulta de indicadores, el estado y el historial de mantenimiento de maquinaria, la solicitud de información comercial y el inicio de sesión declarado en la planificación. Estas metas no acreditan por sí mismas que la integración esté terminada; su cumplimiento se sustentará con las evidencias de desarrollo, ejecución, servicios y despliegue del sprint.
 
 A continuación se presenta el cuadro resumen del Sprint Planning Meeting, con el Sprint Goal, el velocity establecido y las historias comprometidas.
 
 | Sprint # | Sprint 3 |
 |:--|:--|
-| **Sprint Planning Background** | |
-| **Date** | 2026-11-01 |
-| **Time** | 07:00 PM |
-| **Location** | virtual (videollamada del equipo por Discord)  |
-| **Prepared By** | Gallegos De La Cruz, Giovanni Marcelo |
-| **Attendees (to planning meeting)** | Gallegos De La Cruz, Giovanni Marcelo / Casalino Berrocal, Luisa Nhiriel / Huerta Cardenas, Brayan Benjamin / Jimenez Saavedra, Antony Alexander / Rivera Rupay, Fabricio Jose |
-| **Sprint 2 Review Summary** | Se revisó la Web Application desplegada en Azure Static Web Apps con los módulos de producción, calidad, merma, maquinaria y mantenimiento, integrados con una API simulada (JSON Server). Quedaron pendientes la RESTful API definitiva, la base de datos productiva, la documentación Swagger/OpenAPI, las historias de gestión de acceso (US-01 a US-04) y la persistencia de las solicitudes comerciales (US-36). |
-| **Sprint 2 Retrospective Summary** |  Durante el Sprint 2, el equipo integró 9 Pull Requests en la rama develop, aplicando GitFlow y Conventional Commits. Se destacó el trabajo colaborativo, pero también se identificó la necesidad de mejorar la coordinación y el seguimiento de tareas. Para el siguiente sprint, se acordó fortalecer la comunicación y planificar mejor las actividades. |
-| **Sprint 3 Goal** | **Our focus is on replacing the simulated API with the first version of Molinex's RESTful Web Services and on giving mill staff access to performance, quality and maintenance information. We believe it delivers reliable, persistent operational data to administrators, technicians and operators, and a documented API to developers. This will be confirmed when the Web Application consumes the deployed Spring Boot API instead of JSON Server and the endpoints can be explored and tested in Swagger UI.** |
-| **Sprint 3 Velocity** | **24 Story Points.** Se establece una capacidad de 24 Story Points considerando la experiencia de los Sprints 1 y 2 (20 y 23 Story Points) y la capacidad de trabajo del equipo de 5 integrantes. |
-| **Sum of Story Points** | 24 Story Points (TS-01, TS-02, TS-03, US-02, US-12, US-13, US-18, US-21 y US-36) |
+| *Sprint Planning Background* | |
+| *Date* | 2026-11-01 |
+| *Time* | 07:00 PM |
+| *Location* | virtual (videollamada del equipo por Discord)  |
+| *Prepared By* | Gallegos De La Cruz, Giovanni Marcelo |
+| *Attendees (to planning meeting)* | Gallegos De La Cruz, Giovanni Marcelo / Casalino Berrocal, Luisa Nhiriel / Huerta Cardenas, Brayan Benjamin / Jimenez Saavedra, Antony Alexander / Rivera Rupay, Fabricio Jose |
+| *Sprint 2 Review Summary* | Se revisó la Web Application desplegada en Azure Static Web Apps con los módulos de producción, calidad, merma, maquinaria y mantenimiento, integrados con una API simulada (JSON Server). Quedaron pendientes la RESTful API definitiva, la base de datos productiva, la documentación Swagger/OpenAPI, las historias de gestión de acceso (US-01 a US-04) y la persistencia de las solicitudes comerciales (US-36). |
+| *Sprint 2 Retrospective Summary* |  Durante el Sprint 2, el equipo integró 9 Pull Requests en la rama develop, aplicando GitFlow y Conventional Commits. Se destacó el trabajo colaborativo, pero también se identificó la necesidad de mejorar la coordinación y el seguimiento de tareas. Para el siguiente sprint, se acordó fortalecer la comunicación y planificar mejor las actividades. |
+| *Sprint 3 Goal* | Integrar la aplicación web de Molinex con los servicios RESTful previstos en C# y ASP.NET Core para ofrecer consultas de rendimiento, composición del arroz, estado de maquinaria e historial de mantenimiento, registrar solicitudes comerciales y habilitar el inicio de sesión incluido en la planificación. El objetivo se considerará cumplido cuando los flujos acordados consuman los servicios desplegados, la persistencia y los escenarios aplicables estén verificados, y el contrato pueda consultarse mediante Swagger/OpenAPI. Las funciones que sigan usando el servicio simulado o dependan de IAM se identificarán expresamente. |
+| *Sprint 3 Velocity* | *24 Story Points.* Se establece una capacidad de 24 Story Points considerando la experiencia de los Sprints 1 y 2 (20 y 23 Story Points) y la capacidad de trabajo del equipo de 5 integrantes. |
+| *Sum of Story Points* | 24 Story Points (TS-01, TS-02, TS-03, US-02, US-12, US-13, US-18, US-21 y US-36) |
 
 ### 5.2.3.2. Aspect Leaders and Collaborators.
 Los aspectos del Sprint 3 son los Web Services (producción y calidad; mantenimiento y acceso), la integración de la Web Application, la Landing Page con los videos, y la base de datos con el despliegue.
