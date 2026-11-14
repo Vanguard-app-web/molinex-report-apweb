@@ -2488,6 +2488,17 @@ A continuación se presenta el cuadro resumen del Sprint Planning Meeting, con e
 | **Sprint 3 Velocity** | **24 Story Points.** Se establece una capacidad de 24 Story Points considerando la experiencia de los Sprints 1 y 2 (20 y 23 Story Points) y la capacidad de trabajo del equipo de 5 integrantes. |
 | **Sum of Story Points** | 24 Story Points (TS-01, TS-02, TS-03, US-02, US-12, US-13, US-18, US-21 y US-36) |
 
+### 5.2.3.2. Aspect Leaders and Collaborators.
+Los aspectos del Sprint 3 son los Web Services (producción y calidad; mantenimiento y acceso), la integración de la Web Application, la Landing Page con los videos, y la base de datos con el despliegue.
+
+| Team Member (Last Name, First Name) | GitHub Username | Aspecto 1: Web Services – Producción y calidad (TS-01, TS-02) | Aspecto 2: Web Services – Mantenimiento y acceso (TS-03, US-02) | Aspecto 3: Integración Web Application (US-12, US-13, US-18, US-21) | Aspecto 4: Landing Page y videos (US-36) | Aspecto 5: Base de datos y despliegue |
+|:--|:--:|:--:|:--:|:--:|:--:|:--:|
+| Casalino Berrocal, Luisa Nhiriel | lulu22nhiri | C | L | C | C | C |
+| Gallegos De La Cruz, Giovanni Marcelo | Giova2725 | L | C | C| C | C |
+| Huerta Cardenas, Brayan Benjamin | Brayanjk22 | C | C | C | L | C |
+| Jimenez Saavedra, Antony Alexander | saavedraantony-max | C | C| L | C | C |
+| Rivera Rupay, Fabricio Jose | Fabricio1924 | C | C | C | C | L |
+
 ### 5.2.3.4.Development Evidence for Sprint Review.
 ### 5.2.3.5.Execution Evidence for Sprint Review.
 ### 5.2.3.6.Services Documentation Evidence for Sprint Review.
