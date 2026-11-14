@@ -2546,6 +2546,31 @@ Link:https://trello.com/invite/b/6aa9c4fdfc659047df591de0/ATTI907effe44c9315a415
 
 ### 5.2.3.4.Development Evidence for Sprint Review.
 ### 5.2.3.5.Execution Evidence for Sprint Review.
+La revisión utiliza las capturas de la Web Application incluidas en la entrega. Los archivos disponibles se encuentran en la carpeta `Sprint 2`; se presentan como antecedentes funcionales para contrastar las historias del Sprint 3, conservando su procedencia. No constituyen una nueva ejecución de pruebas ni acreditan que el frontend consuma la API definitiva en ASP.NET Core.
+
+| Historia del Sprint 3 | Evidencia disponible | Resultado visible y alcance |
+| --- | --- | --- |
+| US-12 — Consultar indicadores de rendimiento | `quality-results.png` | La pantalla muestra un rendimiento promedio de 68.53 % y seis evaluaciones. No demuestra los escenarios de datos insuficientes o base no válida. |
+| US-13 — Consultar porcentaje de arroz entero y quebrado | `quality-results.png` | Se muestran promedios de 72.05 % de grano entero y 18.73 % de grano quebrado, además de resultados por proceso y lote. No se aporta una prueba nueva del lote sin resultados. |
+| US-18 — Consultar estado de maquinaria | `machinery.png` | Se observan seis equipos, con estados y fechas de actualización: tres operativos, uno que requiere atención, uno en mantenimiento y uno fuera de servicio. |
+| US-21 — Consultar historial de mantenimiento | `maintenance.png` | Se muestran diez intervenciones: seis preventivas y cuatro correctivas, además de 345 minutos de inactividad correctiva y filtros por máquina y tipo. |
+| US-36 — Solicitar información comercial | Sin evidencia de ejecución específica en el ZIP | El backlog declara tareas terminadas, pero no adjunta una solicitud persistida ni la respuesta de confirmación del servicio. |
+| US-02 — Iniciar sesión | Sin evidencia de ejecución específica en el ZIP | La historia figura en la planificación inicial y en Product Backlog; no hay tareas propias ni capturas de inicio de sesión en el Sprint Backlog entregado. |
+
+![Consulta de resultados de calidad](assets/Images%20Chapter%205/Sprint%202/quality-results.png)
+
+**Figura: Indicadores y resultados de calidad relacionados con US-12 y US-13.** La pantalla permite observar rendimiento, composición del arroz y evaluaciones por proceso. Fuente: captura del Sprint 2 incluida en la entrega; los valores corresponden a los datos mostrados en esa imagen.
+
+![Estado del inventario de maquinaria](assets/Images%20Chapter%205/Sprint%202/machinery.png)
+
+**Figura: Inventario y estados de maquinaria relacionados con US-18.** Cada tarjeta identifica el equipo, su modelo, el estado operativo y la fecha desde la que mantiene ese estado. Fuente: captura del Sprint 2 incluida en la entrega.
+
+![Historial de mantenimiento de la aplicación web](assets/Images%20Chapter%205/Sprint%202/maintenance.png)
+
+**Figura: Historial de intervenciones relacionado con US-21.** La captura muestra la dirección `red-sand-0da76971e.1.azurestaticapps.net/assets/maintenance`, intervenciones preventivas y correctivas, sus responsables y fechas. Fuente: captura del Sprint 2 incluida en la entrega.
+
+**Límite de la evidencia.** Las capturas permiten describir el contenido visible, pero no comprobar persistencia, errores, autorización ni respuestas del backend. La entrega no contiene capturas nuevas o registros de ejecución que acrediten los escenarios completos del Sprint 3.
+
 ### 5.2.3.6.Services Documentation Evidence for Sprint Review.
 ### 5.2.3.7.Software Deployment Evidence for Sprint Review.
 ### 5.2.3.8.Team Collaboration Insights during Sprint.
