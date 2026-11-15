@@ -77,7 +77,7 @@ CREATE TABLE plan_conditions (
   COMMENT = 'Commercial Engagement: ordered conditions displayed for each plan';
 
 CREATE TABLE commercial_inquiries (
-    id                      CHAR(36)      NOT NULL,
+    id                      BIGINT        NOT NULL AUTO_INCREMENT,
     interested_plan_code    VARCHAR(30)   NULL,
     full_name               VARCHAR(150)  NOT NULL,
     email                   VARCHAR(254)  NOT NULL,
@@ -103,7 +103,7 @@ CREATE TABLE commercial_inquiries (
 -- ---------------------------------------------------------------------------
 
 CREATE TABLE rice_mills (
-    id                  CHAR(36)     NOT NULL,
+    id                  BIGINT       NOT NULL AUTO_INCREMENT,
     business_name       VARCHAR(150) NOT NULL,
     trade_name          VARCHAR(150) NULL,
     tax_identifier      VARCHAR(20)  NOT NULL,
@@ -151,7 +151,7 @@ CREATE TABLE role_permissions (
   COMMENT = 'IAM: many-to-many association between roles and permissions';
 
 CREATE TABLE users (
-    id              CHAR(36)     NOT NULL,
+    id              BIGINT       NOT NULL AUTO_INCREMENT,
     email           VARCHAR(254) NOT NULL,
     password_hash   VARCHAR(255) NOT NULL,
     full_name       VARCHAR(150) NOT NULL,
@@ -167,9 +167,9 @@ CREATE TABLE users (
   COMMENT = 'IAM: global user identity and credentials';
 
 CREATE TABLE mill_memberships (
-    id              CHAR(36)    NOT NULL,
-    mill_id         CHAR(36)    NOT NULL,
-    user_id         CHAR(36)    NOT NULL,
+    id              BIGINT      NOT NULL AUTO_INCREMENT,
+    mill_id         BIGINT      NOT NULL,
+    user_id         BIGINT      NOT NULL,
     role_code       VARCHAR(40) NOT NULL,
     status          VARCHAR(20) NOT NULL,
     joined_at       DATETIME(6) NOT NULL,
@@ -196,8 +196,8 @@ CREATE TABLE mill_memberships (
 -- ---------------------------------------------------------------------------
 
 CREATE TABLE raw_material_receptions (
-    id                  CHAR(36)      NOT NULL,
-    mill_id             CHAR(36)      NOT NULL,
+    id                  BIGINT        NOT NULL AUTO_INCREMENT,
+    mill_id             BIGINT        NOT NULL,
     received_at         DATETIME(6)   NOT NULL,
     supplier_name       VARCHAR(150)  NOT NULL,
     origin_description  VARCHAR(255)  NOT NULL,
@@ -216,9 +216,9 @@ CREATE TABLE raw_material_receptions (
   COMMENT = 'Production: raw-material reception owned by a rice mill';
 
 CREATE TABLE production_batches (
-    id              CHAR(36)    NOT NULL,
+    id              BIGINT      NOT NULL AUTO_INCREMENT,
     code            VARCHAR(50) NOT NULL,
-    reception_id    CHAR(36)    NOT NULL,
+    reception_id    BIGINT      NOT NULL,
     registered_at   DATETIME(6) NOT NULL,
 
     CONSTRAINT pk_production_batches PRIMARY KEY (id),
@@ -230,8 +230,8 @@ CREATE TABLE production_batches (
   COMMENT = 'Production: batches traced to a raw-material reception';
 
 CREATE TABLE production_records (
-    id                      CHAR(36)      NOT NULL,
-    batch_id                CHAR(36)      NOT NULL,
+    id                      BIGINT        NOT NULL AUTO_INCREMENT,
+    batch_id                BIGINT        NOT NULL,
     process_name            VARCHAR(120)  NOT NULL,
     processed_weight_value  DECIMAL(18,4) NOT NULL,
     processed_weight_unit   VARCHAR(20)   NOT NULL,
@@ -262,8 +262,8 @@ CREATE TABLE production_records (
 -- ---------------------------------------------------------------------------
 
 CREATE TABLE quality_assessments (
-    id                      CHAR(36)    NOT NULL,
-    production_record_id    CHAR(36)    NOT NULL,
+    id                      BIGINT      NOT NULL AUTO_INCREMENT,
+    production_record_id    BIGINT      NOT NULL,
     assessed_at             DATETIME(6) NOT NULL,
 
     CONSTRAINT pk_quality_assessments PRIMARY KEY (id),
@@ -275,7 +275,7 @@ CREATE TABLE quality_assessments (
   COMMENT = 'Quality: assessment of a production record';
 
 CREATE TABLE quality_measurements (
-    assessment_id              CHAR(36)     NOT NULL,
+    assessment_id              BIGINT       NOT NULL,
     indicator                  VARCHAR(40)  NOT NULL,
     value_percentage           DECIMAL(5,2) NOT NULL,
     expected_min_percentage    DECIMAL(5,2) NOT NULL,
@@ -295,8 +295,8 @@ CREATE TABLE quality_measurements (
   COMMENT = 'Quality: normalized measurements belonging to an assessment';
 
 CREATE TABLE waste_records (
-    id                      CHAR(36)      NOT NULL,
-    production_record_id    CHAR(36)      NOT NULL,
+    id                      BIGINT        NOT NULL AUTO_INCREMENT,
+    production_record_id    BIGINT        NOT NULL,
     quantity_value          DECIMAL(18,4) NOT NULL,
     quantity_unit           VARCHAR(20)   NOT NULL,
     base_weight_value       DECIMAL(18,4) NULL,
@@ -323,9 +323,9 @@ CREATE TABLE waste_records (
   COMMENT = 'Quality: waste quantity and optional percentage for a production record';
 
 CREATE TABLE quality_deviations (
-    id                          CHAR(36)     NOT NULL,
-    assessment_id               CHAR(36)     NULL,
-    waste_record_id             CHAR(36)     NULL,
+    id                          BIGINT       NOT NULL AUTO_INCREMENT,
+    assessment_id               BIGINT       NULL,
+    waste_record_id             BIGINT       NULL,
     indicator                   VARCHAR(40)  NOT NULL,
     observed_percentage         DECIMAL(5,2) NOT NULL,
     expected_min_percentage     DECIMAL(5,2) NOT NULL,
@@ -356,8 +356,8 @@ CREATE TABLE quality_deviations (
 -- ---------------------------------------------------------------------------
 
 CREATE TABLE machines (
-    id                  CHAR(36)     NOT NULL,
-    mill_id             CHAR(36)     NOT NULL,
+    id                  BIGINT       NOT NULL AUTO_INCREMENT,
+    mill_id             BIGINT       NOT NULL,
     code                VARCHAR(50)  NOT NULL,
     name                VARCHAR(120) NOT NULL,
     model               VARCHAR(120) NOT NULL,
@@ -380,8 +380,8 @@ CREATE TABLE machines (
 -- ---------------------------------------------------------------------------
 
 CREATE TABLE operational_readings (
-    id              CHAR(36)      NOT NULL,
-    machine_id      CHAR(36)      NOT NULL,
+    id              BIGINT        NOT NULL AUTO_INCREMENT,
+    machine_id      BIGINT        NOT NULL,
     variable_name   VARCHAR(100)  NOT NULL,
     measured_value  DECIMAL(18,4) NOT NULL,
     unit_symbol     VARCHAR(30)   NOT NULL,
@@ -398,8 +398,8 @@ CREATE TABLE operational_readings (
   COMMENT = 'Operational Intelligence: sensor and manual measurements';
 
 CREATE TABLE operational_anomalies (
-    id                  CHAR(36)      NOT NULL,
-    reading_id          CHAR(36)      NOT NULL,
+    id                  BIGINT        NOT NULL AUTO_INCREMENT,
+    reading_id          BIGINT        NOT NULL,
     criterion_minimum   DECIMAL(18,4) NOT NULL,
     criterion_maximum   DECIMAL(18,4) NOT NULL,
     detected_at         DATETIME(6)   NOT NULL,
@@ -417,8 +417,8 @@ CREATE TABLE operational_anomalies (
   COMMENT = 'Operational Intelligence: anomaly detected from one reading';
 
 CREATE TABLE alerts (
-    id              CHAR(36)    NOT NULL,
-    anomaly_id      CHAR(36)    NOT NULL,
+    id              BIGINT      NOT NULL AUTO_INCREMENT,
+    anomaly_id      BIGINT      NOT NULL,
     priority        VARCHAR(20) NOT NULL,
     status          VARCHAR(20) NOT NULL,
     generated_at    DATETIME(6) NOT NULL,
@@ -439,10 +439,10 @@ CREATE TABLE alerts (
 -- ---------------------------------------------------------------------------
 
 CREATE TABLE maintenance_records (
-    id                          CHAR(36)      NOT NULL,
-    machine_id                  CHAR(36)      NOT NULL,
-    technician_membership_id    CHAR(36)      NOT NULL,
-    anomaly_id                  CHAR(36)      NULL,
+    id                          BIGINT        NOT NULL AUTO_INCREMENT,
+    machine_id                  BIGINT        NOT NULL,
+    technician_membership_id    BIGINT        NOT NULL,
+    anomaly_id                  BIGINT        NULL,
     maintenance_type            VARCHAR(20)   NOT NULL,
     performed_at                DATETIME(6)   NOT NULL,
     description                 VARCHAR(2000) NOT NULL,
@@ -475,8 +475,8 @@ CREATE TABLE maintenance_records (
 -- ---------------------------------------------------------------------------
 
 CREATE TABLE report_rows (
-    id              CHAR(36)    NOT NULL,
-    mill_id         CHAR(36)    NOT NULL,
+    id              BIGINT      NOT NULL AUTO_INCREMENT,
+    mill_id         BIGINT      NOT NULL,
     report_type     VARCHAR(40) NOT NULL,
     period_start    DATE        NOT NULL,
     period_end      DATE        NOT NULL,
@@ -494,7 +494,7 @@ CREATE TABLE report_rows (
   COMMENT = 'Reporting: tenant-scoped, rebuildable report projection header';
 
 CREATE TABLE report_dimensions (
-    report_row_id       CHAR(36)     NOT NULL,
+    report_row_id       BIGINT       NOT NULL,
     dimension_name      VARCHAR(80)  NOT NULL,
     dimension_value     VARCHAR(255) NOT NULL,
 
@@ -506,7 +506,7 @@ CREATE TABLE report_dimensions (
   COMMENT = 'Reporting: normalized dimensions for a projected row';
 
 CREATE TABLE report_metrics (
-    report_row_id   CHAR(36)      NOT NULL,
+    report_row_id   BIGINT        NOT NULL,
     metric_name     VARCHAR(80)   NOT NULL,
     measured_at     DATETIME(6)   NOT NULL,
     metric_value    DECIMAL(18,4) NOT NULL,

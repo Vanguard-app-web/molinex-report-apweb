@@ -1,264 +1,349 @@
 @startuml
 left to right direction
+hide empty members
 
-package "Molinex.IdentityAccessManagement.Interfaces.REST" as Interfaces {
+package "Molinex.IdentityAccessManagement.Interfaces.Rest" as Interfaces {
   class AuthenticationController <<REST Controller>> {
-    +SignIn(resource : SignInResource) : ActionResult
-    +SignUp(resource : SignUpResource) : ActionResult
+    -authenticationService : IAuthenticationService
+    --
+    +SignIn(resource : SignInResource, cancellationToken : CancellationToken) : Task<IActionResult>
   }
   class UsersController <<REST Controller>> {
-    +GetAll() : ActionResult
-    +AssignRole(id : Guid, resource : AssignRoleResource) : ActionResult
+    -commandService : IUserCommandService
+    -queryService : IUserQueryService
+    --
+    +Create(resource : CreateUserResource, cancellationToken : CancellationToken) : Task<IActionResult>
+    +ChangeStatus(id : long, resource : ChangeAccountStatusResource, cancellationToken : CancellationToken) : Task<IActionResult>
+    +GetById(id : long, cancellationToken : CancellationToken) : Task<IActionResult>
+    +GetAll(cancellationToken : CancellationToken) : Task<IActionResult>
   }
-  class ProfileController <<REST Controller>> {
-    +GetCurrent() : ActionResult
-    +Update(resource : UpdateProfileResource) : ActionResult
-  }
-  class IdentityResourceAssembler <<Assembler>> {
-    +{static} ToCommand(resource : SignUpResource) : RegisterUserCommand
-    +{static} ToCommand(resource : SignInResource) : AuthenticateUserCommand
-    +{static} ToCommand(userId : Guid, resource : AssignRoleResource) : AssignRoleCommand
-    +{static} ToCommand(userId : Guid, resource : UpdateProfileResource) : UpdateProfileCommand
-    +{static} ToResource(principal : AuthenticatedPrincipal) : AuthenticatedUserResource
-    +{static} ToResource(model : User) : UserResource
-  }
+
   class SignInResource <<Request Resource>> <<(R,#FF7700)>> {
     +Email : string
     +Password : string
   }
-  class SignUpResource <<Request Resource>> <<(R,#FF7700)>> {
+  class CreateUserResource <<Request Resource>> <<(R,#FF7700)>> {
     +Email : string
     +Password : string
     +FullName : string
-  }
-  class AssignRoleResource <<Request Resource>> <<(R,#FF7700)>> {
-    +Role : string
-  }
-  class UpdateProfileResource <<Request Resource>> <<(R,#FF7700)>> {
-    +FullName : string
     +JobTitle : string
     +PhoneNumber : string
+    +Role : string
+  }
+  class ChangeAccountStatusResource <<Request Resource>> <<(R,#FF7700)>> {
+    +Status : string
   }
   class AuthenticatedUserResource <<Response Resource>> <<(R,#FF7700)>> {
-    +UserId : Guid
-    +Token : string
+    +AccessToken : string
+    +UserId : long
     +Role : string
-    +Permissions : string[]
+    +Permissions : IReadOnlySet<string>
   }
   class UserResource <<Response Resource>> <<(R,#FF7700)>> {
-    +Id : Guid
+    +Id : long
     +Email : string
     +FullName : string
-    +JobTitle : string
-    +PhoneNumber : string
     +Role : string
-    +Permissions : string[]
     +Status : string
+  }
+
+  class SignInCommandFromResourceAssembler <<Assembler>> {
+    +{static} ToCommandFromResource(resource : SignInResource) : SignInCommand
+  }
+  class CreateUserCommandFromResourceAssembler <<Assembler>> {
+    +{static} ToCommandFromResource(resource : CreateUserResource) : CreateUserCommand
+  }
+  class ChangeAccountStatusCommandFromResourceAssembler <<Assembler>> {
+    +{static} ToCommandFromResource(userId : long, resource : ChangeAccountStatusResource) : ChangeAccountStatusCommand
+  }
+  class AuthenticatedUserResourceFromEntityAssembler <<Assembler>> {
+    +{static} ToResourceFromEntity(result : AuthenticationResult) : AuthenticatedUserResource
+  }
+  class UserResourceFromEntityAssembler <<Assembler>> {
+    +{static} ToResourceFromEntity(entity : User) : UserResource
   }
 }
 
 package "Molinex.IdentityAccessManagement.Application" as Application {
-  class IdentityCommandService <<Command Service>> {
-    +HandleAsync(command : RegisterUserCommand) : Task<UserId>
-    +HandleAsync(command : AuthenticateUserCommand) : Task<AuthenticatedPrincipal>
-    +HandleAsync(command : AssignRoleCommand) : Task
-    +HandleAsync(command : UpdateProfileCommand) : Task
+  interface IAuthenticationService <<Command Service>> {
+    +Handle(command : SignInCommand, cancellationToken : CancellationToken) : Task<Result<AuthenticationResult>>
   }
-  class IdentityQueryService <<Query Service>> {
-    +GetUsersAsync() : Task<User[]>
-    +GetProfileAsync(id : UserId) : Task<UserProfile>
+  interface IUserCommandService <<Command Service>> {
+    +Handle(command : CreateUserCommand, cancellationToken : CancellationToken) : Task<Result<UserId>>
+    +Handle(command : ChangeAccountStatusCommand, cancellationToken : CancellationToken) : Task<Result<UserId>>
   }
-  class RegisterUserCommand <<Command>> {
-    +Email : string
-    +Password : string
-    +FullName : string
+  interface IUserQueryService <<Query Service>> {
+    +Handle(query : GetUserByIdQuery, cancellationToken : CancellationToken) : Task<User?>
+    +Handle(query : GetUsersQuery, cancellationToken : CancellationToken) : Task<IEnumerable<User>>
   }
-  class AuthenticateUserCommand <<Command>> {
-    +Email : string
-    +Password : string
+  interface IHashingService <<Outbound Service>> {
+    +HashPassword(password : string) : PasswordHash
+    +VerifyPassword(password : string, passwordHash : PasswordHash) : bool
   }
-  class AssignRoleCommand <<Command>> {
-    +UserId : Guid
-    +Role : string
+  interface ITokenService <<Outbound Service>> {
+    +GenerateToken(principal : AuthenticatedPrincipal) : string
+    +ValidateToken(token : string) : Task<AuthenticatedPrincipal?>
   }
-  class UpdateProfileCommand <<Command>> {
-    +UserId : Guid
-    +FullName : string
-    +JobTitle : string
-    +PhoneNumber : string
+  class AuthenticationService <<Command Service>> {
+    -repository : IUserRepository
+    -hashingService : IHashingService
+    -tokenService : ITokenService
+  }
+  class UserCommandService <<Command Service>> {
+    -repository : IUserRepository
+    -uniqueEmailPolicy : UniqueEmailPolicy
+    -hashingService : IHashingService
+    -unitOfWork : IUnitOfWork
+  }
+  class UserQueryService <<Query Service>> {
+    -repository : IUserRepository
+  }
+  class AuthenticationResult <<Application Result>> {
+    +AccessToken : string
+    +Principal : AuthenticatedPrincipal
   }
 }
 
-package "Molinex.IdentityAccessManagement.Domain.Model" as DomainModel {
+package "Molinex.IdentityAccessManagement.Domain.Model.Commands" as Commands {
+  class SignInCommand <<Command>> {
+    +Email : string
+    +Password : string
+  }
+  class CreateUserCommand <<Command>> {
+    +Email : string
+    +Password : string
+    +FullName : string
+    +JobTitle : string
+    +PhoneNumber : string
+    +Role : string
+  }
+  class ChangeAccountStatusCommand <<Command>> {
+    +UserId : long
+    +Status : string
+  }
+}
+
+package "Molinex.IdentityAccessManagement.Domain.Model.Queries" as Queries {
+  class GetUserByIdQuery <<Query>> {
+    +UserId : long
+  }
+  class GetUsersQuery <<Query>>
+}
+
+package "Molinex.IdentityAccessManagement.Domain" as Domain {
   class User <<Aggregate Root>> {
-    -_id : UserId
-    -_email : EmailAddress
-    -_credential : PasswordHash
-    -_profile : UserProfile
-    -_role : Role
-    -_status : AccountStatus
+    +Id : UserId
+    +Email : EmailAddress
+    +Credential : PasswordHash
+    +Profile : UserProfile
+    +Role : Role
+    +Status : AccountStatus
+    --
+    +{static} Register(email, credential, profile, role) : User
     +AssignRole(role : Role) : void
     +UpdateProfile(profile : UserProfile) : void
     +Activate() : void
     +Deactivate() : void
+    +Lock() : void
     +ToPrincipal() : AuthenticatedPrincipal
   }
   class UserId <<Value Object>> {
-    -_value : Guid
+    +Value : long
   }
   class EmailAddress <<Value Object>> {
-    -_value : string
+    +Value : string
+    --
     +IsValid() : bool
   }
   class PasswordHash <<Value Object>> {
-    -_value : string
-    +Matches(candidate : PasswordHash) : bool
-  }
-  class FullName <<Value Object>> {
-    -_value : string
-  }
-  class JobTitle <<Value Object>> {
-    -_value : string
-  }
-  class PhoneNumber <<Value Object>> {
-    -_value : string
+    +Value : string
   }
   class UserProfile <<Value Object>> {
-    -_fullName : FullName
-    -_jobTitle : JobTitle
-    -_phoneNumber : PhoneNumber
+    +FullName : FullName
+    +JobTitle : JobTitle
+    +PhoneNumber : PhoneNumber
+  }
+  class FullName <<Value Object>> {
+    +Value : string
+  }
+  class JobTitle <<Value Object>> {
+    +Value : string
+  }
+  class PhoneNumber <<Value Object>> {
+    +Value : string
   }
   class Role <<Value Object>> {
-    -_type : RoleType
-    -_permissions : Permission[]
+    +Type : RoleType
+    +Permissions : IReadOnlySet<Permission>
+    --
     +Allows(permission : Permission) : bool
   }
   enum RoleType <<Enumeration>> {
-    ADMINISTRATOR
-    MAINTENANCE_TECHNICIAN
-    PRODUCTION_OPERATOR
+    Administrator
+    MaintenanceTechnician
+    ProductionOperator
   }
   enum Permission <<Enumeration>> {
-    MANAGE_USERS
-    MANAGE_PRODUCTION
-    MANAGE_MAINTENANCE
-    VIEW_OPERATIONAL_INFORMATION
-    VIEW_REPORTS
+    ManageUsers
+    ManageProduction
+    ManageMaintenance
+    ViewOperationalInformation
+    ViewReports
   }
   enum AccountStatus <<Enumeration>> {
-    ACTIVE
-    INACTIVE
-    LOCKED
+    Active
+    Inactive
+    Locked
   }
   class AuthenticatedPrincipal <<Published Language>> {
-    +Subject : UserId
-    +Role : RoleType
-    +Permissions : Permission[]
+    +Subject : long
+    +Role : string
+    +Permissions : IReadOnlySet<string>
   }
   class UniqueEmailPolicy <<Domain Service>> {
-    +IsSatisfiedByAsync(email : EmailAddress) : Task<bool>
+    -repository : IUserRepository
+    --
+    +IsSatisfiedByAsync(email : EmailAddress, cancellationToken : CancellationToken) : Task<bool>
   }
   interface IUserRepository <<Repository>> {
-    +SaveAsync(user : User) : Task
-    +FindByIdAsync(id : UserId) : Task<User?>
-    +FindByEmailAsync(email : EmailAddress) : Task<User?>
-    +ExistsByEmailAsync(email : EmailAddress) : Task<bool>
-  }
-  interface IPasswordHasher <<Port>> {
-    +Hash(password : string) : PasswordHash
-    +Verify(password : string, hash : PasswordHash) : bool
-  }
-  interface ITokenIssuer <<Port>> {
-    +Issue(principal : AuthenticatedPrincipal) : string
-  }
-  interface IAccountNotificationPort <<Port>> {
-    +SendRegistrationNoticeAsync(user : User) : Task
+    +FindByEmailAsync(email : EmailAddress, cancellationToken : CancellationToken) : Task<User?>
+    +ExistsByEmailAsync(email : EmailAddress, cancellationToken : CancellationToken) : Task<bool>
   }
   class UserRegistered <<Domain Event>> {
     +UserId : UserId
     +OccurredAt : DateTimeOffset
   }
-  class UserRoleAssigned <<Domain Event>> {
+  class AccountStatusChanged <<Domain Event>> {
     +UserId : UserId
-    +Role : RoleType
+    +Status : AccountStatus
     +OccurredAt : DateTimeOffset
   }
 }
 
-package "Molinex.IdentityAccessManagement.Infrastructure.Persistence.EFC" as Infrastructure {
-  class IdentityDbContext <<EF Core DbContext>> {
-    +Users : DbSet<User>
+package "Molinex.IdentityAccessManagement.Infrastructure.Persistence.EntityFrameworkCore" as Infrastructure {
+  class UserRepository <<EF Core Repository>> {
+    +FindByEmailAsync(email : EmailAddress, cancellationToken : CancellationToken) : Task<User?>
+    +ExistsByEmailAsync(email : EmailAddress, cancellationToken : CancellationToken) : Task<bool>
   }
-  class UserRepositoryAdapter <<Repository Adapter>> {
-    -_context : IdentityDbContext
-    +SaveAsync(user : User) : Task
-    +FindByIdAsync(id : UserId) : Task<User?>
-    +FindByEmailAsync(email : EmailAddress) : Task<User?>
-    +ExistsByEmailAsync(email : EmailAddress) : Task<bool>
-  }
-  class AspNetPasswordHasher <<Security Adapter>> {
-    +Hash(password : string) : PasswordHash
-    +Verify(password : string, hash : PasswordHash) : bool
-  }
-  class JwtTokenIssuer <<Token Adapter>> {
-    -_configuration : JwtConfiguration
-    +Issue(principal : AuthenticatedPrincipal) : string
-  }
-  class NotificationDeliveryAdapter <<Notification Adapter>> {
-    -_httpClient : HttpClient
-    +SendRegistrationNoticeAsync(user : User) : Task
+  class ModelBuilderExtensions <<EF Core Configuration>> {
+    +{static} ApplyIdentityAccessManagementConfiguration(builder : ModelBuilder) : void
   }
 }
 
-AuthenticationController ..> IdentityResourceAssembler
-AuthenticationController ..> IdentityCommandService
-UsersController ..> IdentityCommandService
-UsersController ..> IdentityQueryService
-UsersController ..> IdentityResourceAssembler
-ProfileController ..> IdentityCommandService
-ProfileController ..> IdentityQueryService
-ProfileController ..> IdentityResourceAssembler
-IdentityResourceAssembler ..> SignInResource : uses
-IdentityResourceAssembler ..> SignUpResource : uses
-IdentityResourceAssembler ..> AssignRoleResource : uses
-IdentityResourceAssembler ..> UpdateProfileResource : uses
-IdentityResourceAssembler ..> AuthenticatedUserResource : creates
-IdentityResourceAssembler ..> UserResource : creates
-IdentityResourceAssembler ..> RegisterUserCommand : creates
-IdentityResourceAssembler ..> AuthenticateUserCommand : creates
-IdentityResourceAssembler ..> AssignRoleCommand : creates
-IdentityResourceAssembler ..> UpdateProfileCommand : creates
-IdentityResourceAssembler ..> AuthenticatedPrincipal : uses
-IdentityResourceAssembler ..> User : uses
-IdentityCommandService ..> RegisterUserCommand : handles
-IdentityCommandService ..> AuthenticateUserCommand : handles
-IdentityCommandService ..> AssignRoleCommand : handles
-IdentityCommandService ..> UpdateProfileCommand : handles
-IdentityCommandService ..> IUserRepository
-IdentityCommandService ..> IPasswordHasher
-IdentityCommandService ..> ITokenIssuer
-IdentityCommandService ..> IAccountNotificationPort
-IdentityQueryService ..> IUserRepository
-UniqueEmailPolicy ..> IUserRepository
-User *-- UserId
-User *-- EmailAddress
-User *-- PasswordHash
-User *-- UserProfile
-User *-- Role
-User --> AccountStatus
-UserProfile *-- FullName
-UserProfile *-- JobTitle
-UserProfile *-- PhoneNumber
-Role *-- RoleType
-Role *-- Permission
+package "Molinex.IdentityAccessManagement.Infrastructure.Hashing.BCrypt" as Hashing {
+  class HashingService <<BCrypt Hashing Service>> {
+    +HashPassword(password : string) : PasswordHash
+    +VerifyPassword(password : string, passwordHash : PasswordHash) : bool
+  }
+}
+
+package "Molinex.IdentityAccessManagement.Infrastructure.Tokens.Jwt" as Tokens {
+  class TokenService <<JWT Token Service>> {
+    -tokenSettings : TokenSettings
+    --
+    +GenerateToken(principal : AuthenticatedPrincipal) : string
+    +ValidateToken(token : string) : Task<AuthenticatedPrincipal?>
+  }
+  class TokenSettings <<Settings>> {
+    +Secret : string
+  }
+}
+
+package "Molinex.IdentityAccessManagement.Infrastructure.Pipeline.Middleware" as Pipeline {
+  class RequestAuthorizationMiddleware <<Middleware>> {
+    -next : RequestDelegate
+    --
+    +InvokeAsync(context : HttpContext, userQueryService : IUserQueryService, tokenService : ITokenService) : Task
+  }
+  class AuthorizeAttribute <<Authorization Filter>> {
+    +OnAuthorization(context : AuthorizationFilterContext) : void
+  }
+  class AllowAnonymousAttribute <<Attribute>>
+}
+
+package "Molinex.Shared (reference)" as SharedReference {
+  abstract class AggregateRoot <<Shared Base Aggregate>>
+  interface IEntityId<T> <<Shared Identifier Contract>>
+  interface IEvent <<Shared Event Contract>>
+  interface IBaseRepository<TEntity> <<Shared Repository>>
+  abstract class BaseRepository<TEntity> <<Shared EF Core Repository>>
+  interface IUnitOfWork <<Shared Unit of Work>>
+  class Result<T> <<Shared Application Result>>
+  class Error <<Shared Value Object>>
+}
+
+AuthenticationController --> "1" IAuthenticationService : delegates sign-in to
+UsersController --> "1" IUserCommandService : delegates commands to
+UsersController --> "1" IUserQueryService : delegates queries to
+AuthenticationController ..> SignInCommandFromResourceAssembler : uses
+AuthenticationController ..> AuthenticatedUserResourceFromEntityAssembler : uses
+UsersController ..> CreateUserCommandFromResourceAssembler : uses
+UsersController ..> ChangeAccountStatusCommandFromResourceAssembler : uses
+UsersController ..> UserResourceFromEntityAssembler : uses
+
+SignInCommandFromResourceAssembler ..> SignInResource : reads
+SignInCommandFromResourceAssembler ..> SignInCommand : creates
+CreateUserCommandFromResourceAssembler ..> CreateUserResource : reads
+CreateUserCommandFromResourceAssembler ..> CreateUserCommand : creates
+ChangeAccountStatusCommandFromResourceAssembler ..> ChangeAccountStatusResource : reads
+ChangeAccountStatusCommandFromResourceAssembler ..> ChangeAccountStatusCommand : creates
+AuthenticatedUserResourceFromEntityAssembler ..> AuthenticationResult : reads
+AuthenticatedUserResourceFromEntityAssembler ..> AuthenticatedUserResource : creates
+UserResourceFromEntityAssembler ..> User : reads
+UserResourceFromEntityAssembler ..> UserResource : creates
+
+AuthenticationService ..|> IAuthenticationService
+UserCommandService ..|> IUserCommandService
+UserQueryService ..|> IUserQueryService
+IAuthenticationService ..> SignInCommand : handles
+IAuthenticationService ..> AuthenticationResult : returns
+IAuthenticationService ..> Result : returns
+IUserCommandService ..> CreateUserCommand : handles
+IUserCommandService ..> ChangeAccountStatusCommand : handles
+IUserCommandService ..> Result : returns
+IUserQueryService ..> GetUserByIdQuery : handles
+IUserQueryService ..> GetUsersQuery : handles
+AuthenticationService --> "1" IUserRepository : finds users through
+AuthenticationService --> "1" IHashingService : verifies passwords through
+AuthenticationService --> "1" ITokenService : issues tokens through
+UserCommandService --> "1" IUserRepository : persists users through
+UserCommandService --> "1" UniqueEmailPolicy : validates emails with
+UserCommandService --> "1" IHashingService : hashes passwords through
+UserCommandService --> "1" IUnitOfWork : completes changes through
+UserQueryService --> "1" IUserRepository : reads users through
+AuthenticationResult *-- "1" AuthenticatedPrincipal : carries
+
+User --|> AggregateRoot
+UserId ..|> IEntityId
+User *-- "1" UserId : identified by
+User *-- "1" EmailAddress : signs in with
+User *-- "1" PasswordHash : protected by
+User *-- "1" UserProfile : described by
+User *-- "1" Role : authorized by
+User --> "1" AccountStatus : has
+UserProfile *-- "1" FullName : names
+UserProfile *-- "1" JobTitle : holds
+UserProfile *-- "1" PhoneNumber : reached at
+Role --> "1" RoleType : typed as
+Role --> "1..*" Permission : grants
+User ..> AuthenticatedPrincipal : publishes
+UniqueEmailPolicy --> "1" IUserRepository : checks emails through
+Result --> "1" Error : carries
+
 User ..> UserRegistered : raises
-User ..> UserRoleAssigned : raises
-User ..> AuthenticatedPrincipal : creates
-UserRepositoryAdapter ..|> IUserRepository
-AspNetPasswordHasher ..|> IPasswordHasher
-JwtTokenIssuer ..|> ITokenIssuer
-NotificationDeliveryAdapter ..|> IAccountNotificationPort
-UserRepositoryAdapter --> IdentityDbContext
+User ..> AccountStatusChanged : raises
+UserRegistered ..|> IEvent
+AccountStatusChanged ..|> IEvent
+
+IUserRepository --|> IBaseRepository
+UserRepository ..|> IUserRepository
+UserRepository --|> BaseRepository
+ModelBuilderExtensions ..> User : maps
+HashingService ..|> IHashingService
+TokenService ..|> ITokenService
+TokenService --> "1" TokenSettings : configured by
+RequestAuthorizationMiddleware ..> ITokenService : validates tokens through
+RequestAuthorizationMiddleware ..> IUserQueryService : loads the user through
+RequestAuthorizationMiddleware ..> AllowAnonymousAttribute : skips endpoints marked with
+AuthorizeAttribute ..> AllowAnonymousAttribute : skips endpoints marked with
 @enduml
-
-

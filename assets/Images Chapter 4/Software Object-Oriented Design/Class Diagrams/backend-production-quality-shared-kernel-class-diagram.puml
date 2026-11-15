@@ -1,22 +1,187 @@
 @startuml
+left to right direction
+hide empty members
 
 package "Molinex.Shared.Domain.Model.ValueObjects" as DomainModel {
   class Weight <<Value Object>> {
-    -_value : decimal
-    -_unit : MeasurementUnit
+    +Value : decimal
+    +Unit : MeasurementUnit
     --
-    +Create(value : decimal, unit : MeasurementUnit) : Weight
+    +{static} Of(value : decimal, unit : MeasurementUnit) : Weight
     +IsPositive() : bool
     +IsNonNegative() : bool
     +ConvertTo(unit : MeasurementUnit) : Weight
   }
 
   enum MeasurementUnit <<Enumeration>> {
-    KILOGRAM
-    METRIC_TON
+    Kilogram
+    MetricTon
+  }
+
+  interface IEntityId<T> <<Identifier Contract>> {
+    +Value : T
   }
 }
 
-Weight --> "1" MeasurementUnit
-@enduml
+package "Molinex.Shared.Domain.Model" as SharedDomain {
+  interface IAggregateRoot <<Aggregate Contract>> {
+    +DomainEvents : IReadOnlyCollection<IEvent>
+    +ClearDomainEvents() : void
+  }
+  abstract class AggregateRoot <<Base Aggregate>> {
+    -_domainEventFactories : List<Func<IEvent>>
+    +DomainEvents : IReadOnlyCollection<IEvent>
+    --
+    #AddDomainEvent(domainEventFactory : Func<IEvent>) : void
+    +ClearDomainEvents() : void
+  }
+  interface IEvent <<Event Contract>>
+  interface IAuditableEntity <<Audit Contract>> {
+    +CreatedAt : DateTimeOffset?
+    +UpdatedAt : DateTimeOffset?
+  }
+  class Error <<Value Object>> {
+    +Code : string
+    +Message : string
+    +Type : EErrorType
+    --
+    +{static} None : Error
+    +{static} Validation(code : string, message : string) : Error
+    +{static} NotFound(code : string, message : string) : Error
+    +{static} Conflict(code : string, message : string) : Error
+    +{static} Unauthorized(code : string, message : string) : Error
+    +{static} Forbidden(code : string, message : string) : Error
+    +{static} Failure(code : string, message : string) : Error
+    +{static} Unexpected(code : string, message : string) : Error
+  }
+  enum EErrorType <<Enumeration>> {
+    Failure
+    Validation
+    NotFound
+    Conflict
+    Unauthorized
+    Forbidden
+    Unexpected
+  }
+}
 
+package "Molinex.Shared.Domain.Repositories" as SharedRepositories {
+  interface IBaseRepository<TEntity> <<Repository>> {
+    +AddAsync(entity : TEntity, cancellationToken : CancellationToken) : Task
+    +FindByIdAsync(id : long, cancellationToken : CancellationToken) : Task<TEntity?>
+    +FindByIdAsNoTrackingAsync(id : long, cancellationToken : CancellationToken) : Task<TEntity?>
+    +Update(entity : TEntity) : void
+    +Remove(entity : TEntity) : void
+    +ListAsync(cancellationToken : CancellationToken) : Task<IEnumerable<TEntity>>
+    +ListAsNoTrackingAsync(cancellationToken : CancellationToken) : Task<IEnumerable<TEntity>>
+  }
+  interface IUnitOfWork <<Unit of Work>> {
+    +CompleteAsync(cancellationToken : CancellationToken) : Task
+  }
+}
+
+package "Molinex.Shared.Application" as SharedApplication {
+  class Result<T> <<Application Result>> {
+    +IsSuccess : bool
+    +IsFailure : bool
+    +Value : T?
+    +DomainError : Error
+    --
+    +{static} Success(value : T) : Result<T>
+    +{static} Failure(error : Error) : Result<T>
+    +Match<TResult>(onSuccess : Func<T, TResult>, onFailure : Func<Error, TResult>) : TResult
+  }
+  interface IEventHandler<TEvent> <<Event Handler Contract>> {
+    +Handle(domainEvent : TEvent, cancellationToken : CancellationToken) : Task
+  }
+}
+
+package "Molinex.Shared.Interfaces.Rest" as SharedInterfaces {
+  class ProblemDetailsFactory <<Problem Details Factory>> {
+    +CreateProblemDetails(controller : ControllerBase, statusCode : int, errorEnum : Enum?, detailMessage : string) : IActionResult
+  }
+}
+
+package "Molinex.Shared.Infrastructure.Persistence.EntityFrameworkCore" as SharedPersistence {
+  class AppDbContext <<EF Core DbContext>> {
+    #OnConfiguring(builder : DbContextOptionsBuilder) : void
+    #OnModelCreating(builder : ModelBuilder) : void
+  }
+  abstract class BaseRepository<TEntity> <<EF Core Repository>> {
+    #Context : AppDbContext
+    --
+    +AddAsync(entity : TEntity, cancellationToken : CancellationToken) : Task
+    +FindByIdAsync(id : long, cancellationToken : CancellationToken) : Task<TEntity?>
+    +FindByIdAsNoTrackingAsync(id : long, cancellationToken : CancellationToken) : Task<TEntity?>
+    +Update(entity : TEntity) : void
+    +Remove(entity : TEntity) : void
+    +ListAsync(cancellationToken : CancellationToken) : Task<IEnumerable<TEntity>>
+    +ListAsNoTrackingAsync(cancellationToken : CancellationToken) : Task<IEnumerable<TEntity>>
+  }
+  class UnitOfWork <<Unit of Work>> {
+    -context : AppDbContext
+    --
+    +CompleteAsync(cancellationToken : CancellationToken) : Task
+  }
+  class StronglyTypedIdConverter<TId, TValue> <<EF Core Value Converter>> {
+    +StronglyTypedIdConverter(factory : Func<TValue, TId>)
+  }
+  class AuditableEntityInterceptor <<EF Core Interceptor>> {
+    +SavingChangesAsync(eventData : DbContextEventData, result : InterceptionResult<int>, cancellationToken : CancellationToken) : ValueTask<InterceptionResult<int>>
+  }
+  class DispatchDomainEventsInterceptor <<EF Core Interceptor>> {
+    -mediator : IMediator
+    --
+    +SavedChangesAsync(eventData : SaveChangesCompletedEventData, result : int, cancellationToken : CancellationToken) : ValueTask<int>
+  }
+}
+
+package "Molinex.Shared.Infrastructure.Pipeline.Middleware" as SharedPipeline {
+  class GlobalExceptionHandler <<Exception Handler>> {
+    +TryHandleAsync(httpContext : HttpContext, exception : Exception, cancellationToken : CancellationToken) : ValueTask<bool>
+  }
+}
+
+package ".NET types (reference)" as DotNetReference {
+  class DbContext <<EF Core Type>>
+  class SaveChangesInterceptor <<EF Core Type>>
+  interface IExceptionHandler <<ASP.NET Core Type>>
+  class ProblemDetails <<ASP.NET Core Type>>
+  interface IMediator <<Cortex.Mediator Type>>
+}
+
+Weight --> "1" MeasurementUnit : measured in
+AggregateRoot ..|> IAggregateRoot
+AggregateRoot o-- "0..*" IEvent : accumulates
+Error --> "1" EErrorType : classified by
+Result --> "1" Error : carries
+IEventHandler ..> IEvent : handles
+BaseRepository ..|> IBaseRepository
+UnitOfWork ..|> IUnitOfWork
+BaseRepository --> "1" AppDbContext : queries through
+UnitOfWork --> "1" AppDbContext : saves changes through
+AppDbContext --|> DbContext
+AppDbContext ..> AuditableEntityInterceptor : registers
+AppDbContext ..> StronglyTypedIdConverter : maps identifiers with
+StronglyTypedIdConverter ..> IEntityId : converts
+AuditableEntityInterceptor --|> SaveChangesInterceptor
+DispatchDomainEventsInterceptor --|> SaveChangesInterceptor
+AuditableEntityInterceptor ..> IAuditableEntity : timestamps
+DispatchDomainEventsInterceptor ..> IAggregateRoot : reads pending events of
+DispatchDomainEventsInterceptor --> "1" IMediator : publishes through
+GlobalExceptionHandler ..|> IExceptionHandler
+GlobalExceptionHandler ..> ProblemDetails : responds with
+ProblemDetailsFactory ..> ProblemDetails : creates
+
+note bottom of Weight
+  Production-Quality Shared Kernel:
+  the only domain model shared by
+  Production Management and
+  Quality and Yield Control.
+end note
+
+note bottom of AggregateRoot
+  Reusable technical building block.
+  It is not part of the DDD Shared Kernel.
+end note
+@enduml

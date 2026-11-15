@@ -1,210 +1,278 @@
 @startuml
 left to right direction
+hide empty members
 
-package "Molinex.ReportingAnalytics.Interfaces.REST" as Interfaces {
+package "Molinex.ReportingAnalytics.Interfaces.Rest" as Interfaces {
   class ReportsController <<REST Controller>> {
-    +GetSummary(from : DateOnly, to : DateOnly) : ActionResult
-    +GetProductionReport(from : DateOnly, to : DateOnly) : ActionResult
-    +GetMaintenanceReport(from : DateOnly, to : DateOnly) : ActionResult
-    +GetTrend(indicator : string, from : DateOnly, to : DateOnly) : ActionResult
+    -queryService : IReportingQueryService
+    --
+    +GetOperationalSummary(start : DateOnly, end : DateOnly, cancellationToken : CancellationToken) : Task<IActionResult>
+    +GetProductionReport(start : DateOnly, end : DateOnly, cancellationToken : CancellationToken) : Task<IActionResult>
+    +GetMaintenanceReport(start : DateOnly, end : DateOnly, cancellationToken : CancellationToken) : Task<IActionResult>
+    +GetOperationalTrend(indicator : string, start : DateOnly, end : DateOnly, cancellationToken : CancellationToken) : Task<IActionResult>
   }
-  class ReportingResourceAssembler <<Assembler>> {
-    +{static} ToSummaryQuery(from : DateOnly, to : DateOnly) : GetOperationalSummaryQuery
-    +{static} ToReportQuery(reportType : string, from : DateOnly, to : DateOnly) : GenerateReportQuery
-    +{static} ToTrendQuery(indicator : string, from : DateOnly, to : DateOnly) : GetOperationalTrendQuery
-    +{static} ToResource(model : OperationalSummary) : OperationalSummaryResource
-    +{static} ToResource(model : ProductionReport) : ReportResource
-    +{static} ToResource(model : MaintenanceReport) : ReportResource
-    +{static} ToResource(model : OperationalTrend) : OperationalTrendResource
-    +{static} ToResource(model : MetricValue) : MetricResource
-    +{static} ToResource(model : ReportRow) : ReportRowResource
-    +{static} ToResource(model : TrendPoint) : TrendPointResource
-  }
+
   class OperationalSummaryResource <<Response Resource>> <<(R,#FF7700)>> {
-    +From : DateOnly
-    +To : DateOnly
-    +Metrics : MetricResource[]
+    +Start : DateOnly
+    +End : DateOnly
+    +Metrics : IReadOnlyCollection<MetricResource>
   }
   class ReportResource <<Response Resource>> <<(R,#FF7700)>> {
-    +ReportType : string
-    +From : DateOnly
-    +To : DateOnly
-    +Rows : ReportRowResource[]
+    +Start : DateOnly
+    +End : DateOnly
+    +Rows : IReadOnlyCollection<ReportRowResource>
   }
   class OperationalTrendResource <<Response Resource>> <<(R,#FF7700)>> {
     +Indicator : string
-    +From : DateOnly
-    +To : DateOnly
-    +Points : TrendPointResource[]
+    +Points : IReadOnlyCollection<TrendPointResource>
   }
   class MetricResource <<Response Resource>> <<(R,#FF7700)>> {
     +Name : string
     +Value : decimal
     +Unit : string
-    +MeasuredAt : DateTimeOffset
   }
   class ReportRowResource <<Response Resource>> <<(R,#FF7700)>> {
-    +Dimensions : string[]
-    +Metrics : MetricResource[]
+    +Dimensions : IReadOnlyDictionary<string, string>
+    +Metrics : IReadOnlyCollection<MetricResource>
   }
   class TrendPointResource <<Response Resource>> <<(R,#FF7700)>> {
     +RecordedAt : DateTimeOffset
     +Value : decimal
   }
+
+  class OperationalSummaryResourceFromEntityAssembler <<Assembler>> {
+    +{static} ToResourceFromEntity(entity : OperationalSummary) : OperationalSummaryResource
+  }
+  class ReportResourceFromEntityAssembler <<Assembler>> {
+    +{static} ToResourceFromEntity(entity : ProductionReport) : ReportResource
+    +{static} ToResourceFromEntity(entity : MaintenanceReport) : ReportResource
+  }
+  class OperationalTrendResourceFromEntityAssembler <<Assembler>> {
+    +{static} ToResourceFromEntity(entity : OperationalTrend) : OperationalTrendResource
+  }
 }
 
 package "Molinex.ReportingAnalytics.Application" as Application {
+  interface IReportingQueryService <<Query Service>> {
+    +Handle(query : GetOperationalSummaryQuery, cancellationToken : CancellationToken) : Task<OperationalSummary>
+    +Handle(query : GenerateProductionReportQuery, cancellationToken : CancellationToken) : Task<ProductionReport>
+    +Handle(query : GenerateMaintenanceReportQuery, cancellationToken : CancellationToken) : Task<MaintenanceReport>
+    +Handle(query : GetOperationalTrendQuery, cancellationToken : CancellationToken) : Task<OperationalTrend>
+  }
+  interface IReportingProjectionService <<Projection Service>> {
+    +Handle(publishedEvent : PublishedDomainEvent, cancellationToken : CancellationToken) : Task<Result<ProjectionMetricId>>
+  }
   class ReportingQueryService <<Query Service>> {
-    +GetOperationalSummaryAsync(period : DateRange) : Task<OperationalSummary>
-    +GenerateProductionReportAsync(period : DateRange) : Task<ProductionReport>
-    +GenerateMaintenanceReportAsync(period : DateRange) : Task<MaintenanceReport>
-    +GetOperationalTrendAsync(indicator : MetricName, period : DateRange) : Task<OperationalTrend>
+    -projectionRepository : IReportingProjectionRepository
+  }
+  class ReportingProjectionService <<Projection Service>> {
+    -projectionRepository : IReportingProjectionRepository
+    -unitOfWork : IUnitOfWork
   }
   class ReportingProjectionHandler <<Event Handler>> {
-    +HandleAsync(event : PublishedDomainEvent) : Task
-  }
-  class GetOperationalSummaryQuery <<Query>> {
-    +From : DateOnly
-    +To : DateOnly
-  }
-  class GenerateReportQuery <<Query>> {
-    +ReportType : string
-    +From : DateOnly
-    +To : DateOnly
-  }
-  class GetOperationalTrendQuery <<Query>> {
-    +Indicator : string
-    +From : DateOnly
-    +To : DateOnly
+    -projectionService : IReportingProjectionService
+    --
+    +Handle(publishedEvent : PublishedDomainEvent, cancellationToken : CancellationToken) : Task
   }
 }
 
-package "Molinex.ReportingAnalytics.Domain.Model" as DomainModel {
-  class PublishedDomainEvent <<Published Language>> {
-    +EventName : string
-    +AggregateReference : Guid
-    +OccurredAt : DateTimeOffset
-    +PayloadVersion : int
+package "Molinex.ReportingAnalytics.Domain.Model.Queries" as Queries {
+  class GetOperationalSummaryQuery <<Query>> {
+    +Start : DateOnly
+    +End : DateOnly
+  }
+  class GenerateProductionReportQuery <<Query>> {
+    +Start : DateOnly
+    +End : DateOnly
+  }
+  class GenerateMaintenanceReportQuery <<Query>> {
+    +Start : DateOnly
+    +End : DateOnly
+  }
+  class GetOperationalTrendQuery <<Query>> {
+    +Indicator : string
+    +Start : DateOnly
+    +End : DateOnly
+  }
+}
+
+package "Molinex.ReportingAnalytics.Domain" as Domain {
+  class ProjectionMetricId <<Value Object>> {
+    +Value : long
   }
   class DateRange <<Value Object>> {
-    -_start : DateOnly
-    -_end : DateOnly
+    +Start : DateOnly
+    +End : DateOnly
+    --
     +IsValid() : bool
   }
   class MetricName <<Value Object>> {
-    -_value : string
-  }
-  class MetricAmount <<Value Object>> {
-    -_value : decimal
-  }
-  class UnitSymbol <<Value Object>> {
-    -_value : string
+    +Value : string
   }
   class MetricValue <<Value Object>> {
-    -_name : MetricName
-    -_value : MetricAmount
-    -_unit : UnitSymbol
-    -_measuredAt : DateTimeOffset
-  }
-  class ReportDimension <<Value Object>> {
-    -_name : string
-    -_value : string
+    +Name : MetricName
+    +Value : decimal
+    +Unit : string
+    +MeasuredAt : DateTimeOffset
   }
   class ReportRow <<Value Object>> {
-    -_dimensions : ReportDimension[]
-    -_metrics : MetricValue[]
+    +Dimensions : IReadOnlyDictionary<string, string>
+    +Metrics : IReadOnlyCollection<MetricValue>
   }
   class TrendPoint <<Value Object>> {
-    -_recordedAt : DateTimeOffset
-    -_value : MetricAmount
+    +RecordedAt : DateTimeOffset
+    +Value : decimal
   }
   class OperationalSummary <<Read Model>> {
     +Period : DateRange
-    +Metrics : MetricValue[]
+    +Metrics : IReadOnlyCollection<MetricValue>
   }
   class ProductionReport <<Read Model>> {
     +Period : DateRange
-    +Rows : ReportRow[]
+    +Rows : IReadOnlyCollection<ReportRow>
   }
   class MaintenanceReport <<Read Model>> {
     +Period : DateRange
-    +Rows : ReportRow[]
+    +Rows : IReadOnlyCollection<ReportRow>
   }
   class OperationalTrend <<Read Model>> {
     +Indicator : MetricName
     +Period : DateRange
-    +Points : TrendPoint[]
+    +Points : IReadOnlyCollection<TrendPoint>
   }
-  interface IReportingProjectionStore <<Projection Store>> {
-    +SaveMetricAsync(metric : MetricValue) : Task
-    +FindMetricsAsync(period : DateRange) : Task<MetricValue[]>
-    +FindProductionRowsAsync(period : DateRange) : Task<ReportRow[]>
-    +FindMaintenanceRowsAsync(period : DateRange) : Task<ReportRow[]>
-    +FindTrendAsync(indicator : MetricName, period : DateRange) : Task<TrendPoint[]>
+  class PublishedDomainEvent <<Published Language>> {
+    +EventName : string
+    +SourceContext : string
+    +AggregateReference : long
+    +OccurredAt : DateTimeOffset
+    +PayloadVersion : int
+    +Payload : IReadOnlyDictionary<string, string>
+  }
+  class MetricProjection <<Projection Model>> {
+    +Id : ProjectionMetricId
+    +SourceContext : string
+    +SourceAggregateId : long
+    +Category : ReportCategory
+    +Metric : MetricValue
+    +Dimensions : IReadOnlyDictionary<string, string>
+  }
+  enum ReportCategory <<Enumeration>> {
+    Operational
+    Production
+    Quality
+    Maintenance
+  }
+  interface IReportingProjectionRepository <<Repository>> {
+    +FindMetricsAsync(period : DateRange, cancellationToken : CancellationToken) : Task<IEnumerable<MetricProjection>>
+    +FindByCategoryAsync(category : ReportCategory, period : DateRange, cancellationToken : CancellationToken) : Task<IEnumerable<MetricProjection>>
+    +FindTrendAsync(indicator : MetricName, period : DateRange, cancellationToken : CancellationToken) : Task<IEnumerable<MetricProjection>>
   }
 }
 
-package "Molinex.ReportingAnalytics.Infrastructure.Persistence.EFC" as Infrastructure {
-  class ReportingDbContext <<EF Core DbContext>> {
-    +Metrics : DbSet<MetricValue>
-    +ReportRows : DbSet<ReportRow>
-    +TrendPoints : DbSet<TrendPoint>
-    +SaveChangesAsync() : Task<int>
+package "Molinex.ReportingAnalytics.Infrastructure.Persistence.EntityFrameworkCore" as Infrastructure {
+  class ReportingProjectionRepository <<EF Core Repository>> {
+    +FindMetricsAsync(period : DateRange, cancellationToken : CancellationToken) : Task<IEnumerable<MetricProjection>>
+    +FindByCategoryAsync(category : ReportCategory, period : DateRange, cancellationToken : CancellationToken) : Task<IEnumerable<MetricProjection>>
+    +FindTrendAsync(indicator : MetricName, period : DateRange, cancellationToken : CancellationToken) : Task<IEnumerable<MetricProjection>>
   }
-  class ReportingProjectionStoreAdapter <<Projection Store Adapter>> {
-    -_context : ReportingDbContext
-    +SaveMetricAsync(metric : MetricValue) : Task
-    +FindMetricsAsync(period : DateRange) : Task<MetricValue[]>
-    +FindProductionRowsAsync(period : DateRange) : Task<ReportRow[]>
-    +FindMaintenanceRowsAsync(period : DateRange) : Task<ReportRow[]>
-    +FindTrendAsync(indicator : MetricName, period : DateRange) : Task<TrendPoint[]>
+  class ModelBuilderExtensions <<EF Core Configuration>> {
+    +{static} ApplyReportingAnalyticsConfiguration(builder : ModelBuilder) : void
   }
 }
 
-ReportsController ..> ReportingResourceAssembler
-ReportsController ..> ReportingQueryService
-ReportingResourceAssembler ..> OperationalSummaryResource : creates
-ReportingResourceAssembler ..> ReportResource : creates
-ReportingResourceAssembler ..> OperationalTrendResource : creates
-ReportingResourceAssembler ..> MetricResource : creates
-ReportingResourceAssembler ..> ReportRowResource : creates
-ReportingResourceAssembler ..> TrendPointResource : creates
-ReportingResourceAssembler ..> GetOperationalSummaryQuery : creates
-ReportingResourceAssembler ..> GenerateReportQuery : creates
-ReportingResourceAssembler ..> GetOperationalTrendQuery : creates
-ReportingResourceAssembler ..> OperationalSummary : uses
-ReportingResourceAssembler ..> ProductionReport : uses
-ReportingResourceAssembler ..> MaintenanceReport : uses
-ReportingResourceAssembler ..> OperationalTrend : uses
-ReportingResourceAssembler ..> MetricValue : uses
-ReportingResourceAssembler ..> ReportRow : uses
-ReportingResourceAssembler ..> TrendPoint : uses
-OperationalSummaryResource *-- "0..*" MetricResource
-ReportResource *-- "0..*" ReportRowResource
-ReportRowResource *-- "0..*" MetricResource
-OperationalTrendResource *-- "0..*" TrendPointResource
-ReportingQueryService ..> GetOperationalSummaryQuery : handles
-ReportingQueryService ..> GenerateReportQuery : handles
-ReportingQueryService ..> GetOperationalTrendQuery : handles
-ReportingQueryService ..> IReportingProjectionStore
-ReportingProjectionHandler ..> IReportingProjectionStore
-ReportingProjectionHandler ..> PublishedDomainEvent
-OperationalSummary *-- DateRange
-OperationalSummary *-- MetricValue
-ProductionReport *-- DateRange
-ProductionReport *-- ReportRow
-MaintenanceReport *-- DateRange
-MaintenanceReport *-- ReportRow
-OperationalTrend *-- MetricName
-OperationalTrend *-- DateRange
-OperationalTrend *-- TrendPoint
-MetricValue *-- MetricName
-MetricValue *-- MetricAmount
-MetricValue *-- UnitSymbol
-ReportRow *-- ReportDimension
-ReportRow *-- MetricValue
-ReportingProjectionStoreAdapter ..|> IReportingProjectionStore
-ReportingProjectionStoreAdapter --> ReportingDbContext
+package "Molinex.ReportingAnalytics.Infrastructure.Messaging" as Messaging {
+  class DomainEventMessageHandler <<Event Handler>> {
+    -mediator : IMediator
+    --
+    +Handle(message : DomainEventMessage, cancellationToken : CancellationToken) : Task
+  }
+  class DomainEventMessage <<Integration Message>> {
+    +EventName : string
+    +SourceContext : string
+    +AggregateReference : long
+    +OccurredAt : DateTimeOffset
+    +PayloadVersion : int
+    +Payload : IReadOnlyDictionary<string, string>
+  }
+  class PublishedDomainEventAssembler <<ACL>> {
+    +{static} ToPublishedLanguage(message : DomainEventMessage) : PublishedDomainEvent
+  }
+}
+
+package "Molinex.Shared (reference)" as SharedReference {
+  interface IEntityId<T> <<Shared Identifier Contract>>
+  interface IEvent <<Shared Event Contract>>
+  interface IEventHandler<TEvent> <<Shared Event Handler Contract>>
+  interface IBaseRepository<TEntity> <<Shared Repository>>
+  abstract class BaseRepository<TEntity> <<Shared EF Core Repository>>
+  interface IUnitOfWork <<Shared Unit of Work>>
+  class Result<T> <<Shared Application Result>>
+  class Error <<Shared Value Object>>
+}
+
+package "Cortex.Mediator (reference)" as MediatorReference {
+  interface IMediator <<Cortex.Mediator Type>>
+}
+
+ReportsController --> "1" IReportingQueryService : delegates queries to
+ReportsController ..> OperationalSummaryResourceFromEntityAssembler : uses
+ReportsController ..> ReportResourceFromEntityAssembler : uses
+ReportsController ..> OperationalTrendResourceFromEntityAssembler : uses
+OperationalSummaryResourceFromEntityAssembler ..> OperationalSummary : reads
+OperationalSummaryResourceFromEntityAssembler ..> OperationalSummaryResource : creates
+ReportResourceFromEntityAssembler ..> ProductionReport : reads
+ReportResourceFromEntityAssembler ..> MaintenanceReport : reads
+ReportResourceFromEntityAssembler ..> ReportResource : creates
+OperationalTrendResourceFromEntityAssembler ..> OperationalTrend : reads
+OperationalTrendResourceFromEntityAssembler ..> OperationalTrendResource : creates
+OperationalSummaryResource *-- "0..*" MetricResource : contains
+ReportResource *-- "0..*" ReportRowResource : contains
+ReportRowResource *-- "0..*" MetricResource : contains
+OperationalTrendResource *-- "0..*" TrendPointResource : contains
+
+ReportingQueryService ..|> IReportingQueryService
+ReportingProjectionService ..|> IReportingProjectionService
+ReportingProjectionHandler ..|> IEventHandler
+IReportingQueryService ..> GetOperationalSummaryQuery : handles
+IReportingQueryService ..> GenerateProductionReportQuery : handles
+IReportingQueryService ..> GenerateMaintenanceReportQuery : handles
+IReportingQueryService ..> GetOperationalTrendQuery : handles
+IReportingProjectionService ..> PublishedDomainEvent : projects
+IReportingProjectionService ..> Result : returns
+ReportingQueryService --> "1" IReportingProjectionRepository : reads projections through
+ReportingProjectionService --> "1" IReportingProjectionRepository : stores projections through
+ReportingProjectionService --> "1" IUnitOfWork : completes changes through
+ReportingProjectionHandler --> "1" IReportingProjectionService : delegates projections to
+ReportingProjectionHandler ..> PublishedDomainEvent : handles
+
+ProjectionMetricId ..|> IEntityId
+PublishedDomainEvent ..|> IEvent
+MetricProjection *-- "1" ProjectionMetricId : identified by
+MetricProjection *-- "1" MetricValue : stores
+MetricProjection --> "1" ReportCategory : classified as
+MetricValue *-- "1" MetricName : named
+OperationalSummary *-- "1" DateRange : covers
+OperationalSummary *-- "0..*" MetricValue : summarizes
+ProductionReport *-- "1" DateRange : covers
+ProductionReport *-- "0..*" ReportRow : lists
+MaintenanceReport *-- "1" DateRange : covers
+MaintenanceReport *-- "0..*" ReportRow : lists
+OperationalTrend *-- "1" MetricName : tracks
+OperationalTrend *-- "1" DateRange : covers
+OperationalTrend *-- "0..*" TrendPoint : plots
+ReportRow *-- "0..*" MetricValue : reports
+IReportingProjectionRepository ..> MetricProjection : stores and finds
+Result --> "1" Error : carries
+
+IReportingProjectionRepository --|> IBaseRepository
+ReportingProjectionRepository ..|> IReportingProjectionRepository
+ReportingProjectionRepository --|> BaseRepository
+ModelBuilderExtensions ..> MetricProjection : maps
+DomainEventMessageHandler ..|> IEventHandler
+DomainEventMessage ..|> IEvent
+DomainEventMessageHandler ..> DomainEventMessage : handles
+DomainEventMessageHandler ..> PublishedDomainEventAssembler : translates with
+DomainEventMessageHandler --> "1" IMediator : publishes the published language through
+PublishedDomainEventAssembler ..> DomainEventMessage : reads
+PublishedDomainEventAssembler ..> PublishedDomainEvent : creates
 @enduml
-
-

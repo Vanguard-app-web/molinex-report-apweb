@@ -2,7 +2,7 @@ systemContext molinex "MolinexSystemContext" {
     include visitor administrator maintenanceTechnician productionOperator sensorGateway notificationService molinex
     autoLayout lr
     title "Molinex Platform - System Context Diagram"
-    description "People and planned external software systems that interact with the Molinex Platform."
+    description "People and external software systems that interact with the Molinex Platform."
 }
 
 container molinex "MolinexContainers" {
@@ -16,12 +16,12 @@ container molinex "MolinexContainers" {
 
 component molinex.webApplication "MolinexFrontendComponents" {
     include visitor administrator maintenanceTechnician productionOperator
-    include molinex.webApplication.commercialFeature molinex.webApplication.identityFeature
     include molinex.webApplication.productionFeature molinex.webApplication.qualityFeature
     include molinex.webApplication.maintenanceFeature molinex.webApplication.intelligenceFeature
-    include molinex.webApplication.reportingFeature molinex.webApplication.frontendSharedKernel
+    include molinex.webApplication.commercialFeature molinex.webApplication.reportingFeature
+    include molinex.webApplication.identityFeature molinex.webApplication.frontendSharedKernel
     include molinex.apiApplication
-    autoLayout tb
+    autoLayout lr
     title "Molinex Frontend - Component Overview by Bounded Context"
     description "The seven frontend bounded contexts, the Shared Kernel and their relationships with the RESTful API."
 }
@@ -43,27 +43,25 @@ component molinex.webApplication "MolinexFrontendIdentity" {
     title "Molinex Frontend - Identity and Access Management Components"
 }
 component molinex.webApplication "MolinexFrontendProduction" {
-    include molinex.webApplication.rawMaterialReceptionList molinex.webApplication.rawMaterialReceptionForm
-    include molinex.webApplication.productionBatchList molinex.webApplication.productionBatchForm
-    include molinex.webApplication.productionRecordList molinex.webApplication.productionRecordForm
-    include molinex.webApplication.productionHistoryView molinex.webApplication.productionApplication
+    include molinex.webApplication.productionOverview
+    include molinex.webApplication.rawMaterialReceptionViews molinex.webApplication.productionBatchViews
+    include molinex.webApplication.productionRecordViews
+    include molinex.webApplication.productionApplication
     include molinex.webApplication.productionDomain molinex.webApplication.productionInfrastructure molinex.apiApplication
     autoLayout tb
     title "Molinex Frontend - Production Management Components"
 }
 component molinex.webApplication "MolinexFrontendQuality" {
-    include molinex.webApplication.qualityAssessmentList molinex.webApplication.qualityAssessmentForm
-    include molinex.webApplication.wasteRecordList molinex.webApplication.wasteRecordForm
-    include molinex.webApplication.yieldIndicatorDashboard molinex.webApplication.qualityComparisonView
-    include molinex.webApplication.qualityDeviationList molinex.webApplication.qualityApplication
+    include molinex.webApplication.qualityAssessmentViews molinex.webApplication.wasteRecordViews
+    include molinex.webApplication.yieldAnalysisViews molinex.webApplication.productionProcessSelect
+    include molinex.webApplication.qualityApplication
     include molinex.webApplication.qualityDomain molinex.webApplication.qualityInfrastructure molinex.apiApplication
     autoLayout tb
     title "Molinex Frontend - Quality and Yield Control Components"
 }
 component molinex.webApplication "MolinexFrontendMaintenance" {
-    include molinex.webApplication.machineList molinex.webApplication.machineForm
-    include molinex.webApplication.machineStatusView molinex.webApplication.maintenanceRecordForm
-    include molinex.webApplication.maintenanceHistoryView molinex.webApplication.maintenanceApplication
+    include molinex.webApplication.machineManagementViews molinex.webApplication.maintenanceManagementViews
+    include molinex.webApplication.maintenanceApplication
     include molinex.webApplication.maintenanceDomain molinex.webApplication.maintenanceInfrastructure molinex.apiApplication
     autoLayout tb
     title "Molinex Frontend - Asset and Maintenance Management Components"
@@ -85,8 +83,7 @@ component molinex.webApplication "MolinexFrontendReporting" {
     title "Molinex Frontend - Reporting and Analytics Components"
 }
 component molinex.webApplication "MolinexFrontendSharedKernel" {
-    include molinex.webApplication.appLayout molinex.webApplication.navigationMenu
-    include molinex.webApplication.sharedViews molinex.webApplication.feedbackMessage
+    include molinex.webApplication.applicationShell molinex.webApplication.sharedPresentation
     include molinex.webApplication.sharedKernelDomain molinex.webApplication.sharedInfrastructure
     autoLayout tb
     title "Molinex Frontend - Shared Kernel Components"
@@ -94,14 +91,14 @@ component molinex.webApplication "MolinexFrontendSharedKernel" {
 }
 
 component molinex.apiApplication "MolinexBackendComponents" {
-    include molinex.landingPage molinex.webApplication molinex.database sensorGateway notificationService
-    include molinex.apiApplication.commercialModule molinex.apiApplication.identityModule
     include molinex.apiApplication.productionModule molinex.apiApplication.qualityModule
     include molinex.apiApplication.maintenanceModule molinex.apiApplication.intelligenceModule
-    include molinex.apiApplication.reportingModule molinex.apiApplication.sharedKernel
-    autoLayout tb
+    include molinex.apiApplication.commercialModule molinex.apiApplication.reportingModule
+    include molinex.apiApplication.identityModule molinex.apiApplication.sharedKernel
+    include molinex.landingPage molinex.webApplication molinex.database
+    autoLayout lr
     title "Molinex Backend - Component Overview by Bounded Context"
-    description "The seven backend bounded contexts, the Shared Kernel, persistence and planned external integrations of the modular monolith."
+    description "Core, supporting and generic bounded contexts, the Shared Kernel, clients, persistence and the anti-corruption layer integrations of the modular monolith."
 }
 
 component molinex.apiApplication "MolinexBackendCommercial" {
@@ -127,8 +124,11 @@ component molinex.apiApplication "MolinexBackendProduction" {
     include molinex.apiApplication.productionRecordInterfaces molinex.apiApplication.productionCommandServices
     include molinex.apiApplication.productionQueryServices molinex.apiApplication.productionDomain
     include molinex.apiApplication.productionInfrastructure
+    include molinex.apiApplication.productionAclInterface molinex.apiApplication.productionContextFacade
+    include molinex.apiApplication.qualityProductionAcl
     autoLayout tb
     title "Molinex Backend - Production Management Components"
+    description "Production Management publishes IProductionContextFacade; the Quality and Yield Control ACL is its only cross-context consumer."
 }
 component molinex.apiApplication "MolinexBackendQuality" {
     include molinex.webApplication molinex.database
@@ -136,36 +136,47 @@ component molinex.apiApplication "MolinexBackendQuality" {
     include molinex.apiApplication.yieldAnalysisInterfaces molinex.apiApplication.qualityCommandServices
     include molinex.apiApplication.qualityQueryServices molinex.apiApplication.qualityDomain
     include molinex.apiApplication.qualityInfrastructure
+    include molinex.apiApplication.qualityProductionAcl molinex.apiApplication.productionAclInterface
     autoLayout tb
     title "Molinex Backend - Quality and Yield Control Components"
+    description "Quality and Yield Control reaches Production Management only through its ACL and the published Production context facade contract."
 }
 component molinex.apiApplication "MolinexBackendMaintenance" {
     include molinex.webApplication molinex.database
     include molinex.apiApplication.machineInterfaces molinex.apiApplication.maintenanceRecordInterfaces
     include molinex.apiApplication.maintenanceCommandServices molinex.apiApplication.maintenanceQueryServices
     include molinex.apiApplication.maintenanceDomain molinex.apiApplication.maintenanceInfrastructure
+    include molinex.apiApplication.maintenanceAclInterface molinex.apiApplication.maintenanceContextFacade
+    include molinex.apiApplication.intelligenceMachineAcl
     autoLayout tb
     title "Molinex Backend - Asset and Maintenance Management Components"
+    description "Planned integration: Asset and Maintenance Management publishes IAssetMaintenanceContextFacade for the Operational Intelligence ACL."
 }
 component molinex.apiApplication "MolinexBackendIntelligence" {
     include molinex.webApplication sensorGateway notificationService molinex.database
     include molinex.apiApplication.telemetryIngestionInterfaces molinex.apiApplication.monitoringInterfaces
     include molinex.apiApplication.intelligenceCommandServices molinex.apiApplication.intelligenceQueryServices
     include molinex.apiApplication.intelligenceDomain molinex.apiApplication.intelligenceInfrastructure
+    include molinex.apiApplication.intelligenceMachineAcl molinex.apiApplication.maintenanceAclInterface
     autoLayout tb
     title "Molinex Backend - Operational Intelligence Components"
+    description "Planned integration: Operational Intelligence reaches Asset and Maintenance Management only through its ACL and the published facade contract."
 }
 component molinex.apiApplication "MolinexBackendReporting" {
     include molinex.webApplication molinex.database
     include molinex.apiApplication.reportingInterfaces molinex.apiApplication.reportingQueryServices
     include molinex.apiApplication.reportingProjectionHandlers molinex.apiApplication.reportingDomain
     include molinex.apiApplication.reportingInfrastructure
+    include molinex.apiApplication.reportingEventAcl
+    include molinex.apiApplication.productionModule molinex.apiApplication.qualityModule
+    include molinex.apiApplication.maintenanceModule molinex.apiApplication.intelligenceModule
     autoLayout tb
     title "Molinex Backend - Reporting and Analytics Components"
+    description "Reporting and Analytics receives domain events only through its event-based ACL, which translates them into its published language."
 }
 component molinex.apiApplication "MolinexBackendSharedKernel" {
     include molinex.apiApplication.sharedKernelDomain
     autoLayout tb
     title "Molinex Backend - Shared Kernel Components"
-    description "Value objects shared by Production Management and Quality and Yield Control."
+    description "Common domain abstractions, persistence contracts and value objects used by the backend bounded contexts."
 }
