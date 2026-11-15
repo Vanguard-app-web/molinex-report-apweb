@@ -1,43 +1,62 @@
 @startuml
 left to right direction
+hide empty members
 
-package "Molinex.QualityYieldControl.Interfaces.REST" as Interfaces {
+package "Molinex.QualityYieldControl.Interfaces.Rest" as Interfaces {
   class QualityAssessmentsController <<REST Controller>> {
-    +Create(resource : QualityAssessmentResource) : ActionResult
-    +GetById(id : Guid) : ActionResult
+    -commandService : IQualityCommandService
+    -queryService : IQualityQueryService
+    --
+    +Create(resource : CreateQualityAssessmentResource, cancellationToken : CancellationToken) : Task<IActionResult>
+    +GetById(id : long, cancellationToken : CancellationToken) : Task<IActionResult>
   }
   class WasteRecordsController <<REST Controller>> {
-    +Create(resource : WasteRecordResource) : ActionResult
-    +GetAll() : ActionResult
+    -commandService : IQualityCommandService
+    -queryService : IQualityQueryService
+    --
+    +Create(resource : CreateWasteRecordResource, cancellationToken : CancellationToken) : Task<IActionResult>
+    +GetAll(cancellationToken : CancellationToken) : Task<IActionResult>
   }
   class YieldIndicatorsController <<REST Controller>> {
-    +GetIndicators() : ActionResult
-    +Compare() : ActionResult
-    +GetDeviations() : ActionResult
+    -queryService : IQualityQueryService
+    --
+    +GetIndicators(cancellationToken : CancellationToken) : Task<IActionResult>
+    +Compare(cancellationToken : CancellationToken) : Task<IActionResult>
+    +GetDeviations(cancellationToken : CancellationToken) : Task<IActionResult>
   }
-  class QualityResourceAssembler <<Assembler>> {
-    +{static} ToCommand(resource : QualityAssessmentResource) : RecordQualityAssessmentCommand
-    +{static} ToCommand(resource : WasteRecordResource) : RecordWasteCommand
-    +{static} ToResource(model : YieldIndicator) : YieldIndicatorResource
-    +{static} ToResource(model : QualityComparison) : QualityComparisonResource
-    +{static} ToResource(model : QualityDeviation) : QualityDeviationResource
-  }
-  class QualityAssessmentResource <<Request Resource>> <<(R,#FF7700)>> {
-    +ProductionRecordId : Guid
-    +Measurements : QualityMeasurementResource[]
+
+  class CreateQualityAssessmentResource <<Request Resource>> <<(R,#FF7700)>> {
+    +ProductionRecordId : long
+    +Measurements : IReadOnlyCollection<QualityMeasurementResource>
     +AssessedAt : DateTimeOffset
   }
-  class QualityMeasurementResource <<Request Resource>> <<(R,#FF7700)>> {
+  class QualityMeasurementResource <<Resource>> <<(R,#FF7700)>> {
     +Indicator : string
     +Value : decimal
     +ExpectedMinimum : decimal
     +ExpectedMaximum : decimal
   }
-  class WasteRecordResource <<Request Resource>> <<(R,#FF7700)>> {
-    +ProductionRecordId : Guid
+  class CreateWasteRecordResource <<Request Resource>> <<(R,#FF7700)>> {
+    +ProductionRecordId : long
     +QuantityValue : decimal
     +QuantityUnit : string
-    +BaseWeightValue : decimal?
+    +BaseWeightValue : decimal
+    +RecordedAt : DateTimeOffset
+  }
+  class QualityAssessmentResource <<Response Resource>> <<(R,#FF7700)>> {
+    +Id : long
+    +ProductionRecordId : long
+    +Measurements : IReadOnlyCollection<QualityMeasurementResource>
+    +AssessedAt : DateTimeOffset
+  }
+  class WasteRecordResource <<Response Resource>> <<(R,#FF7700)>> {
+    +Id : long
+    +ProductionRecordId : long
+    +QuantityValue : decimal
+    +QuantityUnit : string
+    +BaseWeightValue : decimal
+    +Percentage : decimal
+    +RecordedAt : DateTimeOffset
   }
   class YieldIndicatorResource <<Response Resource>> <<(R,#FF7700)>> {
     +Name : string
@@ -48,29 +67,66 @@ package "Molinex.QualityYieldControl.Interfaces.REST" as Interfaces {
     +Previous : decimal
   }
   class QualityDeviationResource <<Response Resource>> <<(R,#FF7700)>> {
-    +Id : Guid
-    +SourceId : Guid
+    +Id : long
+    +SourceId : long
     +SourceType : string
     +Indicator : string
     +ObservedValue : decimal
+    +DetectedAt : DateTimeOffset
+  }
+
+  class RecordQualityAssessmentCommandFromResourceAssembler <<Assembler>> {
+    +{static} ToCommandFromResource(resource : CreateQualityAssessmentResource) : RecordQualityAssessmentCommand
+  }
+  class RecordWasteCommandFromResourceAssembler <<Assembler>> {
+    +{static} ToCommandFromResource(resource : CreateWasteRecordResource) : RecordWasteCommand
+  }
+  class QualityAssessmentResourceFromEntityAssembler <<Assembler>> {
+    +{static} ToResourceFromEntity(entity : QualityAssessment) : QualityAssessmentResource
+  }
+  class WasteRecordResourceFromEntityAssembler <<Assembler>> {
+    +{static} ToResourceFromEntity(entity : WasteRecord) : WasteRecordResource
+  }
+  class YieldIndicatorResourceFromEntityAssembler <<Assembler>> {
+    +{static} ToResourceFromEntity(entity : YieldIndicator) : YieldIndicatorResource
+  }
+  class QualityComparisonResourceFromEntityAssembler <<Assembler>> {
+    +{static} ToResourceFromEntity(entity : QualityComparison) : QualityComparisonResource
+  }
+  class QualityDeviationResourceFromEntityAssembler <<Assembler>> {
+    +{static} ToResourceFromEntity(entity : QualityDeviation) : QualityDeviationResource
   }
 }
 
 package "Molinex.QualityYieldControl.Application" as Application {
+  interface IQualityCommandService <<Command Service>> {
+    +Handle(command : RecordQualityAssessmentCommand, cancellationToken : CancellationToken) : Task<Result<QualityAssessmentId>>
+    +Handle(command : RecordWasteCommand, cancellationToken : CancellationToken) : Task<Result<WasteRecordId>>
+    +Handle(command : IdentifyQualityDeviationCommand, cancellationToken : CancellationToken) : Task<Result<QualityDeviationId>>
+  }
+  interface IQualityQueryService <<Query Service>> {
+    +Handle(query : GetQualityAssessmentByIdQuery, cancellationToken : CancellationToken) : Task<QualityAssessment?>
+    +Handle(query : GetYieldIndicatorsQuery, cancellationToken : CancellationToken) : Task<IEnumerable<YieldIndicator>>
+    +Handle(query : CompareQualityIndicatorsQuery, cancellationToken : CancellationToken) : Task<QualityComparison>
+    +Handle(query : GetQualityDeviationsQuery, cancellationToken : CancellationToken) : Task<IEnumerable<QualityDeviation>>
+  }
   class QualityCommandService <<Command Service>> {
-    +HandleAsync(command : RecordQualityAssessmentCommand) : Task<QualityAssessmentId>
-    +HandleAsync(command : RecordWasteCommand) : Task<WasteRecordId>
-    +HandleAsync(command : IdentifyQualityDeviationCommand) : Task<QualityDeviationId>
+    -assessmentRepository : IQualityAssessmentRepository
+    -wasteRepository : IWasteRecordRepository
+    -deviationRepository : IQualityDeviationRepository
+    -unitOfWork : IUnitOfWork
   }
   class QualityQueryService <<Query Service>> {
-    +GetAssessmentAsync(id : QualityAssessmentId) : Task<QualityAssessment?>
-    +GetYieldIndicatorsAsync() : Task<YieldIndicator[]>
-    +CompareQualityAsync() : Task<QualityComparison>
-    +GetDeviationsAsync() : Task<QualityDeviation[]>
+    -assessmentRepository : IQualityAssessmentRepository
+    -wasteRepository : IWasteRecordRepository
+    -deviationRepository : IQualityDeviationRepository
   }
+}
+
+package "Molinex.QualityYieldControl.Domain.Model.Commands" as Commands {
   class RecordQualityAssessmentCommand <<Command>> {
-    +ProductionRecordId : Guid
-    +Measurements : QualityMeasurementData[]
+    +ProductionRecordId : long
+    +Measurements : IReadOnlyCollection<QualityMeasurementData>
     +AssessedAt : DateTimeOffset
   }
   class QualityMeasurementData <<Command Data>> {
@@ -80,78 +136,98 @@ package "Molinex.QualityYieldControl.Application" as Application {
     +ExpectedMaximum : decimal
   }
   class RecordWasteCommand <<Command>> {
-    +ProductionRecordId : Guid
+    +ProductionRecordId : long
     +QuantityValue : decimal
     +QuantityUnit : string
-    +BaseWeightValue : decimal?
+    +BaseWeightValue : decimal
+    +RecordedAt : DateTimeOffset
   }
   class IdentifyQualityDeviationCommand <<Command>> {
-    +SourceId : Guid
+    +SourceId : long
     +SourceType : string
     +Indicator : string
     +ObservedValue : decimal
   }
 }
 
-package "Molinex.QualityYieldControl.Domain.Model" as DomainModel {
+package "Molinex.QualityYieldControl.Domain.Model.Queries" as Queries {
+  class GetQualityAssessmentByIdQuery <<Query>> {
+    +Id : long
+  }
+  class GetYieldIndicatorsQuery <<Query>>
+  class CompareQualityIndicatorsQuery <<Query>>
+  class GetQualityDeviationsQuery <<Query>>
+}
+
+package "Molinex.QualityYieldControl.Domain" as Domain {
   class QualityAssessment <<Aggregate Root>> {
-    -_id : QualityAssessmentId
-    -_productionRecordId : ProductionRecordId
-    -_measurements : QualityMeasurement[]
-    -_assessedAt : AssessmentDateTime
+    +Id : QualityAssessmentId
+    +ProductionRecordId : ProductionRecordId
+    +Measurements : IReadOnlyCollection<QualityMeasurement>
+    +AssessedAt : AssessmentDateTime
+    --
     +RecordMeasurement(measurement : QualityMeasurement) : void
     +HasValidPercentages() : bool
   }
   class WasteRecord <<Aggregate Root>> {
-    -_id : WasteRecordId
-    -_productionRecordId : ProductionRecordId
-    -_quantity : Weight
-    -_baseWeight : Weight?
-    -_percentage : Percentage?
-    +CalculatePercentage() : Percentage?
+    +Id : WasteRecordId
+    +ProductionRecordId : ProductionRecordId
+    +Quantity : Weight
+    +BaseWeight : Weight
+    +Percentage : Percentage
+    +RecordedAt : WasteRecordDateTime
+    --
+    +CalculatePercentage() : Percentage
   }
   class QualityDeviation <<Aggregate Root>> {
-    -_id : QualityDeviationId
-    -_source : DeviationSource
-    -_measurement : QualityMeasurement
-    -_detectedAt : DetectionDateTime
+    +Id : QualityDeviationId
+    +Source : DeviationSource
+    +Measurement : QualityMeasurement
+    +DetectedAt : DetectionDateTime
   }
+
   class QualityAssessmentId <<Value Object>> {
-    -_value : Guid
+    +Value : long
   }
   class WasteRecordId <<Value Object>> {
-    -_value : Guid
+    +Value : long
   }
   class QualityDeviationId <<Value Object>> {
-    -_value : Guid
+    +Value : long
   }
   class ProductionRecordId <<Value Object>> {
-    -_value : Guid
+    +Value : long
   }
   class AssessmentDateTime <<Value Object>> {
-    -_value : DateTimeOffset
+    +Value : DateTimeOffset
+  }
+  class WasteRecordDateTime <<Value Object>> {
+    +Value : DateTimeOffset
   }
   class DetectionDateTime <<Value Object>> {
-    -_value : DateTimeOffset
+    +Value : DateTimeOffset
   }
   class Percentage <<Value Object>> {
-    -_value : decimal
+    +Value : decimal
+    --
     +IsValid() : bool
   }
   class QualityRange <<Value Object>> {
-    -_minimum : Percentage
-    -_maximum : Percentage
+    +Minimum : Percentage
+    +Maximum : Percentage
+    --
     +Contains(value : Percentage) : bool
   }
   class QualityMeasurement <<Value Object>> {
-    -_indicator : QualityIndicator
-    -_value : Percentage
-    -_expectedRange : QualityRange
+    +Indicator : QualityIndicator
+    +Value : Percentage
+    +ExpectedRange : QualityRange
+    --
     +IsOutsideExpectedRange() : bool
   }
   class DeviationSource <<Value Object>> {
-    -_sourceId : Guid
-    -_sourceType : DeviationSourceType
+    +SourceId : long
+    +SourceType : DeviationSourceType
   }
   class YieldIndicator <<Read Model>> {
     +Name : string
@@ -162,29 +238,19 @@ package "Molinex.QualityYieldControl.Domain.Model" as DomainModel {
     +Previous : Percentage
   }
   enum QualityIndicator <<Enumeration>> {
-    WHOLE_GRAIN_PERCENTAGE
-    BROKEN_GRAIN_PERCENTAGE
-    YIELD_PERCENTAGE
+    WholeGrainPercentage
+    BrokenGrainPercentage
+    YieldPercentage
   }
   enum DeviationSourceType <<Enumeration>> {
-    QUALITY_ASSESSMENT
-    WASTE_RECORD
+    QualityAssessment
+    WasteRecord
   }
-  interface IQualityAssessmentRepository <<Repository>> {
-    +SaveAsync(assessment : QualityAssessment) : Task
-    +FindByIdAsync(id : QualityAssessmentId) : Task<QualityAssessment?>
-  }
-  interface IWasteRecordRepository <<Repository>> {
-    +SaveAsync(record : WasteRecord) : Task
-    +FindByIdAsync(id : WasteRecordId) : Task<WasteRecord?>
-  }
-  interface IQualityDeviationRepository <<Repository>> {
-    +SaveAsync(deviation : QualityDeviation) : Task
-    +FindByIdAsync(id : QualityDeviationId) : Task<QualityDeviation?>
-  }
-  interface IDomainEventPublisher <<Port>> {
-    +PublishAsync(event : object) : Task
-  }
+
+  interface IQualityAssessmentRepository <<Repository>>
+  interface IWasteRecordRepository <<Repository>>
+  interface IQualityDeviationRepository <<Repository>>
+
   class QualityAssessmentRecorded <<Domain Event>> {
     +AssessmentId : QualityAssessmentId
     +OccurredAt : DateTimeOffset
@@ -199,94 +265,128 @@ package "Molinex.QualityYieldControl.Domain.Model" as DomainModel {
   }
 }
 
-package "Molinex.QualityYieldControl.Infrastructure.Persistence.EFC" as Infrastructure {
-  class QualityDbContext <<EF Core DbContext>> {
-    +QualityAssessments : DbSet<QualityAssessment>
-    +WasteRecords : DbSet<WasteRecord>
-    +QualityDeviations : DbSet<QualityDeviation>
-  }
-  class QualityAssessmentRepositoryAdapter <<Repository Adapter>> {
-    -_context : QualityDbContext
-    +SaveAsync(assessment : QualityAssessment) : Task
-    +FindByIdAsync(id : QualityAssessmentId) : Task<QualityAssessment?>
-  }
-  class WasteRecordRepositoryAdapter <<Repository Adapter>> {
-    -_context : QualityDbContext
-    +SaveAsync(record : WasteRecord) : Task
-    +FindByIdAsync(id : WasteRecordId) : Task<WasteRecord?>
-  }
-  class QualityDeviationRepositoryAdapter <<Repository Adapter>> {
-    -_context : QualityDbContext
-    +SaveAsync(deviation : QualityDeviation) : Task
-    +FindByIdAsync(id : QualityDeviationId) : Task<QualityDeviation?>
-  }
-  class DomainEventPublisherAdapter <<Event Publisher Adapter>> {
-    +PublishAsync(event : object) : Task
+package "Molinex.QualityYieldControl.Infrastructure.Persistence.EntityFrameworkCore" as Infrastructure {
+  class QualityAssessmentRepository <<EF Core Repository>>
+  class WasteRecordRepository <<EF Core Repository>>
+  class QualityDeviationRepository <<EF Core Repository>>
+  class ModelBuilderExtensions <<EF Core Configuration>> {
+    +{static} ApplyQualityYieldControlConfiguration(builder : ModelBuilder) : void
   }
 }
 
-package "Molinex.Shared.Domain.Model.ValueObjects (reference)" as SharedReference {
-
+package "Molinex.Shared (reference)" as SharedReference {
+  abstract class AggregateRoot <<Shared Base Aggregate>>
+  interface IEntityId<T> <<Shared Identifier Contract>>
+  interface IEvent <<Shared Event Contract>>
+  interface IBaseRepository<TEntity> <<Shared Repository>>
+  abstract class BaseRepository<TEntity> <<Shared EF Core Repository>>
+  interface IUnitOfWork <<Shared Unit of Work>>
+  class Result<T> <<Shared Application Result>>
+  class Error <<Shared Value Object>>
   class Weight <<Shared Value Object>>
-
+  enum MeasurementUnit <<Enumeration>> {
+    Kilogram
+    MetricTon
+  }
 }
-QualityAssessmentsController ..> QualityCommandService
-QualityAssessmentsController ..> QualityQueryService
-QualityAssessmentsController ..> QualityResourceAssembler
-WasteRecordsController ..> QualityCommandService
-WasteRecordsController ..> QualityQueryService
-WasteRecordsController ..> QualityResourceAssembler
-YieldIndicatorsController ..> QualityQueryService
-YieldIndicatorsController ..> QualityResourceAssembler
-QualityResourceAssembler ..> QualityAssessmentResource : uses
-QualityAssessmentResource *-- "1..*" QualityMeasurementResource
-QualityResourceAssembler ..> WasteRecordResource : uses
-QualityResourceAssembler ..> YieldIndicatorResource : creates
-QualityResourceAssembler ..> QualityComparisonResource : creates
-QualityResourceAssembler ..> QualityDeviationResource : creates
-QualityResourceAssembler ..> RecordQualityAssessmentCommand : creates
-QualityResourceAssembler ..> RecordWasteCommand : creates
-QualityResourceAssembler ..> IdentifyQualityDeviationCommand : creates
-QualityResourceAssembler ..> YieldIndicator : uses
-QualityResourceAssembler ..> QualityComparison : uses
-QualityResourceAssembler ..> QualityDeviation : uses
-RecordQualityAssessmentCommand *-- "1..*" QualityMeasurementData
-QualityCommandService ..> RecordQualityAssessmentCommand : handles
-QualityCommandService ..> RecordWasteCommand : handles
-QualityCommandService ..> IdentifyQualityDeviationCommand : handles
-QualityCommandService ..> IQualityAssessmentRepository
-QualityCommandService ..> IWasteRecordRepository
-QualityCommandService ..> IQualityDeviationRepository
-QualityCommandService ..> IDomainEventPublisher
-QualityQueryService ..> IQualityAssessmentRepository
-QualityQueryService ..> IWasteRecordRepository
-QualityQueryService ..> IQualityDeviationRepository
-QualityAssessment *-- QualityAssessmentId
-QualityAssessment *-- ProductionRecordId : references by identity
-QualityAssessment *-- QualityMeasurement
-QualityAssessment *-- AssessmentDateTime
-WasteRecord *-- WasteRecordId
-WasteRecord *-- ProductionRecordId : references by identity
-WasteRecord *-- Weight
-WasteRecord o-- Percentage
-QualityDeviation *-- QualityDeviationId
-QualityDeviation *-- DeviationSource
-QualityDeviation *-- QualityMeasurement
-QualityDeviation *-- DetectionDateTime
-QualityMeasurement *-- Percentage
-QualityMeasurement *-- QualityRange
-QualityMeasurement --> QualityIndicator
-DeviationSource --> DeviationSourceType
+
+QualityAssessmentsController --> "1" IQualityCommandService : delegates commands to
+QualityAssessmentsController --> "1" IQualityQueryService : delegates queries to
+WasteRecordsController --> "1" IQualityCommandService : delegates commands to
+WasteRecordsController --> "1" IQualityQueryService : delegates queries to
+YieldIndicatorsController --> "1" IQualityQueryService : delegates queries to
+QualityAssessmentsController ..> RecordQualityAssessmentCommandFromResourceAssembler : uses
+QualityAssessmentsController ..> QualityAssessmentResourceFromEntityAssembler : uses
+WasteRecordsController ..> RecordWasteCommandFromResourceAssembler : uses
+WasteRecordsController ..> WasteRecordResourceFromEntityAssembler : uses
+YieldIndicatorsController ..> YieldIndicatorResourceFromEntityAssembler : uses
+YieldIndicatorsController ..> QualityComparisonResourceFromEntityAssembler : uses
+YieldIndicatorsController ..> QualityDeviationResourceFromEntityAssembler : uses
+
+RecordQualityAssessmentCommandFromResourceAssembler ..> CreateQualityAssessmentResource : reads
+RecordQualityAssessmentCommandFromResourceAssembler ..> RecordQualityAssessmentCommand : creates
+RecordWasteCommandFromResourceAssembler ..> CreateWasteRecordResource : reads
+RecordWasteCommandFromResourceAssembler ..> RecordWasteCommand : creates
+QualityAssessmentResourceFromEntityAssembler ..> QualityAssessment : reads
+QualityAssessmentResourceFromEntityAssembler ..> QualityAssessmentResource : creates
+WasteRecordResourceFromEntityAssembler ..> WasteRecord : reads
+WasteRecordResourceFromEntityAssembler ..> WasteRecordResource : creates
+YieldIndicatorResourceFromEntityAssembler ..> YieldIndicator : reads
+YieldIndicatorResourceFromEntityAssembler ..> YieldIndicatorResource : creates
+QualityComparisonResourceFromEntityAssembler ..> QualityComparison : reads
+QualityComparisonResourceFromEntityAssembler ..> QualityComparisonResource : creates
+QualityDeviationResourceFromEntityAssembler ..> QualityDeviation : reads
+QualityDeviationResourceFromEntityAssembler ..> QualityDeviationResource : creates
+CreateQualityAssessmentResource *-- "1..*" QualityMeasurementResource : contains
+QualityAssessmentResource *-- "1..*" QualityMeasurementResource : contains
+RecordQualityAssessmentCommand *-- "1..*" QualityMeasurementData : contains
+
+QualityCommandService ..|> IQualityCommandService
+QualityQueryService ..|> IQualityQueryService
+IQualityCommandService ..> RecordQualityAssessmentCommand : handles
+IQualityCommandService ..> RecordWasteCommand : handles
+IQualityCommandService ..> IdentifyQualityDeviationCommand : handles
+IQualityCommandService ..> Result : returns
+IQualityQueryService ..> GetQualityAssessmentByIdQuery : handles
+IQualityQueryService ..> GetYieldIndicatorsQuery : handles
+IQualityQueryService ..> CompareQualityIndicatorsQuery : handles
+IQualityQueryService ..> GetQualityDeviationsQuery : handles
+IQualityQueryService ..> YieldIndicator : returns
+IQualityQueryService ..> QualityComparison : returns
+QualityCommandService --> "1" IQualityAssessmentRepository : persists assessments through
+QualityCommandService --> "1" IWasteRecordRepository : persists waste records through
+QualityCommandService --> "1" IQualityDeviationRepository : persists deviations through
+QualityCommandService --> "1" IUnitOfWork : completes changes through
+QualityQueryService --> "1" IQualityAssessmentRepository : reads assessments through
+QualityQueryService --> "1" IWasteRecordRepository : reads waste records through
+QualityQueryService --> "1" IQualityDeviationRepository : reads deviations through
+
+QualityAssessment --|> AggregateRoot
+WasteRecord --|> AggregateRoot
+QualityDeviation --|> AggregateRoot
+QualityAssessmentId ..|> IEntityId
+WasteRecordId ..|> IEntityId
+QualityDeviationId ..|> IEntityId
+QualityAssessment *-- "1" QualityAssessmentId : identified by
+QualityAssessment *-- "1" ProductionRecordId : references by identity
+QualityAssessment *-- "1..*" QualityMeasurement : records
+QualityAssessment *-- "1" AssessmentDateTime : assessed at
+WasteRecord *-- "1" WasteRecordId : identified by
+WasteRecord *-- "1" ProductionRecordId : references by identity
+WasteRecord *-- "2" Weight : quantity and base weight
+WasteRecord *-- "1" Percentage : represents
+WasteRecord *-- "1" WasteRecordDateTime : recorded at
+QualityDeviation *-- "1" QualityDeviationId : identified by
+QualityDeviation *-- "1" DeviationSource : originates from
+QualityDeviation *-- "1" QualityMeasurement : observes
+QualityDeviation *-- "1" DetectionDateTime : detected at
+QualityMeasurement *-- "1" Percentage : measures
+QualityMeasurement *-- "1" QualityRange : expected within
+QualityMeasurement --> "1" QualityIndicator : evaluates
+QualityRange *-- "2" Percentage : bounded by
+DeviationSource --> "1" DeviationSourceType : typed as
+YieldIndicator *-- "1" Percentage : valued as
+QualityComparison *-- "2" Percentage : compares
+Weight --> "1" MeasurementUnit : measured in
+Result --> "1" Error : carries
+
 QualityAssessment ..> QualityAssessmentRecorded : raises
 WasteRecord ..> WasteRecorded : raises
 QualityDeviation ..> QualityDeviationIdentified : raises
-QualityAssessmentRepositoryAdapter ..|> IQualityAssessmentRepository
-WasteRecordRepositoryAdapter ..|> IWasteRecordRepository
-QualityDeviationRepositoryAdapter ..|> IQualityDeviationRepository
-DomainEventPublisherAdapter ..|> IDomainEventPublisher
-QualityAssessmentRepositoryAdapter --> QualityDbContext
-WasteRecordRepositoryAdapter --> QualityDbContext
-QualityDeviationRepositoryAdapter --> QualityDbContext
+QualityAssessmentRecorded ..|> IEvent
+WasteRecorded ..|> IEvent
+QualityDeviationIdentified ..|> IEvent
+
+IQualityAssessmentRepository --|> IBaseRepository
+IWasteRecordRepository --|> IBaseRepository
+IQualityDeviationRepository --|> IBaseRepository
+QualityAssessmentRepository ..|> IQualityAssessmentRepository
+WasteRecordRepository ..|> IWasteRecordRepository
+QualityDeviationRepository ..|> IQualityDeviationRepository
+QualityAssessmentRepository --|> BaseRepository
+WasteRecordRepository --|> BaseRepository
+QualityDeviationRepository --|> BaseRepository
+ModelBuilderExtensions ..> QualityAssessment : maps
+ModelBuilderExtensions ..> WasteRecord : maps
+ModelBuilderExtensions ..> QualityDeviation : maps
 @enduml
-
-
