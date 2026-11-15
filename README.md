@@ -2629,6 +2629,17 @@ El backend Web se publicó en Azure App Service como `molinex-backend-appweb-van
 **Figura.** Secuencia de registro de Azure App Service. El backend inició en el entorno `Production` y escucha en el puerto interno `8080`.
 
 ### 5.2.3.8.Team Collaboration Insights during Sprint.
+
+Las gráficas de GitHub Insights muestran la participación de los cinco integrantes en el repositorio `molinex-backend` de Aplicaciones Web. La vista **Contributors** cuenta los commits de `main` durante la ventana seleccionada de los últimos tres meses y excluye los commits de merge. [GitHub Insights del backend Web](https://github.com/Vanguard-app-web/molinex-backend/graphs/contributors).
+
+![Contribuciones por integrante al backend Web](assets/evidence/sprint-3/collaboration/backend-contributors.png)
+
+**Figura.** GitHub Insights, vista **Contributors**. Se muestran los commits por integrante y su distribución semanal.
+
+![Comparación de commits de los cinco integrantes del backend Web](assets/evidence/sprint-3/collaboration/backend-top-committers.png)
+
+**Figura.** Comparación de commits en la vista **Top committers**. La captura muestra 31 de `Giova2725`, 14 de `Fabricio1924`, 7 de `brayanjk22`, 5 de `saavedraantony-max` y 1 de `lulu22nhiri`.
+
 ### 5.3. Validation Interviews.
 ### 5.3.1. Diseño de Entrevistas.
 
