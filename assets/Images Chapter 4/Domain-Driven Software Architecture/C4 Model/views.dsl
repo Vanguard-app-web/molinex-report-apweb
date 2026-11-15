@@ -167,8 +167,12 @@ component molinex.apiApplication "MolinexBackendReporting" {
     include molinex.apiApplication.reportingInterfaces molinex.apiApplication.reportingQueryServices
     include molinex.apiApplication.reportingProjectionHandlers molinex.apiApplication.reportingDomain
     include molinex.apiApplication.reportingInfrastructure
+    include molinex.apiApplication.reportingEventAcl
+    include molinex.apiApplication.productionModule molinex.apiApplication.qualityModule
+    include molinex.apiApplication.maintenanceModule molinex.apiApplication.intelligenceModule
     autoLayout tb
     title "Molinex Backend - Reporting and Analytics Components"
+    description "Reporting and Analytics receives domain events only through its event-based ACL, which translates them into its published language."
 }
 component molinex.apiApplication "MolinexBackendSharedKernel" {
     include molinex.apiApplication.sharedKernelDomain

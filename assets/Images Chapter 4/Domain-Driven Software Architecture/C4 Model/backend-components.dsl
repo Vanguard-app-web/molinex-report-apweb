@@ -253,6 +253,9 @@ group "Reporting and Analytics" {
         reportingInfrastructure = component "ReportingAnalytics/Infrastructure" "ReportingProjectionRepository implements IReportingProjectionRepository with EF Core and denormalized relational mappings." "Entity Framework Core Repository Implementations" {
             tags "Backend Infrastructure" "Read Side"
         }
+        reportingEventAcl = component "Published Event Translator" "DomainEventMessageHandler receives the DomainEventMessage notifications raised by the operational contexts; PublishedDomainEventAssembler is the anti-corruption layer that translates them into the PublishedDomainEvent published language." "C# Messaging Handler and ACL Assembler" {
+            tags "Backend Infrastructure" "Read Side" "ACL"
+        }
     }
 }
 
