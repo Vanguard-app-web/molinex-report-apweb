@@ -16,12 +16,12 @@ container molinex "MolinexContainers" {
 
 component molinex.webApplication "MolinexFrontendComponents" {
     include visitor administrator maintenanceTechnician productionOperator
-    include molinex.webApplication.commercialFeature molinex.webApplication.identityFeature
     include molinex.webApplication.productionFeature molinex.webApplication.qualityFeature
     include molinex.webApplication.maintenanceFeature molinex.webApplication.intelligenceFeature
-    include molinex.webApplication.reportingFeature molinex.webApplication.frontendSharedKernel
+    include molinex.webApplication.commercialFeature molinex.webApplication.reportingFeature
+    include molinex.webApplication.identityFeature molinex.webApplication.frontendSharedKernel
     include molinex.apiApplication
-    autoLayout tb
+    autoLayout lr
     title "Molinex Frontend - Component Overview by Bounded Context"
     description "The seven frontend bounded contexts, the Shared Kernel and their relationships with the RESTful API."
 }
@@ -43,27 +43,25 @@ component molinex.webApplication "MolinexFrontendIdentity" {
     title "Molinex Frontend - Identity and Access Management Components"
 }
 component molinex.webApplication "MolinexFrontendProduction" {
-    include molinex.webApplication.rawMaterialReceptionList molinex.webApplication.rawMaterialReceptionForm
-    include molinex.webApplication.productionBatchList molinex.webApplication.productionBatchForm
-    include molinex.webApplication.productionRecordList molinex.webApplication.productionRecordForm
-    include molinex.webApplication.productionHistoryView molinex.webApplication.productionApplication
+    include molinex.webApplication.productionOverview
+    include molinex.webApplication.rawMaterialReceptionViews molinex.webApplication.productionBatchViews
+    include molinex.webApplication.productionRecordViews
+    include molinex.webApplication.productionApplication
     include molinex.webApplication.productionDomain molinex.webApplication.productionInfrastructure molinex.apiApplication
     autoLayout tb
     title "Molinex Frontend - Production Management Components"
 }
 component molinex.webApplication "MolinexFrontendQuality" {
-    include molinex.webApplication.qualityAssessmentList molinex.webApplication.qualityAssessmentForm
-    include molinex.webApplication.wasteRecordList molinex.webApplication.wasteRecordForm
-    include molinex.webApplication.yieldIndicatorDashboard molinex.webApplication.qualityComparisonView
-    include molinex.webApplication.qualityDeviationList molinex.webApplication.qualityApplication
+    include molinex.webApplication.qualityAssessmentViews molinex.webApplication.wasteRecordViews
+    include molinex.webApplication.yieldAnalysisViews molinex.webApplication.productionProcessSelect
+    include molinex.webApplication.qualityApplication
     include molinex.webApplication.qualityDomain molinex.webApplication.qualityInfrastructure molinex.apiApplication
     autoLayout tb
     title "Molinex Frontend - Quality and Yield Control Components"
 }
 component molinex.webApplication "MolinexFrontendMaintenance" {
-    include molinex.webApplication.machineList molinex.webApplication.machineForm
-    include molinex.webApplication.machineStatusView molinex.webApplication.maintenanceRecordForm
-    include molinex.webApplication.maintenanceHistoryView molinex.webApplication.maintenanceApplication
+    include molinex.webApplication.machineManagementViews molinex.webApplication.maintenanceManagementViews
+    include molinex.webApplication.maintenanceApplication
     include molinex.webApplication.maintenanceDomain molinex.webApplication.maintenanceInfrastructure molinex.apiApplication
     autoLayout tb
     title "Molinex Frontend - Asset and Maintenance Management Components"
@@ -85,8 +83,7 @@ component molinex.webApplication "MolinexFrontendReporting" {
     title "Molinex Frontend - Reporting and Analytics Components"
 }
 component molinex.webApplication "MolinexFrontendSharedKernel" {
-    include molinex.webApplication.appLayout molinex.webApplication.navigationMenu
-    include molinex.webApplication.sharedViews molinex.webApplication.feedbackMessage
+    include molinex.webApplication.applicationShell molinex.webApplication.sharedPresentation
     include molinex.webApplication.sharedKernelDomain molinex.webApplication.sharedInfrastructure
     autoLayout tb
     title "Molinex Frontend - Shared Kernel Components"
