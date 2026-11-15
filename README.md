@@ -2586,6 +2586,28 @@ El backend Web de referencia de Molinex, desarrollado en C# con ASP.NET Core, ex
 
 La verificación del contrato cubrió 9 operaciones `POST`, 19 `GET` y 1 `PUT` con una base en memoria. En una prueba adicional con MySQL local, `POST /api/v1/raw-material-receptions` devolvió `201 Created` y se comprobó la fila en la tabla `raw_material_receptions`.
 
+Las siguientes capturas muestran la documentación interactiva en Scalar del backend Web ejecutado en `localhost:5080`. Los códigos HTTP que aparecen en la interfaz corresponden a las respuestas documentadas para cada operación.
+
+![Vista general de la API de Molinex en Scalar](assets/evidence/sprint-3/scalar/01-scalar-vista-general.png)
+
+**Figura.** Vista general de la API Web de Molinex en Scalar. Se muestran los grupos de operaciones, la descarga de OpenAPI y la configuración de autenticación Bearer.
+
+![Documentación del registro de lotes en Scalar](assets/evidence/sprint-3/scalar/03-scalar-registro-lotes.png)
+
+**Figura.** Contrato de `POST /api/v1/production-batches`. Muestra los campos del lote y el identificador de la recepción de origen.
+
+![Documentación del registro de evaluaciones de calidad en Scalar](assets/evidence/sprint-3/scalar/02-scalar-registro-calidad.png)
+
+**Figura.** Contrato de `POST /api/v1/quality-assessments`. Muestra el registro de producción asociado, las mediciones, la fecha de evaluación y las respuestas documentadas.
+
+![Documentación del registro de maquinaria en Scalar](assets/evidence/sprint-3/scalar/05-scalar-registro-maquinaria.png)
+
+**Figura.** Contrato de `POST /api/v1/machines`. Documenta los datos de registro de maquinaria y las respuestas previstas, incluido el conflicto por código duplicado.
+
+![Documentación de la emisión de tokens en Scalar](assets/evidence/sprint-3/scalar/04-scalar-token-acceso.png)
+
+**Figura.** Contrato de `POST /api/v1/tokens`. Muestra los campos de inicio de sesión y la estructura de la respuesta con el token.
+
 ### 5.2.3.7.Software Deployment Evidence for Sprint Review.
 ### 5.2.3.8.Team Collaboration Insights during Sprint.
 ### 5.3. Validation Interviews.
