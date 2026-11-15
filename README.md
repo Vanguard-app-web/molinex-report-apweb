@@ -2609,6 +2609,17 @@ Las siguientes capturas muestran la documentación interactiva en Scalar del bac
 **Figura.** Contrato de `POST /api/v1/tokens`. Muestra los campos de inicio de sesión y la estructura de la respuesta con el token.
 
 ### 5.2.3.7.Software Deployment Evidence for Sprint Review.
+
+El backend C# de Molinex Web se empaquetó como una imagen Docker y se ejecutó localmente en Docker Desktop. El repositorio del equipo contiene el [Dockerfile del backend](https://github.com/Vanguard-app-web/molinex-backend/blob/9819c2a/Dockerfile).
+
+![Imagen Docker del backend de Molinex Web en Docker Desktop](assets/evidence/sprint-3/docker/molinex-backend-docker-images.png)
+
+**Figura.** Vista **Images** de Docker Desktop. Se muestra la imagen local del backend Web etiquetada como `1.0.0`.
+
+![Proyecto molinex-backend en ejecución en Docker Desktop](assets/evidence/sprint-3/docker/molinex-backend-docker-containers.png)
+
+**Figura.** Vista **Containers** de Docker Desktop. El indicador verde muestra el proyecto `molinex-backend` en ejecución local.
+
 ### 5.2.3.8.Team Collaboration Insights during Sprint.
 ### 5.3. Validation Interviews.
 ### 5.3.1. Diseño de Entrevistas.
