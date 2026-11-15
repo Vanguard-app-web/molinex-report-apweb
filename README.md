@@ -1662,13 +1662,13 @@ Los modelos fueron elaborados con PlantUML bajo el enfoque Diagram-as-Code. Las 
 
 | Bounded Context | Clasificación | Responsabilidad |
 |:--|:--|:--|
-| `Commercial Engagement` | Supporting Subdomain | Presentar la oferta comercial y registrar solicitudes de visitantes interesados. No incluye todavía contratación, pago ni activación de suscripciones. |
-| `Identity and Access Management` | Generic Subdomain | Gestionar usuarios, autenticación, roles, permisos y datos de perfil. |
 | `Production Management` | Core Subdomain | Gestionar recepciones de materia prima, lotes y registros de producción. |
 | `Quality and Yield Control` | Core Subdomain | Registrar resultados de calidad y merma, consultar indicadores e identificar desviaciones. |
 | `Asset and Maintenance Management` | Core Subdomain | Gestionar el inventario de máquinas y registrar mantenimiento preventivo y correctivo. |
 | `Operational Intelligence` | Core Subdomain | Registrar variables operativas, detectar anomalías y generar alertas e información de atención. |
 | `Reporting and Analytics` | Supporting Subdomain / Read Side | Construir proyecciones para resúmenes, reportes y tendencias sin apropiarse de los Aggregates operativos. |
+| `Commercial Engagement` | Supporting Subdomain | Presentar la oferta comercial y registrar solicitudes de visitantes interesados. No incluye todavía contratación, pago ni activación de suscripciones. |
+| `Identity and Access Management` | Generic Subdomain | Gestionar usuarios, autenticación, roles, permisos y datos de perfil. |
 
 
 
@@ -1682,18 +1682,6 @@ El panorama general muestra la comunicación entre los Bounded Contexts mediante
 
 #### Detailed diagrams by Bounded Context
 
-
-##### Commercial Engagement
-
-<p align="center">
-  <img src="assets/Images%20Chapter%204/Domain-Driven%20Software%20Architecture/design-level-event-storming-commercial-engagement.svg" alt="Design-Level Event Storming de Commercial Engagement" width="100%">
-</p>
-
-##### Identity and Access Management
-
-<p align="center">
-  <img src="assets/Images%20Chapter%204/Domain-Driven%20Software%20Architecture/design-level-event-storming-identity-access-management.svg" alt="Design-Level Event Storming de Identity and Access Management" width="100%">
-</p>
 
 ##### Production Management
 
@@ -1723,6 +1711,18 @@ El panorama general muestra la comunicación entre los Bounded Contexts mediante
 
 <p align="center">
   <img src="assets/Images%20Chapter%204/Domain-Driven%20Software%20Architecture/design-level-event-storming-reporting-analytics.svg" alt="Design-Level Event Storming de Reporting and Analytics" width="100%">
+</p>
+
+##### Commercial Engagement
+
+<p align="center">
+  <img src="assets/Images%20Chapter%204/Domain-Driven%20Software%20Architecture/design-level-event-storming-commercial-engagement.svg" alt="Design-Level Event Storming de Commercial Engagement" width="100%">
+</p>
+
+##### Identity and Access Management
+
+<p align="center">
+  <img src="assets/Images%20Chapter%204/Domain-Driven%20Software%20Architecture/design-level-event-storming-identity-access-management.svg" alt="Design-Level Event Storming de Identity and Access Management" width="100%">
 </p>
 
 
@@ -1765,22 +1765,6 @@ La vista general muestra los siete Bounded Contexts del frontend, el Shared Kern
 
 **Figura: Molinex Frontend Component Overview. Fuente: elaboración propia en Structurizr.**
 
-##### Commercial Engagement Frontend Components
-
-<p align="center">
-  <img src="assets/Images%20Chapter%204/Domain-Driven%20Software%20Architecture/C4%20Model/frontend-commercial-engagement-component-diagram.svg" alt="Commercial Engagement Frontend Component Diagram" width="100%">
-</p>
-
-**Figura: Commercial Engagement Frontend Component Diagram. Fuente: elaboración propia en Structurizr.**
-
-##### Identity and Access Management Frontend Components
-
-<p align="center">
-  <img src="assets/Images%20Chapter%204/Domain-Driven%20Software%20Architecture/C4%20Model/frontend-identity-access-management-component-diagram.svg" alt="Identity and Access Management Frontend Component Diagram" width="100%">
-</p>
-
-**Figura: Identity and Access Management Frontend Component Diagram. Fuente: elaboración propia en Structurizr.**
-
 ##### Production Management Frontend Components
 
 <p align="center">
@@ -1821,6 +1805,22 @@ La vista general muestra los siete Bounded Contexts del frontend, el Shared Kern
 
 **Figura: Reporting and Analytics Frontend Component Diagram. Fuente: elaboración propia en Structurizr.**
 
+##### Commercial Engagement Frontend Components
+
+<p align="center">
+  <img src="assets/Images%20Chapter%204/Domain-Driven%20Software%20Architecture/C4%20Model/frontend-commercial-engagement-component-diagram.svg" alt="Commercial Engagement Frontend Component Diagram" width="100%">
+</p>
+
+**Figura: Commercial Engagement Frontend Component Diagram. Fuente: elaboración propia en Structurizr.**
+
+##### Identity and Access Management Frontend Components
+
+<p align="center">
+  <img src="assets/Images%20Chapter%204/Domain-Driven%20Software%20Architecture/C4%20Model/frontend-identity-access-management-component-diagram.svg" alt="Identity and Access Management Frontend Component Diagram" width="100%">
+</p>
+
+**Figura: Identity and Access Management Frontend Component Diagram. Fuente: elaboración propia en Structurizr.**
+
 ##### Frontend Shared Kernel Components
 
 <p align="center">
@@ -1831,7 +1831,7 @@ La vista general muestra los siete Bounded Contexts del frontend, el Shared Kern
 
 #### Backend Component Diagrams
 
-La vista general representa los siete módulos de los Bounded Contexts que conviven dentro de la RESTful API, el Shared Kernel, sus eventos en proceso y los sistemas externos planificados. Cada vista detallada separa Interfaces, Application, Domain e Infrastructure; Domain conserva un único componente Model, mientras Infrastructure describe la persistencia y los adaptadores previstos. 
+La vista general representa los siete módulos de los Bounded Contexts que conviven dentro de la RESTful API, el Shared Kernel, sus eventos en proceso y los sistemas externos planificados. Cada vista detallada separa Interfaces, Application, Domain e Infrastructure; Domain conserva un único componente Model, mientras Infrastructure describe la persistencia y los adaptadores previstos.
 
 ##### Backend Component Overview
 
@@ -1840,22 +1840,6 @@ La vista general representa los siete módulos de los Bounded Contexts que convi
 </p>
 
 **Figura: Molinex Backend Component Overview. Fuente: elaboración propia en Structurizr.**
-
-##### Commercial Engagement Backend Components
-
-<p align="center">
-  <img src="assets/Images%20Chapter%204/Domain-Driven%20Software%20Architecture/C4%20Model/backend-commercial-engagement-component-diagram.svg" alt="Commercial Engagement Backend Component Diagram" width="100%">
-</p>
-
-**Figura: Commercial Engagement Backend Component Diagram. Fuente: elaboración propia en Structurizr.**
-
-##### Identity and Access Management Backend Components
-
-<p align="center">
-  <img src="assets/Images%20Chapter%204/Domain-Driven%20Software%20Architecture/C4%20Model/backend-identity-access-management-component-diagram.svg" alt="Identity and Access Management Backend Component Diagram" width="100%">
-</p>
-
-**Figura: Identity and Access Management Backend Component Diagram. Fuente: elaboración propia en Structurizr.**
 
 ##### Production Management Backend Components
 
@@ -1897,6 +1881,22 @@ La vista general representa los siete módulos de los Bounded Contexts que convi
 
 **Figura: Reporting and Analytics Backend Component Diagram. Fuente: elaboración propia en Structurizr.**
 
+##### Commercial Engagement Backend Components
+
+<p align="center">
+  <img src="assets/Images%20Chapter%204/Domain-Driven%20Software%20Architecture/C4%20Model/backend-commercial-engagement-component-diagram.svg" alt="Commercial Engagement Backend Component Diagram" width="100%">
+</p>
+
+**Figura: Commercial Engagement Backend Component Diagram. Fuente: elaboración propia en Structurizr.**
+
+##### Identity and Access Management Backend Components
+
+<p align="center">
+  <img src="assets/Images%20Chapter%204/Domain-Driven%20Software%20Architecture/C4%20Model/backend-identity-access-management-component-diagram.svg" alt="Identity and Access Management Backend Component Diagram" width="100%">
+</p>
+
+**Figura: Identity and Access Management Backend Component Diagram. Fuente: elaboración propia en Structurizr.**
+
 ##### Production-Quality Shared Kernel Components
 
 <p align="center">
@@ -1931,22 +1931,6 @@ El modelado se separa por producto de software y por límite funcional. Cada Bou
 #### Frontend Class Diagrams
 
 
-
-##### Commercial Engagement Frontend
-
-<p align="center">
-  <img src="assets/Images%20Chapter%204/Software%20Object-Oriented%20Design/Class%20Diagrams/frontend-commercial-engagement-class-diagram.svg" alt="Commercial Engagement Frontend Class Diagram" width="100%">
-</p>
-
-**Figura: Commercial Engagement Frontend Class Diagram. Fuente: elaboración propia en PlantUML.**
-
-##### Identity and Access Management Frontend
-
-<p align="center">
-  <img src="assets/Images%20Chapter%204/Software%20Object-Oriented%20Design/Class%20Diagrams/frontend-identity-access-management-class-diagram.svg" alt="Identity and Access Management Frontend Class Diagram" width="100%">
-</p>
-
-**Figura: Identity and Access Management Frontend Class Diagram. Fuente: elaboración propia en PlantUML.**
 
 ##### Production Management Frontend
 
@@ -1988,6 +1972,22 @@ El modelado se separa por producto de software y por límite funcional. Cada Bou
 
 **Figura: Reporting and Analytics Frontend Class Diagram. Fuente: elaboración propia en PlantUML.**
 
+##### Commercial Engagement Frontend
+
+<p align="center">
+  <img src="assets/Images%20Chapter%204/Software%20Object-Oriented%20Design/Class%20Diagrams/frontend-commercial-engagement-class-diagram.svg" alt="Commercial Engagement Frontend Class Diagram" width="100%">
+</p>
+
+**Figura: Commercial Engagement Frontend Class Diagram. Fuente: elaboración propia en PlantUML.**
+
+##### Identity and Access Management Frontend
+
+<p align="center">
+  <img src="assets/Images%20Chapter%204/Software%20Object-Oriented%20Design/Class%20Diagrams/frontend-identity-access-management-class-diagram.svg" alt="Identity and Access Management Frontend Class Diagram" width="100%">
+</p>
+
+**Figura: Identity and Access Management Frontend Class Diagram. Fuente: elaboración propia en PlantUML.**
+
 ##### Frontend Shared Kernel
 
 <p align="center">
@@ -1999,22 +1999,6 @@ El modelado se separa por producto de software y por límite funcional. Cada Bou
 #### Backend Class Diagrams
 
 
-
-##### Commercial Engagement Backend
-
-<p align="center">
-  <img src="assets/Images%20Chapter%204/Software%20Object-Oriented%20Design/Class%20Diagrams/backend-commercial-engagement-class-diagram.svg" alt="Commercial Engagement Backend Class Diagram" width="100%">
-</p>
-
-**Figura: Commercial Engagement Backend Class Diagram. Fuente: elaboración propia en PlantUML.**
-
-##### Identity and Access Management Backend
-
-<p align="center">
-  <img src="assets/Images%20Chapter%204/Software%20Object-Oriented%20Design/Class%20Diagrams/backend-identity-access-management-class-diagram.svg" alt="Identity and Access Management Backend Class Diagram" width="100%">
-</p>
-
-**Figura: Identity and Access Management Backend Class Diagram. Fuente: elaboración propia en PlantUML.**
 
 ##### Production Management Backend
 
@@ -2055,6 +2039,22 @@ El modelado se separa por producto de software y por límite funcional. Cada Bou
 </p>
 
 **Figura: Reporting and Analytics Backend Class Diagram. Fuente: elaboración propia en PlantUML.**
+
+##### Commercial Engagement Backend
+
+<p align="center">
+  <img src="assets/Images%20Chapter%204/Software%20Object-Oriented%20Design/Class%20Diagrams/backend-commercial-engagement-class-diagram.svg" alt="Commercial Engagement Backend Class Diagram" width="100%">
+</p>
+
+**Figura: Commercial Engagement Backend Class Diagram. Fuente: elaboración propia en PlantUML.**
+
+##### Identity and Access Management Backend
+
+<p align="center">
+  <img src="assets/Images%20Chapter%204/Software%20Object-Oriented%20Design/Class%20Diagrams/backend-identity-access-management-class-diagram.svg" alt="Identity and Access Management Backend Class Diagram" width="100%">
+</p>
+
+**Figura: Identity and Access Management Backend Class Diagram. Fuente: elaboración propia en PlantUML.**
 
 ##### Production-Quality Shared Kernel Backend
 
