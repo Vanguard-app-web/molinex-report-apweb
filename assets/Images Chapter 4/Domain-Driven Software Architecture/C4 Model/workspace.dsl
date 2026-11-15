@@ -13,11 +13,11 @@ workspace "Molinex Platform" "C4 model for the Molinex rice mill operational man
         maintenanceTechnician = person "Maintenance Technician" "Registers machines and maintenance work, and reviews anomalies and alerts."
         productionOperator = person "Production Operator" "Records raw material, batches, production, quality and waste information."
 
-        sensorGateway = softwareSystem "Rice Mill Sensor Gateway" "Collects rice mill telemetry and sends planned operational readings to Molinex." {
-            tags "External System" "Planned"
+        sensorGateway = softwareSystem "Rice Mill Sensor Gateway" "Collects rice mill telemetry and sends operational readings to Molinex." {
+            tags "External System"
         }
-        notificationService = softwareSystem "Notification Delivery Service" "Delivers planned account and critical operational alert notifications." {
-            tags "External System" "Planned"
+        notificationService = softwareSystem "Notification Delivery Service" "Delivers account and critical operational alert notifications." {
+            tags "External System"
         }
 
         molinex = softwareSystem "Molinex Platform" "Centralizes rice mill production, quality, maintenance and operational intelligence information." {
@@ -25,7 +25,7 @@ workspace "Molinex Platform" "C4 model for the Molinex rice mill operational man
                 tags "Landing Page"
             }
 
-            webHost = container "Web Application" "Hosts and delivers the Molinex Single-Page Application to its users." "Microsoft Azure" {
+            webHost = container "Web Application" "Hosts and delivers the Molinex Single-Page Application to its users." "Azure Static Web Apps" {
                 tags "Web Application"
             }
 
@@ -39,7 +39,7 @@ workspace "Molinex Platform" "C4 model for the Molinex rice mill operational man
                 !include backend-components.dsl
             }
 
-            database = container "Relational Database" "Stores operational information while preserving logical ownership by backend module." "MySQL or PostgreSQL (TBD)" {
+            database = container "Relational Database" "Stores operational information while preserving logical ownership by backend module." "MySQL Server" {
                 tags "Database"
             }
         }
@@ -137,9 +137,6 @@ workspace "Molinex Platform" "C4 model for the Molinex rice mill operational man
             element "External System" {
                 background #8C96A0
                 color #FFFFFF
-            }
-            element "Planned" {
-                border dashed
             }
             element "Group" {
                 color #526D82

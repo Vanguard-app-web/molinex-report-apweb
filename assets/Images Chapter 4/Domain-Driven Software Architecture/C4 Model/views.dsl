@@ -2,7 +2,7 @@ systemContext molinex "MolinexSystemContext" {
     include visitor administrator maintenanceTechnician productionOperator sensorGateway notificationService molinex
     autoLayout lr
     title "Molinex Platform - System Context Diagram"
-    description "People and planned external software systems that interact with the Molinex Platform."
+    description "People and external software systems that interact with the Molinex Platform."
 }
 
 container molinex "MolinexContainers" {
@@ -94,14 +94,14 @@ component molinex.webApplication "MolinexFrontendSharedKernel" {
 }
 
 component molinex.apiApplication "MolinexBackendComponents" {
-    include molinex.landingPage molinex.webApplication molinex.database sensorGateway notificationService
-    include molinex.apiApplication.commercialModule molinex.apiApplication.identityModule
     include molinex.apiApplication.productionModule molinex.apiApplication.qualityModule
     include molinex.apiApplication.maintenanceModule molinex.apiApplication.intelligenceModule
-    include molinex.apiApplication.reportingModule molinex.apiApplication.sharedKernel
-    autoLayout tb
+    include molinex.apiApplication.commercialModule molinex.apiApplication.reportingModule
+    include molinex.apiApplication.identityModule molinex.apiApplication.sharedKernel
+    include molinex.landingPage molinex.webApplication molinex.database
+    autoLayout lr
     title "Molinex Backend - Component Overview by Bounded Context"
-    description "The seven backend bounded contexts, the Shared Kernel, persistence and planned external integrations of the modular monolith."
+    description "Core, supporting and generic bounded contexts, the Shared Kernel, clients and persistence of the modular monolith."
 }
 
 component molinex.apiApplication "MolinexBackendCommercial" {
@@ -167,5 +167,5 @@ component molinex.apiApplication "MolinexBackendSharedKernel" {
     include molinex.apiApplication.sharedKernelDomain
     autoLayout tb
     title "Molinex Backend - Shared Kernel Components"
-    description "Value objects shared by Production Management and Quality and Yield Control."
+    description "Common domain abstractions, persistence contracts and value objects used by the backend bounded contexts."
 }
