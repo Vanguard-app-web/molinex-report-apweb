@@ -2572,6 +2572,17 @@ La revisión utiliza las capturas de la Web Application incluidas en la entrega.
 **Límite de la evidencia.** Las capturas permiten describir el contenido visible, pero no comprobar persistencia, errores, autorización ni respuestas del backend. La entrega no contiene capturas nuevas o registros de ejecución que acrediten los escenarios completos del Sprint 3.
 
 ### 5.2.3.6.Services Documentation Evidence for Sprint Review.
+
+El backend Web de referencia de Molinex, desarrollado en C# con ASP.NET Core, expone Swagger UI en `/swagger/index.html` y publica su especificación en `/swagger/v1/swagger.json` en el entorno de desarrollo. El contrato incluye ejemplos para los cuerpos de las solicitudes y parámetros de consulta. Para probar rutas protegidas, se obtiene un token mediante `POST /api/v1/tokens` y se pega en **Authorize**. Los identificadores de ejemplo se sustituyen por los que devuelve la creación de cada recurso. [Especificación OpenAPI exportada del backend Web](assets/evidence/sprint-3/molinex-web-openapi.json).
+
+| Historia técnica | Operaciones documentadas | Verificación local |
+| --- | --- | --- |
+| TS-01 · Producción | Registro y consulta de recepciones, lotes y registros productivos. Actualización mediante `PUT /api/v1/production-records/{id}`. | La creación devolvió `201 Created`. El `PUT` devolvió `200 OK` y un `GET` confirmó los cambios. Intentar modificar el lote de origen devolvió `400 Bad Request`. |
+| TS-02 · Indicadores | `GET /api/v1/yield-indicators` admite filtros por registro y fechas. `GET /api/v1/rice-composition` consulta por lote. | Ambas consultas devolvieron `200 OK`. Invertir las fechas en la consulta de rendimiento devolvió `400 Bad Request`. |
+| TS-03 · Mantenimiento | `POST /api/v1/maintenance-records` y consultas por identificador y por máquina. | El registro devolvió `201 Created` y las consultas devolvieron `200 OK`. Consultar el historial de una máquina inexistente devolvió `404 Not Found`. |
+
+La verificación del contrato cubrió 9 operaciones `POST`, 19 `GET` y 1 `PUT` con una base en memoria. En una prueba adicional con MySQL local, `POST /api/v1/raw-material-receptions` devolvió `201 Created` y se comprobó la fila en la tabla `raw_material_receptions`.
+
 ### 5.2.3.7.Software Deployment Evidence for Sprint Review.
 ### 5.2.3.8.Team Collaboration Insights during Sprint.
 ### 5.3. Validation Interviews.
