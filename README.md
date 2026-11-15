@@ -1833,6 +1833,8 @@ La vista general muestra los siete Bounded Contexts del frontend, el Shared Kern
 
 La vista general representa los siete módulos de los Bounded Contexts que conviven dentro de la RESTful API, el Shared Kernel, sus eventos en proceso y los sistemas externos planificados. Cada vista detallada separa Interfaces, Application, Domain e Infrastructure; Domain conserva un único componente Model, mientras Infrastructure describe la persistencia y los adaptadores previstos.
 
+Las integraciones entre Bounded Contexts se resuelven con el patrón Anti-Corruption Layer (ACL), resaltado en color en los diagramas. El contexto proveedor publica un único contrato en `Interfaces/Acl` (facade y contrato de lectura con valores primitivos) y lo implementa en `Application/Acl`; el contexto consumidor lo invoca desde un servicio saliente en `Application/Internal/OutboundServices/Acl`, que traduce la respuesta a su propio modelo. Así, ningún contexto accede a agregados, repositorios ni al `DbContext` de otro. Quality and Yield Control → Production Management es la integración vigente; Operational Intelligence → Asset and Maintenance Management se muestra con borde discontinuo por ser diseño planificado. Los demás contextos no requieren ACL: Reporting and Analytics se alimenta de eventos de dominio y el resto solo comparte el Shared Kernel. Los contratos y nombres se detallan en [docs/acl-design.md](docs/acl-design.md).
+
 ##### Backend Component Overview
 
 <p align="center">
@@ -1998,6 +2000,7 @@ El modelado se separa por producto de software y por límite funcional. Cada Bou
 
 #### Backend Class Diagrams
 
+Los diagramas de Production Management y Quality and Yield Control incluyen los paquetes ACL con los estereotipos `<<Facade>>`, `<<Read Contract>>` y `<<ACL>>`: `ExternalProductionService` realiza `IExternalProductionService`, depende únicamente de `IProductionContextFacade` y traduce `ProductionRecordSummary` a `ProductionRecordReference`. Los diagramas de Asset and Maintenance Management y Operational Intelligence muestran la integración equivalente en paquetes marcados como *planned*.
 
 
 ##### Production Management Backend

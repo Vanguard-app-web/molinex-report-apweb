@@ -252,6 +252,23 @@ package "Molinex.AssetMaintenanceManagement.Infrastructure.Persistence.EntityFra
   }
 }
 
+package "Molinex.AssetMaintenanceManagement.Interfaces.Acl (planned)" as InterfacesAcl {
+  interface IAssetMaintenanceContextFacade <<Facade>> {
+    +ExistsMachineById(machineId : long, cancellationToken : CancellationToken) : Task<bool>
+    +FetchMachineStatusById(machineId : long, cancellationToken : CancellationToken) : Task<string>
+  }
+}
+
+package "Molinex.AssetMaintenanceManagement.Application.Acl (planned)" as ApplicationAcl {
+  class AssetMaintenanceContextFacade <<Facade>> {
+    -queryService : IMaintenanceQueryService
+  }
+}
+
+package "Molinex.OperationalIntelligence.Application.Internal.OutboundServices.Acl (planned consumer, reference)" as IntelligenceConsumer {
+  class ExternalMachineService <<ACL>>
+}
+
 package "Molinex.Shared (reference)" as SharedReference {
   abstract class AggregateRoot <<Shared Base Aggregate>>
   interface IEntityId<T> <<Shared Identifier Contract>>
@@ -334,4 +351,11 @@ MachineRepository --|> BaseRepository
 MaintenanceRecordRepository --|> BaseRepository
 ModelBuilderExtensions ..> Machine : maps
 ModelBuilderExtensions ..> MaintenanceRecord : maps
+
+AssetMaintenanceContextFacade ..|> IAssetMaintenanceContextFacade
+AssetMaintenanceContextFacade --> "1" IMaintenanceQueryService : delegates queries to
+AssetMaintenanceContextFacade ..> GetMachineByIdQuery : creates
+AssetMaintenanceContextFacade ..> Machine : reads to translate
+AssetMaintenanceContextFacade ..> MachineStatus : translates to string
+ExternalMachineService ..> IAssetMaintenanceContextFacade : calls
 @enduml
