@@ -187,7 +187,7 @@ molinex.apiApplication.commercialCommandServices -> molinex.apiApplication.comme
 molinex.apiApplication.commercialQueryServices -> molinex.apiApplication.commercialDomain "Reads from"
 molinex.apiApplication.commercialCommandServices -> molinex.apiApplication.commercialInfrastructure "Persists through"
 molinex.apiApplication.commercialQueryServices -> molinex.apiApplication.commercialInfrastructure "Loads through"
-molinex.apiApplication.commercialInfrastructure -> molinex.apiApplication.commercialDomain "Implements repository and event-publication ports defined by"
+molinex.apiApplication.commercialInfrastructure -> molinex.apiApplication.commercialDomain "Implements the repository interfaces defined by"
 molinex.apiApplication.commercialInfrastructure -> molinex.database "Persists commercial data in" "EF Core/SQL"
 
 molinex.webApplication -> molinex.apiApplication.authenticationInterfaces "Invokes authentication operations on" "JSON/HTTPS REST"
@@ -202,7 +202,7 @@ molinex.apiApplication.identityCommandServices -> molinex.apiApplication.identit
 molinex.apiApplication.identityQueryServices -> molinex.apiApplication.identityDomain "Reads from"
 molinex.apiApplication.identityCommandServices -> molinex.apiApplication.identityInfrastructure "Persists and notifies through"
 molinex.apiApplication.identityQueryServices -> molinex.apiApplication.identityInfrastructure "Loads through"
-molinex.apiApplication.identityInfrastructure -> molinex.apiApplication.identityDomain "Implements security, notification and repository ports defined by"
+molinex.apiApplication.identityInfrastructure -> molinex.apiApplication.identityDomain "Implements the repository interfaces defined by and issues tokens for the principals of"
 molinex.apiApplication.identityInfrastructure -> molinex.database "Persists identity data in" "EF Core/SQL"
 molinex.apiApplication.identityInfrastructure -> notificationService "Delivers account notifications through" "HTTPS API or SMTP"
 
@@ -219,7 +219,7 @@ molinex.apiApplication.productionCommandServices -> molinex.apiApplication.produ
 molinex.apiApplication.productionQueryServices -> molinex.apiApplication.productionDomain "Reads from"
 molinex.apiApplication.productionCommandServices -> molinex.apiApplication.productionInfrastructure "Persists through"
 molinex.apiApplication.productionQueryServices -> molinex.apiApplication.productionInfrastructure "Loads through"
-molinex.apiApplication.productionInfrastructure -> molinex.apiApplication.productionDomain "Implements repository and event-publication ports defined by"
+molinex.apiApplication.productionInfrastructure -> molinex.apiApplication.productionDomain "Implements the repository interfaces defined by"
 molinex.apiApplication.productionInfrastructure -> molinex.database "Persists production data in" "EF Core/SQL"
 
 molinex.webApplication -> molinex.apiApplication.qualityAssessmentInterfaces "Invokes quality-assessment operations on" "JSON/HTTPS REST"
@@ -234,7 +234,7 @@ molinex.apiApplication.qualityCommandServices -> molinex.apiApplication.qualityD
 molinex.apiApplication.qualityQueryServices -> molinex.apiApplication.qualityDomain "Reads from"
 molinex.apiApplication.qualityCommandServices -> molinex.apiApplication.qualityInfrastructure "Persists through"
 molinex.apiApplication.qualityQueryServices -> molinex.apiApplication.qualityInfrastructure "Loads through"
-molinex.apiApplication.qualityInfrastructure -> molinex.apiApplication.qualityDomain "Implements repository and event-publication ports defined by"
+molinex.apiApplication.qualityInfrastructure -> molinex.apiApplication.qualityDomain "Implements the repository interfaces defined by"
 molinex.apiApplication.qualityInfrastructure -> molinex.database "Persists quality and yield data in" "EF Core/SQL"
 
 molinex.webApplication -> molinex.apiApplication.machineInterfaces "Invokes machine operations on" "JSON/HTTPS REST"
@@ -247,7 +247,7 @@ molinex.apiApplication.maintenanceCommandServices -> molinex.apiApplication.main
 molinex.apiApplication.maintenanceQueryServices -> molinex.apiApplication.maintenanceDomain "Reads from"
 molinex.apiApplication.maintenanceCommandServices -> molinex.apiApplication.maintenanceInfrastructure "Persists through"
 molinex.apiApplication.maintenanceQueryServices -> molinex.apiApplication.maintenanceInfrastructure "Loads through"
-molinex.apiApplication.maintenanceInfrastructure -> molinex.apiApplication.maintenanceDomain "Implements repository and event-publication ports defined by"
+molinex.apiApplication.maintenanceInfrastructure -> molinex.apiApplication.maintenanceDomain "Implements the repository interfaces defined by"
 molinex.apiApplication.maintenanceInfrastructure -> molinex.database "Persists asset and maintenance data in" "EF Core/SQL"
 
 sensorGateway -> molinex.apiApplication.telemetryIngestionInterfaces "Sends operational readings to" "HTTPS or MQTT"
@@ -259,7 +259,7 @@ molinex.apiApplication.intelligenceCommandServices -> molinex.apiApplication.int
 molinex.apiApplication.intelligenceQueryServices -> molinex.apiApplication.intelligenceDomain "Reads from"
 molinex.apiApplication.intelligenceCommandServices -> molinex.apiApplication.intelligenceInfrastructure "Persists and notifies through"
 molinex.apiApplication.intelligenceQueryServices -> molinex.apiApplication.intelligenceInfrastructure "Loads through"
-molinex.apiApplication.intelligenceInfrastructure -> molinex.apiApplication.intelligenceDomain "Implements telemetry, notification and repository ports defined by"
+molinex.apiApplication.intelligenceInfrastructure -> molinex.apiApplication.intelligenceDomain "Implements the repository interfaces defined by and delivers the alerts of"
 molinex.apiApplication.intelligenceInfrastructure -> molinex.database "Persists readings, anomalies and alerts in" "EF Core/SQL"
 molinex.apiApplication.intelligenceInfrastructure -> notificationService "Delivers operational alerts through" "HTTPS API"
 
@@ -269,7 +269,7 @@ molinex.apiApplication.reportingQueryServices -> molinex.apiApplication.reportin
 molinex.apiApplication.reportingQueryServices -> molinex.apiApplication.reportingInfrastructure "Loads through"
 molinex.apiApplication.reportingProjectionHandlers -> molinex.apiApplication.reportingDomain "Builds projections defined by"
 molinex.apiApplication.reportingProjectionHandlers -> molinex.apiApplication.reportingInfrastructure "Updates projections through"
-molinex.apiApplication.reportingInfrastructure -> molinex.apiApplication.reportingDomain "Implements projection repository ports defined by"
+molinex.apiApplication.reportingInfrastructure -> molinex.apiApplication.reportingDomain "Implements the projection repository interface defined by"
 molinex.apiApplication.reportingInfrastructure -> molinex.database "Reads and stores reporting projections in" "EF Core/SQL"
 
 molinex.apiApplication.productionDomain -> molinex.apiApplication.sharedKernelDomain "Uses Weight and MeasurementUnit from"

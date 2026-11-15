@@ -25,28 +25,28 @@ sharedKernel = component "Shared Kernel" "Contains Weight and MeasurementUnit, s
 
 group "Commercial Engagement" {
     group "Interfaces" {
-        planCatalogInterfaces = component "Plan Catalog REST Interface" "PlanController, plan resources and assemblers expose the available plan catalog and value proposition." "ASP.NET Core Web API" {
+        planCatalogInterfaces = component "Plan Catalog REST Interface" "CommercialContentController, plan and value proposition resources and assemblers expose the available plan catalog and value proposition." "ASP.NET Core Web API" {
             tags "Backend Interfaces"
         }
-        commercialInquiryInterfaces = component "Commercial Inquiry REST Interface" "CommercialInquiryController, request resources and assemblers receive visitor contact requests." "ASP.NET Core Web API" {
+        commercialInquiryInterfaces = component "Commercial Inquiry REST Interface" "CommercialInquiriesController, inquiry resources and assemblers receive and expose visitor contact requests." "ASP.NET Core Web API" {
             tags "Backend Interfaces"
         }
     }
     group "Application" {
-        commercialCommandServices = component "Commercial Command Services" "SubmitCommercialInquiryService validates and coordinates commercial inquiry submission." "C# Command Services" {
+        commercialCommandServices = component "Commercial Command Services" "ICommercialCommandService and its implementation validate and coordinate commercial inquiry submission and status changes." "C# Command Services" {
             tags "Backend Application Layer"
         }
-        commercialQueryServices = component "Commercial Query Services" "GetPlanCatalogService and GetValuePropositionService answer public offer queries." "C# Query Services" {
+        commercialQueryServices = component "Commercial Query Services" "ICommercialQueryService and its implementation answer commercial inquiry, plan catalog and value proposition queries." "C# Query Services" {
             tags "Backend Application Layer"
         }
     }
     group "Domain" {
-        commercialDomain = component "Commercial Model" "CommercialInquiry, Plan and ValueProposition: represent the public offer and the commercial contact workflow." "C# Model" {
+        commercialDomain = component "Commercial Model" "CommercialInquiry, PlanSummary and ValueProposition: represent the public offer and the commercial contact workflow." "C# Model" {
             tags "Backend Domain"
         }
     }
     group "Infrastructure" {
-        commercialInfrastructure = component "commercial/infrastructure" "CommercialDbContext configuration, inquiry and plan repository adapters, relational mappings and domain-event publication." "Entity Framework Core" {
+        commercialInfrastructure = component "CommercialEngagement/Infrastructure" "EF Core model configuration, inquiry repository, commercial content service, relational mappings and domain-event dispatch on save." "Entity Framework Core" {
             tags "Backend Infrastructure"
         }
     }
@@ -54,7 +54,7 @@ group "Commercial Engagement" {
 
 group "Identity and Access Management" {
     group "Interfaces" {
-        authenticationInterfaces = component "Authentication REST Interface" "AuthenticationController, credential resources and assemblers expose sign-in and account-registration operations." "ASP.NET Core Web API and Authentication" {
+        authenticationInterfaces = component "Authentication REST Interface" "AuthenticationController, credential resources and assemblers expose sign-in and account-registration operations." "ASP.NET Core Web API and JSON Web Tokens" {
             tags "Backend Interfaces"
         }
         userAdministrationInterfaces = component "User Administration REST Interface" "UsersController, role and permission resources and assemblers expose administrative operations." "ASP.NET Core Web API" {
@@ -78,7 +78,7 @@ group "Identity and Access Management" {
         }
     }
     group "Infrastructure" {
-        identityInfrastructure = component "iam/infrastructure" "IdentityDbContext configuration, repository adapters, password hashing, token issuing and notification-delivery adapters." "Entity Framework Core and ASP.NET Core Authentication" {
+        identityInfrastructure = component "IdentityAccessManagement/Infrastructure" "EF Core model configuration, user repository, BCrypt hashing service, JWT token service, request authorization middleware and notification delivery integration." "Entity Framework Core, BCrypt and JSON Web Tokens" {
             tags "Backend Infrastructure"
         }
     }
@@ -110,7 +110,7 @@ group "Production Management" {
         }
     }
     group "Infrastructure" {
-        productionInfrastructure = component "production/infrastructure" "ProductionDbContext configuration, reception, batch and record repository adapters, relational mappings and domain-event publication." "Entity Framework Core" {
+        productionInfrastructure = component "ProductionManagement/Infrastructure" "EF Core model configuration, reception, batch and record repositories, relational mappings and domain-event dispatch on save." "Entity Framework Core" {
             tags "Backend Infrastructure"
         }
     }
@@ -142,7 +142,7 @@ group "Quality and Yield Control" {
         }
     }
     group "Infrastructure" {
-        qualityInfrastructure = component "quality/infrastructure" "QualityDbContext configuration, quality and waste repository adapters, relational mappings and domain-event publication." "Entity Framework Core" {
+        qualityInfrastructure = component "QualityYieldControl/Infrastructure" "EF Core model configuration, quality, waste and deviation repositories, relational mappings and domain-event dispatch on save." "Entity Framework Core" {
             tags "Backend Infrastructure"
         }
     }
@@ -171,7 +171,7 @@ group "Asset and Maintenance Management" {
         }
     }
     group "Infrastructure" {
-        maintenanceInfrastructure = component "maintenance/infrastructure" "MaintenanceDbContext configuration, machine and maintenance repository adapters, relational mappings and domain-event publication." "Entity Framework Core" {
+        maintenanceInfrastructure = component "AssetMaintenanceManagement/Infrastructure" "EF Core model configuration, machine and maintenance repositories, relational mappings and domain-event dispatch on save." "Entity Framework Core" {
             tags "Backend Infrastructure"
         }
     }
@@ -200,7 +200,7 @@ group "Operational Intelligence" {
         }
     }
     group "Infrastructure" {
-        intelligenceInfrastructure = component "intelligence/infrastructure" "IntelligenceDbContext configuration, telemetry, repository and notification adapters, relational mappings and event publication." "Entity Framework Core and Integration Adapters" {
+        intelligenceInfrastructure = component "OperationalIntelligence/Infrastructure" "EF Core model configuration, telemetry integration, reading, anomaly and alert repositories, notification delivery, relational mappings and domain-event dispatch on save." "Entity Framework Core and External Integrations" {
             tags "Backend Infrastructure"
         }
     }
@@ -226,7 +226,7 @@ group "Reporting and Analytics" {
         }
     }
     group "Infrastructure" {
-        reportingInfrastructure = component "reporting/infrastructure" "ReportingDbContext configuration, projection repository adapters and denormalized relational mappings." "Entity Framework Core" {
+        reportingInfrastructure = component "ReportingAnalytics/Infrastructure" "EF Core model configuration, projection repository and denormalized relational mappings." "Entity Framework Core" {
             tags "Backend Infrastructure" "Read Side"
         }
     }

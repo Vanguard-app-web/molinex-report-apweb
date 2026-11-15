@@ -1,19 +1,23 @@
 @startuml
 left to right direction
+hide empty members
 
-package "Molinex.CommercialEngagement.Interfaces.REST" as Interfaces {
-  class PlanController <<REST Controller>> {
-    +GetCatalog() : ActionResult
-    +GetValueProposition() : ActionResult
+package "Molinex.CommercialEngagement.Interfaces.Rest" as Interfaces {
+  class CommercialInquiriesController <<REST Controller>> {
+    -commandService : ICommercialCommandService
+    -queryService : ICommercialQueryService
+    --
+    +Submit(resource : SubmitCommercialInquiryResource, cancellationToken : CancellationToken) : Task<IActionResult>
+    +GetById(id : long, cancellationToken : CancellationToken) : Task<IActionResult>
+    +GetAll(status : string?, cancellationToken : CancellationToken) : Task<IActionResult>
   }
-  class CommercialInquiryController <<REST Controller>> {
-    +Submit(resource : SubmitCommercialInquiryResource) : ActionResult
+  class CommercialContentController <<REST Controller>> {
+    -queryService : ICommercialQueryService
+    --
+    +GetPlans(cancellationToken : CancellationToken) : Task<IActionResult>
+    +GetValueProposition(cancellationToken : CancellationToken) : Task<IActionResult>
   }
-  class CommercialResourceAssembler <<Assembler>> {
-    +{static} ToCommand(resource : SubmitCommercialInquiryResource) : SubmitCommercialInquiryCommand
-    +{static} ToResource(model : Plan) : PlanResource
-    +{static} ToResource(model : ValueProposition) : ValuePropositionResource
-  }
+
   class SubmitCommercialInquiryResource <<Request Resource>> <<(R,#FF7700)>> {
     +FullName : string
     +Email : string
@@ -21,28 +25,65 @@ package "Molinex.CommercialEngagement.Interfaces.REST" as Interfaces {
     +CompanyName : string
     +Message : string
   }
-  class PlanResource <<Response Resource>> <<(R,#FF7700)>> {
-    +Id : Guid
+  class CommercialInquiryResource <<Response Resource>> <<(R,#FF7700)>> {
+    +Id : long
+    +FullName : string
+    +Email : string
+    +Status : string
+    +SubmittedAt : DateTimeOffset
+  }
+  class PlanSummaryResource <<Response Resource>> <<(R,#FF7700)>> {
+    +Code : string
     +Name : string
     +PriceLabel : string
-    +Features : string[]
+    +Features : IReadOnlyCollection<string>
   }
   class ValuePropositionResource <<Response Resource>> <<(R,#FF7700)>> {
     +Headline : string
-    +Benefits : string[]
+    +Description : string
+    +Benefits : IReadOnlyCollection<string>
+  }
+
+  class SubmitCommercialInquiryCommandFromResourceAssembler <<Assembler>> {
+    +{static} ToCommandFromResource(resource : SubmitCommercialInquiryResource) : SubmitCommercialInquiryCommand
+  }
+  class CommercialInquiryResourceFromEntityAssembler <<Assembler>> {
+    +{static} ToResourceFromEntity(entity : CommercialInquiry) : CommercialInquiryResource
+  }
+  class PlanSummaryResourceFromEntityAssembler <<Assembler>> {
+    +{static} ToResourceFromEntity(entity : PlanSummary) : PlanSummaryResource
+  }
+  class ValuePropositionResourceFromEntityAssembler <<Assembler>> {
+    +{static} ToResourceFromEntity(entity : ValueProposition) : ValuePropositionResource
   }
 }
 
 package "Molinex.CommercialEngagement.Application" as Application {
-  class SubmitCommercialInquiryService <<Command Service>> {
-    +HandleAsync(command : SubmitCommercialInquiryCommand) : Task<CommercialInquiryId>
+  interface ICommercialCommandService <<Command Service>> {
+    +Handle(command : SubmitCommercialInquiryCommand, cancellationToken : CancellationToken) : Task<Result<CommercialInquiryId>>
+    +Handle(command : ChangeInquiryStatusCommand, cancellationToken : CancellationToken) : Task<Result<CommercialInquiryId>>
   }
-  class GetPlanCatalogService <<Query Service>> {
-    +HandleAsync() : Task<Plan[]>
+  interface ICommercialQueryService <<Query Service>> {
+    +Handle(query : GetCommercialInquiryByIdQuery, cancellationToken : CancellationToken) : Task<CommercialInquiry?>
+    +Handle(query : GetCommercialInquiriesQuery, cancellationToken : CancellationToken) : Task<IEnumerable<CommercialInquiry>>
+    +Handle(query : GetPlanCatalogQuery, cancellationToken : CancellationToken) : Task<IEnumerable<PlanSummary>>
+    +Handle(query : GetValuePropositionQuery, cancellationToken : CancellationToken) : Task<ValueProposition>
   }
-  class GetValuePropositionService <<Query Service>> {
-    +HandleAsync() : Task<ValueProposition>
+  interface ICommercialContentService <<Outbound Service>> {
+    +FindPlanCatalogAsync(cancellationToken : CancellationToken) : Task<IEnumerable<PlanSummary>>
+    +FindValuePropositionAsync(cancellationToken : CancellationToken) : Task<ValueProposition>
   }
+  class CommercialCommandService <<Command Service>> {
+    -repository : ICommercialInquiryRepository
+    -unitOfWork : IUnitOfWork
+  }
+  class CommercialQueryService <<Query Service>> {
+    -repository : ICommercialInquiryRepository
+    -contentService : ICommercialContentService
+  }
+}
+
+package "Molinex.CommercialEngagement.Domain.Model.Commands" as Commands {
   class SubmitCommercialInquiryCommand <<Command>> {
     +FullName : string
     +Email : string
@@ -50,123 +91,182 @@ package "Molinex.CommercialEngagement.Application" as Application {
     +CompanyName : string
     +Message : string
   }
+  class ChangeInquiryStatusCommand <<Command>> {
+    +InquiryId : long
+    +Status : string
+  }
 }
 
-package "Molinex.CommercialEngagement.Domain.Model" as DomainModel {
+package "Molinex.CommercialEngagement.Domain.Model.Queries" as Queries {
+  class GetCommercialInquiryByIdQuery <<Query>> {
+    +InquiryId : long
+  }
+  class GetCommercialInquiriesQuery <<Query>> {
+    +Status : string?
+  }
+  class GetPlanCatalogQuery <<Query>>
+  class GetValuePropositionQuery <<Query>>
+}
+
+package "Molinex.CommercialEngagement.Domain" as Domain {
   class CommercialInquiry <<Aggregate Root>> {
-    -_id : CommercialInquiryId
-    -_contact : ContactInformation
-    -_message : InquiryMessage
-    -_submittedAt : SubmissionDateTime
-    +Submit(contact, message, submittedAt) : CommercialInquiry
+    +Id : CommercialInquiryId
+    +Contact : ContactInformation
+    +Message : InquiryMessage
+    +Status : InquiryStatus
+    +SubmittedAt : SubmissionDateTime
+    --
+    +{static} Submit(contact, message, submittedAt) : CommercialInquiry
+    +MarkAsContacted() : void
+    +Close() : void
   }
   class CommercialInquiryId <<Value Object>> {
-    -_value : Guid
+    +Value : long
+  }
+  class ContactInformation <<Value Object>> {
+    +FullName : FullName
+    +Email : EmailAddress
+    +Phone : PhoneNumber?
+    +CompanyName : CompanyName
   }
   class FullName <<Value Object>> {
-    -_value : string
-  }
-  class CompanyName <<Value Object>> {
-    -_value : string
+    +Value : string
   }
   class EmailAddress <<Value Object>> {
-    -_value : string
+    +Value : string
+    --
     +IsValid() : bool
   }
   class PhoneNumber <<Value Object>> {
-    -_value : string
+    +Value : string
+    --
     +IsValid() : bool
   }
+  class CompanyName <<Value Object>> {
+    +Value : string
+  }
   class InquiryMessage <<Value Object>> {
-    -_value : string
+    +Value : string
+    --
     +IsBlank() : bool
   }
   class SubmissionDateTime <<Value Object>> {
-    -_value : DateTimeOffset
+    +Value : DateTimeOffset
   }
-  class ContactInformation <<Value Object>> {
-    -_fullName : FullName
-    -_email : EmailAddress
-    -_phone : PhoneNumber?
-    -_companyName : CompanyName
+  enum InquiryStatus <<Enumeration>> {
+    Submitted
+    Contacted
+    Closed
   }
-  class Plan <<Read Model>> {
-    +Id : Guid
+  class PlanSummary <<Read Model>> {
+    +Code : string
     +Name : string
     +PriceLabel : string
-    +Features : string[]
+    +Features : IReadOnlyCollection<string>
+    +Conditions : IReadOnlyCollection<string>
   }
   class ValueProposition <<Read Model>> {
     +Headline : string
-    +Benefits : string[]
+    +Description : string
+    +Benefits : IReadOnlyCollection<string>
   }
   interface ICommercialInquiryRepository <<Repository>> {
-    +SaveAsync(inquiry : CommercialInquiry) : Task
-    +FindByIdAsync(id : CommercialInquiryId) : Task<CommercialInquiry?>
-  }
-  interface ICommercialContentQueryPort <<Port>> {
-    +GetPlansAsync() : Task<Plan[]>
-    +GetValuePropositionAsync() : Task<ValueProposition>
-  }
-  interface IDomainEventPublisher <<Port>> {
-    +PublishAsync(event : object) : Task
+    +FindByStatusAsync(status : InquiryStatus, cancellationToken : CancellationToken) : Task<IEnumerable<CommercialInquiry>>
   }
   class CommercialInquirySubmitted <<Domain Event>> {
     +InquiryId : CommercialInquiryId
     +OccurredAt : DateTimeOffset
   }
-}
-
-package "Molinex.CommercialEngagement.Infrastructure.Persistence.EFC" as Infrastructure {
-  class CommercialDbContext <<EF Core DbContext>> {
-    +CommercialInquiries : DbSet<CommercialInquiry>
-    +Plans : DbSet<Plan>
-  }
-  class CommercialInquiryRepositoryAdapter <<Repository Adapter>> {
-    -_context : CommercialDbContext
-    +SaveAsync(inquiry : CommercialInquiry) : Task
-    +FindByIdAsync(id : CommercialInquiryId) : Task<CommercialInquiry?>
-  }
-  class CommercialContentQueryAdapter <<Query Adapter>> {
-    -_context : CommercialDbContext
-    +GetPlansAsync() : Task<Plan[]>
-    +GetValuePropositionAsync() : Task<ValueProposition>
-  }
-  class DomainEventPublisherAdapter <<Event Publisher Adapter>> {
-    +PublishAsync(event : object) : Task
+  class CommercialInquiryStatusChanged <<Domain Event>> {
+    +InquiryId : CommercialInquiryId
+    +Status : InquiryStatus
+    +OccurredAt : DateTimeOffset
   }
 }
 
-PlanController ..> GetPlanCatalogService
-PlanController ..> GetValuePropositionService
-PlanController ..> CommercialResourceAssembler
-CommercialInquiryController ..> CommercialResourceAssembler
-CommercialInquiryController ..> SubmitCommercialInquiryService
-CommercialResourceAssembler ..> SubmitCommercialInquiryResource : uses
-CommercialResourceAssembler ..> SubmitCommercialInquiryCommand : creates
-CommercialResourceAssembler ..> Plan : uses
-CommercialResourceAssembler ..> PlanResource : creates
-CommercialResourceAssembler ..> ValueProposition : uses
-CommercialResourceAssembler ..> ValuePropositionResource : creates
-SubmitCommercialInquiryService ..> SubmitCommercialInquiryCommand : handles
-SubmitCommercialInquiryService ..> ICommercialInquiryRepository
-SubmitCommercialInquiryService ..> IDomainEventPublisher
-GetPlanCatalogService ..> ICommercialContentQueryPort
-GetValuePropositionService ..> ICommercialContentQueryPort
-CommercialInquiry *-- CommercialInquiryId
-CommercialInquiry *-- ContactInformation
-CommercialInquiry *-- InquiryMessage
-CommercialInquiry *-- SubmissionDateTime
-ContactInformation *-- FullName
-ContactInformation *-- EmailAddress
-ContactInformation o-- PhoneNumber
-ContactInformation *-- CompanyName
+package "Molinex.CommercialEngagement.Infrastructure.Persistence.EntityFrameworkCore" as Infrastructure {
+  class CommercialInquiryRepository <<EF Core Repository>> {
+    +FindByStatusAsync(status : InquiryStatus, cancellationToken : CancellationToken) : Task<IEnumerable<CommercialInquiry>>
+  }
+  class ModelBuilderExtensions <<EF Core Configuration>> {
+    +{static} ApplyCommercialEngagementConfiguration(builder : ModelBuilder) : void
+  }
+}
+
+package "Molinex.CommercialEngagement.Infrastructure.Content.Configuration" as Content {
+  class CommercialContentService <<Configuration Content Service>> {
+    -configuration : IConfiguration
+    --
+    +FindPlanCatalogAsync(cancellationToken : CancellationToken) : Task<IEnumerable<PlanSummary>>
+    +FindValuePropositionAsync(cancellationToken : CancellationToken) : Task<ValueProposition>
+  }
+}
+
+package "Molinex.Shared (reference)" as SharedReference {
+  abstract class AggregateRoot <<Shared Base Aggregate>>
+  interface IEntityId<T> <<Shared Identifier Contract>>
+  interface IEvent <<Shared Event Contract>>
+  interface IBaseRepository<TEntity> <<Shared Repository>>
+  abstract class BaseRepository<TEntity> <<Shared EF Core Repository>>
+  interface IUnitOfWork <<Shared Unit of Work>>
+  class Result<T> <<Shared Application Result>>
+  class Error <<Shared Value Object>>
+}
+
+CommercialInquiriesController --> "1" ICommercialCommandService : delegates commands to
+CommercialInquiriesController --> "1" ICommercialQueryService : delegates queries to
+CommercialContentController --> "1" ICommercialQueryService : delegates queries to
+CommercialInquiriesController ..> SubmitCommercialInquiryCommandFromResourceAssembler : uses
+CommercialInquiriesController ..> CommercialInquiryResourceFromEntityAssembler : uses
+CommercialContentController ..> PlanSummaryResourceFromEntityAssembler : uses
+CommercialContentController ..> ValuePropositionResourceFromEntityAssembler : uses
+
+SubmitCommercialInquiryCommandFromResourceAssembler ..> SubmitCommercialInquiryResource : reads
+SubmitCommercialInquiryCommandFromResourceAssembler ..> SubmitCommercialInquiryCommand : creates
+CommercialInquiryResourceFromEntityAssembler ..> CommercialInquiry : reads
+CommercialInquiryResourceFromEntityAssembler ..> CommercialInquiryResource : creates
+PlanSummaryResourceFromEntityAssembler ..> PlanSummary : reads
+PlanSummaryResourceFromEntityAssembler ..> PlanSummaryResource : creates
+ValuePropositionResourceFromEntityAssembler ..> ValueProposition : reads
+ValuePropositionResourceFromEntityAssembler ..> ValuePropositionResource : creates
+
+CommercialCommandService ..|> ICommercialCommandService
+CommercialQueryService ..|> ICommercialQueryService
+ICommercialCommandService ..> SubmitCommercialInquiryCommand : handles
+ICommercialCommandService ..> ChangeInquiryStatusCommand : handles
+ICommercialCommandService ..> Result : returns
+ICommercialQueryService ..> GetCommercialInquiryByIdQuery : handles
+ICommercialQueryService ..> GetCommercialInquiriesQuery : handles
+ICommercialQueryService ..> GetPlanCatalogQuery : handles
+ICommercialQueryService ..> GetValuePropositionQuery : handles
+CommercialCommandService --> "1" ICommercialInquiryRepository : persists inquiries through
+CommercialCommandService --> "1" IUnitOfWork : completes changes through
+CommercialQueryService --> "1" ICommercialInquiryRepository : reads inquiries through
+CommercialQueryService --> "1" ICommercialContentService : reads public content through
+ICommercialContentService ..> PlanSummary : provides
+ICommercialContentService ..> ValueProposition : provides
+
+CommercialInquiry --|> AggregateRoot
+CommercialInquiryId ..|> IEntityId
+CommercialInquiry *-- "1" CommercialInquiryId : identified by
+CommercialInquiry *-- "1" ContactInformation : submitted by
+CommercialInquiry *-- "1" InquiryMessage : states
+CommercialInquiry *-- "1" SubmissionDateTime : submitted at
+CommercialInquiry --> "1" InquiryStatus : has
+ContactInformation *-- "1" FullName : names
+ContactInformation *-- "1" EmailAddress : reached at
+ContactInformation o-- "0..1" PhoneNumber : optionally reached at
+ContactInformation *-- "1" CompanyName : represents
+Result --> "1" Error : carries
+
 CommercialInquiry ..> CommercialInquirySubmitted : raises
-CommercialInquiryRepositoryAdapter ..|> ICommercialInquiryRepository
-CommercialContentQueryAdapter ..|> ICommercialContentQueryPort
-DomainEventPublisherAdapter ..|> IDomainEventPublisher
-CommercialInquiryRepositoryAdapter --> CommercialDbContext
-CommercialContentQueryAdapter --> CommercialDbContext
+CommercialInquiry ..> CommercialInquiryStatusChanged : raises
+CommercialInquirySubmitted ..|> IEvent
+CommercialInquiryStatusChanged ..|> IEvent
+
+ICommercialInquiryRepository --|> IBaseRepository
+CommercialInquiryRepository ..|> ICommercialInquiryRepository
+CommercialInquiryRepository --|> BaseRepository
+ModelBuilderExtensions ..> CommercialInquiry : maps
+CommercialContentService ..|> ICommercialContentService
 @enduml
-
-
