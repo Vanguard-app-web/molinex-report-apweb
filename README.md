@@ -2586,6 +2586,8 @@ El backend Web de referencia de Molinex, desarrollado en C# con ASP.NET Core, ex
 
 La verificación del contrato cubrió 9 operaciones `POST`, 19 `GET` y 1 `PUT` con una base en memoria. En una prueba adicional con MySQL local, `POST /api/v1/raw-material-receptions` devolvió `201 Created` y se comprobó la fila en la tabla `raw_material_receptions`.
 
+La documentación interactiva también está disponible en el entorno publicado. [Abrir Scalar del backend Web en Azure](https://molinex-backend-appweb-vanguard-bkeyccezegcbc4ga.canadacentral-01.azurewebsites.net/scalar/v1).
+
 Las siguientes capturas muestran la documentación interactiva en Scalar del backend Web ejecutado en `localhost:5080`. Los códigos HTTP que aparecen en la interfaz corresponden a las respuestas documentadas para cada operación.
 
 ![Vista general de la API de Molinex en Scalar](assets/evidence/sprint-3/scalar/01-scalar-vista-general.png)
@@ -2619,6 +2621,12 @@ El backend C# de Molinex Web se empaquetó como una imagen Docker y se ejecutó 
 ![Proyecto molinex-backend en ejecución en Docker Desktop](assets/evidence/sprint-3/docker/molinex-backend-docker-containers.png)
 
 **Figura.** Vista **Containers** de Docker Desktop. El indicador verde muestra el proyecto `molinex-backend` en ejecución local.
+
+El backend Web se publicó en Azure App Service como `molinex-backend-appweb-vanguard`. Se verificó que Scalar devuelve `200 OK` y que `GET /health` devuelve `200 OK` con el cuerpo `{"status":"ok"}`. [Documentación desplegada en Scalar](https://molinex-backend-appweb-vanguard-bkeyccezegcbc4ga.canadacentral-01.azurewebsites.net/scalar/v1), [Endpoint de salud](https://molinex-backend-appweb-vanguard-bkeyccezegcbc4ga.canadacentral-01.azurewebsites.net/health).
+
+![Registro de arranque del backend Web en Azure App Service](assets/evidence/sprint-3/azure/molinex-backend-azure-startup.png)
+
+**Figura.** Secuencia de registro de Azure App Service. El backend inició en el entorno `Production` y escucha en el puerto interno `8080`.
 
 ### 5.2.3.8.Team Collaboration Insights during Sprint.
 ### 5.3. Validation Interviews.
