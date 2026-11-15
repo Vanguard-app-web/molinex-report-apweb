@@ -115,6 +115,9 @@ package "Molinex.ProductionManagement.Application" as Application {
     +Handle(query : GetRawMaterialReceptionByIdQuery, cancellationToken : CancellationToken) : Task<RawMaterialReception?>
     +Handle(query : GetAvailableProductionBatchesQuery, cancellationToken : CancellationToken) : Task<IEnumerable<ProductionBatch>>
     +Handle(query : GetProductionHistoryQuery, cancellationToken : CancellationToken) : Task<IEnumerable<ProductionRecord>>
+    +Handle(query : GetProductionRecordByIdQuery, cancellationToken : CancellationToken) : Task<ProductionRecord?>
+    +Handle(query : GetProductionBatchByIdQuery, cancellationToken : CancellationToken) : Task<ProductionBatch?>
+    +Handle(query : GetProductionRecordsQuery, cancellationToken : CancellationToken) : Task<IEnumerable<ProductionRecord>>
   }
   class ProductionCommandService <<Command Service>> {
     -receptionRepository : IRawMaterialReceptionRepository
@@ -166,6 +169,17 @@ package "Molinex.ProductionManagement.Domain.Model.Queries" as Queries {
   }
   class GetAvailableProductionBatchesQuery <<Query>>
   class GetProductionHistoryQuery <<Query>>
+  class GetProductionRecordByIdQuery <<Query>> {
+    +Id : long
+  }
+  class GetProductionBatchByIdQuery <<Query>> {
+    +Id : long
+  }
+  class GetProductionRecordsQuery <<Query>> {
+    +BatchId : long?
+    +From : DateTimeOffset?
+    +To : DateTimeOffset?
+  }
 }
 
 package "Molinex.ProductionManagement.Domain" as Domain {
@@ -283,6 +297,34 @@ package "Molinex.ProductionManagement.Infrastructure.Persistence.EntityFramework
   }
 }
 
+package "Molinex.ProductionManagement.Interfaces.Acl" as InterfacesAcl {
+  interface IProductionContextFacade <<Facade>> {
+    +ExistsProductionRecordById(productionRecordId : long, cancellationToken : CancellationToken) : Task<bool>
+    +ExistsProductionBatchById(productionBatchId : long, cancellationToken : CancellationToken) : Task<bool>
+    +FetchProductionRecordById(productionRecordId : long, cancellationToken : CancellationToken) : Task<ProductionRecordSummary?>
+    +FetchProductionRecords(productionBatchId : long?, from : DateTimeOffset?, to : DateTimeOffset?, cancellationToken : CancellationToken) : Task<IReadOnlyList<ProductionRecordSummary>>
+  }
+  class ProductionRecordSummary <<Read Contract>> {
+    +ProductionRecordId : long
+    +ProductionBatchId : long
+    +ProcessedWeightValue : decimal
+    +ProcessedWeightUnit : string
+    +StartedAt : DateTimeOffset
+  }
+}
+
+package "Molinex.ProductionManagement.Application.Acl" as ApplicationAcl {
+  class ProductionContextFacade <<Facade>> {
+    -queryService : IProductionQueryService
+    --
+    -{static} ToSummary(record : ProductionRecord) : ProductionRecordSummary
+  }
+}
+
+package "Molinex.QualityYieldControl.Application.Internal.OutboundServices.Acl (consumer, reference)" as QualityConsumer {
+  class ExternalProductionService <<ACL>>
+}
+
 package "Molinex.Shared (reference)" as SharedReference {
   abstract class AggregateRoot <<Shared Base Aggregate>>
   interface IEntityId<T> <<Shared Identifier Contract>>
@@ -393,4 +435,18 @@ ProductionRecordRepository --|> BaseRepository
 ModelBuilderExtensions ..> RawMaterialReception : maps
 ModelBuilderExtensions ..> ProductionBatch : maps
 ModelBuilderExtensions ..> ProductionRecord : maps
+
+IProductionQueryService ..> GetProductionRecordByIdQuery : handles
+IProductionQueryService ..> GetProductionBatchByIdQuery : handles
+IProductionQueryService ..> GetProductionRecordsQuery : handles
+ProductionContextFacade ..|> IProductionContextFacade
+ProductionContextFacade --> "1" IProductionQueryService : delegates queries to
+ProductionContextFacade ..> GetProductionRecordByIdQuery : creates
+ProductionContextFacade ..> GetProductionBatchByIdQuery : creates
+ProductionContextFacade ..> GetProductionRecordsQuery : creates
+ProductionContextFacade ..> ProductionRecord : reads to translate
+ProductionContextFacade ..> ProductionRecordSummary : creates
+IProductionContextFacade ..> ProductionRecordSummary : returns
+ExternalProductionService ..> IProductionContextFacade : calls
+ExternalProductionService ..> ProductionRecordSummary : reads
 @enduml

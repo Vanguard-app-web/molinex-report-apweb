@@ -114,12 +114,14 @@ package "Molinex.QualityYieldControl.Application" as Application {
     -assessmentRepository : IQualityAssessmentRepository
     -wasteRepository : IWasteRecordRepository
     -deviationRepository : IQualityDeviationRepository
+    -externalProductionService : IExternalProductionService
     -unitOfWork : IUnitOfWork
   }
   class QualityQueryService <<Query Service>> {
     -assessmentRepository : IQualityAssessmentRepository
     -wasteRepository : IWasteRecordRepository
     -deviationRepository : IQualityDeviationRepository
+    -externalProductionService : IExternalProductionService
   }
 }
 
@@ -198,6 +200,12 @@ package "Molinex.QualityYieldControl.Domain" as Domain {
   class ProductionRecordId <<Value Object>> {
     +Value : long
   }
+  class ProductionRecordReference <<Value Object>> {
+    +Id : ProductionRecordId
+    +ProductionBatchId : long
+    +ProcessedWeight : Weight
+    +StartedAt : DateTimeOffset
+  }
   class AssessmentDateTime <<Value Object>> {
     +Value : DateTimeOffset
   }
@@ -271,6 +279,39 @@ package "Molinex.QualityYieldControl.Infrastructure.Persistence.EntityFrameworkC
   class QualityDeviationRepository <<EF Core Repository>>
   class ModelBuilderExtensions <<EF Core Configuration>> {
     +{static} ApplyQualityYieldControlConfiguration(builder : ModelBuilder) : void
+  }
+}
+
+package "Molinex.QualityYieldControl.Application.OutboundServices.Acl" as OutboundAcl {
+  interface IExternalProductionService <<ACL>> {
+    +ExistsProductionRecord(productionRecordId : ProductionRecordId, cancellationToken : CancellationToken) : Task<bool>
+    +ExistsProductionBatch(productionBatchId : long, cancellationToken : CancellationToken) : Task<bool>
+    +FetchProductionRecord(productionRecordId : ProductionRecordId, cancellationToken : CancellationToken) : Task<ProductionRecordReference?>
+    +FetchProductionRecords(productionBatchId : long?, from : DateTimeOffset?, to : DateTimeOffset?, cancellationToken : CancellationToken) : Task<IReadOnlyList<ProductionRecordReference>>
+  }
+}
+
+package "Molinex.QualityYieldControl.Application.Internal.OutboundServices.Acl" as InternalAcl {
+  class ExternalProductionService <<ACL>> {
+    -productionContextFacade : IProductionContextFacade
+    --
+    -{static} ToReference(summary : ProductionRecordSummary) : ProductionRecordReference
+  }
+}
+
+package "Molinex.ProductionManagement.Interfaces.Acl (provider, reference)" as ProductionAcl {
+  interface IProductionContextFacade <<Facade>> {
+    +ExistsProductionRecordById(productionRecordId : long, cancellationToken : CancellationToken) : Task<bool>
+    +ExistsProductionBatchById(productionBatchId : long, cancellationToken : CancellationToken) : Task<bool>
+    +FetchProductionRecordById(productionRecordId : long, cancellationToken : CancellationToken) : Task<ProductionRecordSummary?>
+    +FetchProductionRecords(productionBatchId : long?, from : DateTimeOffset?, to : DateTimeOffset?, cancellationToken : CancellationToken) : Task<IReadOnlyList<ProductionRecordSummary>>
+  }
+  class ProductionRecordSummary <<Read Contract>> {
+    +ProductionRecordId : long
+    +ProductionBatchId : long
+    +ProcessedWeightValue : decimal
+    +ProcessedWeightUnit : string
+    +StartedAt : DateTimeOffset
   }
 }
 
@@ -389,4 +430,16 @@ QualityDeviationRepository --|> BaseRepository
 ModelBuilderExtensions ..> QualityAssessment : maps
 ModelBuilderExtensions ..> WasteRecord : maps
 ModelBuilderExtensions ..> QualityDeviation : maps
+
+QualityCommandService --> "1" IExternalProductionService : verifies production records through
+QualityQueryService --> "1" IExternalProductionService : reads production references through
+ExternalProductionService ..|> IExternalProductionService
+ExternalProductionService --> "1" IProductionContextFacade : calls
+ExternalProductionService ..> ProductionRecordSummary : reads
+ExternalProductionService ..> ProductionRecordReference : creates
+ExternalProductionService ..> ProductionRecordId : unwraps and creates
+IExternalProductionService ..> ProductionRecordReference : returns
+IProductionContextFacade ..> ProductionRecordSummary : returns
+ProductionRecordReference *-- "1" ProductionRecordId : identified by
+ProductionRecordReference *-- "1" Weight : processed weight
 @enduml

@@ -93,6 +93,7 @@ package "Molinex.OperationalIntelligence.Application" as Application {
     -alertRepository : IAlertRepository
     -notificationPort : INotificationPort
     -detectionService : AnomalyDetectionService
+    -externalMachineService : IExternalMachineService
     -unitOfWork : IUnitOfWork
   }
   class IntelligenceQueryService <<Query Service>> {
@@ -262,6 +263,26 @@ package "Molinex.OperationalIntelligence.Infrastructure.Integration" as Integrat
   }
 }
 
+package "Molinex.OperationalIntelligence.Application.OutboundServices.Acl (planned)" as OutboundAcl {
+  interface IExternalMachineService <<ACL>> {
+    +ExistsMachine(machineId : MachineId, cancellationToken : CancellationToken) : Task<bool>
+    +IsMachineOperational(machineId : MachineId, cancellationToken : CancellationToken) : Task<bool>
+  }
+}
+
+package "Molinex.OperationalIntelligence.Application.Internal.OutboundServices.Acl (planned)" as InternalAcl {
+  class ExternalMachineService <<ACL>> {
+    -assetMaintenanceContextFacade : IAssetMaintenanceContextFacade
+  }
+}
+
+package "Molinex.AssetMaintenanceManagement.Interfaces.Acl (planned provider, reference)" as MaintenanceAcl {
+  interface IAssetMaintenanceContextFacade <<Facade>> {
+    +ExistsMachineById(machineId : long, cancellationToken : CancellationToken) : Task<bool>
+    +FetchMachineStatusById(machineId : long, cancellationToken : CancellationToken) : Task<string>
+  }
+}
+
 package "Molinex.Shared (reference)" as SharedReference {
   abstract class AggregateRoot <<Shared Base Aggregate>>
   interface IEntityId<T> <<Shared Identifier Contract>>
@@ -372,4 +393,9 @@ ModelBuilderExtensions ..> Alert : maps
 SensorGatewayAdapter ..> SensorReadingResource : reads
 SensorGatewayAdapter ..> RegisterOperationalReadingCommand : creates
 NotificationDeliveryAdapter ..|> INotificationPort
+
+IntelligenceCommandService --> "1" IExternalMachineService : verifies monitored machines through
+ExternalMachineService ..|> IExternalMachineService
+ExternalMachineService --> "1" IAssetMaintenanceContextFacade : calls
+ExternalMachineService ..> MachineId : unwraps
 @enduml
