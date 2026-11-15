@@ -10,9 +10,11 @@ Este documento registra las decisiones y los contratos necesarios para implement
 | Operational Intelligence | Asset and Maintenance Management | Verificar que la máquina de una lectura existe y está operativa antes de evaluar anomalías. | **ACL (planificada)** |
 | Asset and Maintenance Management | Identity and Access Management | `TechnicianReference` guarda la identidad del técnico. | Sin ACL: la identidad llega en el principal autenticado; se conserva como referencia por identidad. |
 | Asset and Maintenance Management | Operational Intelligence | `AnomalyReference` opcional en el mantenimiento. | Sin ACL: referencia por identidad opcional, sin consulta síncrona. Evita además una dependencia cíclica con la ACL planificada. |
-| Reporting and Analytics | Contextos operativos | Proyecciones de lectura. | Sin ACL: consume eventos de dominio en `Reporting Projection Handlers`; sus read models ya aíslan el modelo. |
+| Reporting and Analytics | Production, Quality, Asset and Maintenance, Operational Intelligence | Alimentar proyecciones de lectura con los eventos de dominio de los contextos operativos sin depender de sus tipos de evento. | **ACL basada en eventos (diseño propuesto)**: traduce mensajes entrantes a un lenguaje publicado; no usa facade. |
 | Production / Quality | Shared Kernel | `Weight`, `MeasurementUnit`. | Sin ACL: Shared Kernel explícito. |
 | Commercial Engagement, Identity and Access Management | — | No consumen otros contextos. | Sin ACL. |
+
+Hay, por tanto, tres ACL de dos estilos: dos **síncronas con facade** (Quality → Production y, planificada, Operational Intelligence → Asset and Maintenance) y una **basada en eventos** (Reporting and Analytics).
 
 ## 2. Estado actual frente al diseño
 
@@ -33,6 +35,7 @@ Se sigue la convención de `learning-center-platform` (`Profiles` → `Publishin
 | Implementación del facade (proveedor) | `<Provider>/Application/Acl` | `Profiles/Application/Acl/ProfilesContextFacade` |
 | Adaptador ACL (consumidor) | `<Consumer>/Application/Internal/OutboundServices/Acl` | `Publishing/Application/Internal/OutboundServices/Acl/ExternalProfileService` |
 | Puerto saliente del adaptador (consumidor) | `<Consumer>/Application/OutboundServices/Acl` | Añadido en Molinex para que los servicios dependan de una interfaz, igual que con `IQualityCommandService`. |
+| Traductor de eventos entrantes (consumidor) | `<Consumer>/Infrastructure/Messaging` | Sin equivalente en la referencia; propio de la ACL basada en eventos de Reporting. |
 
 Los diagramas usan el prefijo `Molinex.<Context>`; en el código corresponde a `Molinex.Platform.<Context>` (por ejemplo `Molinex.Platform.QualityAndYieldControl`).
 
@@ -42,6 +45,7 @@ Los diagramas usan el prefijo `Molinex.<Context>`; en el código corresponde a `
 |---|---|---|---|---|---|---|
 | Quality and Yield Control | Production Management | `IExternalProductionService` / `ExternalProductionService` | `IProductionContextFacade` / `ProductionContextFacade` | `ProductionRecordSummary` `<<Read Contract>>` (proveedor); `ProductionRecordReference` y `ProductionRecordId` (modelo del consumidor) | `ProductionRecordId : long`, `ProductionBatchId : long`, `ProcessedWeightValue : decimal`, `ProcessedWeightUnit : string`, `StartedAt : DateTimeOffset` | Facade: `ExistsProductionRecordById`, `ExistsProductionBatchById`, `FetchProductionRecordById`, `FetchProductionRecords`. ACL: `ExistsProductionRecord`, `ExistsProductionBatch`, `FetchProductionRecord`, `FetchProductionRecords` |
 | Operational Intelligence *(planificada)* | Asset and Maintenance Management | `IExternalMachineService` / `ExternalMachineService` | `IAssetMaintenanceContextFacade` / `AssetMaintenanceContextFacade` | Solo primitivos; sin contrato de lectura | `machineId : long`, estado de máquina como `string` | Facade: `ExistsMachineById`, `FetchMachineStatusById`. ACL: `ExistsMachine`, `IsMachineOperational` |
+| Reporting and Analytics *(basada en eventos, propuesta)* | Production, Quality, Asset and Maintenance, Operational Intelligence | `PublishedDomainEventAssembler` (invocado por `DomainEventMessageHandler`) | No aplica: el proveedor solo publica eventos | `DomainEventMessage` `<<Integration Message>>` (entrada); `PublishedDomainEvent` `<<Published Language>>` (modelo del consumidor) | `EventName`, `SourceContext`, `AggregateReference : long`, `OccurredAt`, `PayloadVersion`, `Payload : IReadOnlyDictionary<string, string>` | `DomainEventMessageHandler.Handle`, `PublishedDomainEventAssembler.ToPublishedLanguage`, `ReportingProjectionHandler.Handle` |
 
 ### 4.1 Quality and Yield Control → Production Management
 
@@ -98,6 +102,16 @@ Uso: `QualityCommandService` llama `ExistsProductionRecord` antes de registrar e
 - `OperationalIntelligence/Application/OutboundServices/Acl/IExternalMachineService`: `ExistsMachine(MachineId)`, `IsMachineOperational(MachineId)`.
 - `OperationalIntelligence/Application/Internal/OutboundServices/Acl/ExternalMachineService`: desempaqueta su propio `MachineId` y convierte el estado recibido en una decisión booleana; Operational Intelligence no conoce `MachineStatus`.
 
+### 4.3 Reporting and Analytics ← contextos operativos (basada en eventos, propuesta)
+
+Reporting no consulta a otros contextos; reacciona a sus eventos. La ACL está en el borde de entrada, en `ReportingAnalytics/Infrastructure/Messaging`:
+
+1. `DomainEventMessageHandler` recibe el `DomainEventMessage` (mensaje plano, sin tipos de dominio del emisor).
+2. `PublishedDomainEventAssembler.ToPublishedLanguage` lo traduce a `PublishedDomainEvent`, el lenguaje publicado definido en el dominio de Reporting.
+3. `DomainEventMessageHandler` lo publica mediante `IMediator`; `ReportingProjectionHandler` lo entrega a `IReportingProjectionService`, que actualiza `MetricProjection`.
+
+Reporting nunca referencia `ProductionInformationRecorded`, `QualityAssessmentRecorded` ni ningún otro evento, agregado o repositorio de los contextos emisores; solo conoce `SourceContext` y `EventName` como texto. El módulo Reporting and Analytics aún no existe en el backend de referencia, por lo que esta ACL es diseño propuesto.
+
 ## 5. Reglas de dependencia
 
 1. Un contexto consumidor solo puede referenciar `<Provider>.Interfaces.Acl`.
@@ -105,17 +119,18 @@ Uso: `QualityCommandService` llama `ExistsProductionRecord` antes de registrar e
 3. El facade depende de los servicios de consulta/comando de su propio contexto, no de repositorios ni de `AppDbContext`.
 4. Los contratos publicados usan primitivos o records planos; nunca agregados, entidades ni value objects del proveedor.
 5. Registro en DI previsto: `IProductionContextFacade → ProductionContextFacade` e `IExternalProductionService → ExternalProductionService`, ambos `Scoped`.
+6. En la ACL basada en eventos, solo `Infrastructure/Messaging` conoce `DomainEventMessage`; Application y Domain de Reporting trabajan únicamente con `PublishedDomainEvent`.
 
 ## 6. Representación en los diagramas
 
-- **C4 nivel 3**: componentes con tag `ACL` (color propio) en Production (`Production Context Facade Contract`, `Production Context Facade`) y Quality (`External Production Service`); los equivalentes planificados en Asset and Maintenance y Operational Intelligence llevan además el tag `Planned` (borde discontinuo). Cada vista incluye el componente del otro contexto para mostrar consumidor, proveedor y dirección.
-- **Vista general del backend**: relaciones `Quality and Yield Control → Production Management` y `Operational Intelligence → Asset and Maintenance Management` (esta última rotulada *Planned*). No se crean contenedores ni sistemas nuevos.
-- **Diagramas de clases**: paquetes `Interfaces.Acl`, `Application.Acl`, `Application.OutboundServices.Acl` y `Application.Internal.OutboundServices.Acl` con estereotipos `<<Facade>>`, `<<Read Contract>>` y `<<ACL>>`; el contexto externo aparece solo como paquete *reference* con su contrato publicado.
+- **C4 nivel 3**: componentes con tag `ACL` (color propio) en Production (`Production Context Facade Contract`, `Production Context Facade`) y Quality (`External Production Service`); los equivalentes planificados en Asset and Maintenance y Operational Intelligence llevan además el tag `Planned` (borde discontinuo). Cada vista incluye el componente del otro contexto para mostrar consumidor, proveedor y dirección. En Reporting, el componente `Published Event Translator` (tag `ACL`) recibe los eventos de los cuatro módulos operativos y entrega `PublishedDomainEvent` a `Reporting Projection Handlers`.
+- **Vista general del backend**: relaciones `Quality and Yield Control → Production Management` y `Operational Intelligence → Asset and Maintenance Management` (esta última rotulada *Planned*), más las cuatro relaciones de eventos en proceso de los módulos operativos hacia `Reporting and Analytics`. No se crean contenedores ni sistemas nuevos.
+- **Diagramas de clases**: paquetes `Interfaces.Acl`, `Application.Acl`, `Application.OutboundServices.Acl` y `Application.Internal.OutboundServices.Acl` con estereotipos `<<Facade>>`, `<<Read Contract>>` y `<<ACL>>`; el contexto externo aparece solo como paquete *reference* con su contrato publicado. En Reporting, `PublishedDomainEventAssembler` usa el mismo estereotipo `<<ACL>>` (antes `<<Anti-Corruption Layer>>`).
 
 ## 7. Progreso
 
-- **Decisiones**: dos ACL (una vigente, una planificada); el resto de integraciones se mantiene sin ACL con su justificación (sección 1).
-- **Archivos**: `backend-components.dsl`, `relationships.dsl`, `views.dsl`, `workspace.dsl`; SVG C4 de overview, production, quality, asset-maintenance y operational-intelligence; `.puml` y `.svg` de clases de esos cuatro contextos; párrafos afectados del `README.md`; este documento.
-- **Verificaciones**: `structurizr-cli` 2025.11.09 exportó el workspace sin errores (`plantuml/structurizr`); PlantUML 1.2026.2 `-checkonly` sin errores en los cuatro `.puml`; SVG regenerados e inspeccionados visualmente.
+- **Decisiones**: tres ACL: Quality → Production (vigente), Operational Intelligence → Asset and Maintenance (planificada) y la ACL basada en eventos de Reporting (propuesta). Corrección: una versión anterior de este documento declaraba Reporting "sin ACL", en contradicción con su diagrama de clases; la decisión quedó unificada en documentación, C4 y clases.
+- **Archivos**: `backend-components.dsl`, `relationships.dsl`, `views.dsl`, `workspace.dsl`; SVG C4 de overview, production, quality, asset-maintenance, operational-intelligence y reporting; `.puml` y `.svg` de clases de esos cinco contextos; párrafos afectados del `README.md`; este documento.
+- **Verificaciones**: `structurizr-cli` 2025.11.09 exportó el workspace sin errores (`plantuml/structurizr`); PlantUML 1.2026.2 `-checkonly` sin errores en los cinco `.puml`; SVG regenerados e inspeccionados visualmente.
 - **Bloqueos**: ninguno. Nota: los SVG C4 regenerados muestran la descripción de la vista bajo el título porque esta versión del exportador la incluye.
 - **Siguiente paso**: implementar la sección 4.1 en el backend (facade, contrato de lectura, ACL y registro en DI) y eliminar el acceso de Quality a `ProductionRecord` y `IProductionQueries`.
