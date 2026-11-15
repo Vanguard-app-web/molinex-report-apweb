@@ -156,6 +156,26 @@ La Web Application se desarrolló mediante ramas `feature/*`, Pull Requests haci
 
 **Figura:** GitHub Insights del repositorio `molinex-webapp` durante TB1. Fuente: elaboración propia a partir de GitHub.
 
+## AV2
+
+Para AV2, el equipo desarrolló el backend de Molinex Web en C# y ASP.NET Core, documentó su API con OpenAPI y Scalar, y publicó el backend en Azure App Service. El informe del Sprint 3 registra las pruebas de la API y la evidencia de despliegue.
+
+| Integrante | Contribución principal en AV2 |
+| --- | --- |
+| **Antony Alexander Jimenez Saavedra** | Implementó el registro de maquinaria y las intervenciones de mantenimiento. Documentó la verificación de TS-03. |
+| **Luisa Nhiriel Casalino Berrocal** | Implementó las evaluaciones de calidad, el registro de merma y las consultas de rendimiento y composición por lote. |
+| **Giovanni Marcelo Gallegos De La Cruz** | Integró Producción e IAM en el backend y documentó la API con OpenAPI y Scalar. |
+| **Brayan Benjamin Huerta Cardenas** | Actualizó los diagramas C4 y de clases del backend y documentó los contratos y las capas anticorrupción. |
+| **Fabricio Jose Rivera Rupay** | Alineó los diagramas C4 y el esquema MySQL con la implementación y preparó la configuración de Docker. |
+
+El equipo organizó los cambios del backend mediante ramas `feature/*` y Conventional Commits. Las gráficas de GitHub Insights muestran las contribuciones de los cinco integrantes en `main` durante los últimos tres meses de la consulta. El conteo excluye los commits de merge.
+
+![Contribuciones al backend de Molinex Web para AV2](assets/evidence/sprint-3/collaboration/backend-contributors.png)
+
+![Comparación de commits del backend de Molinex Web para AV2](assets/evidence/sprint-3/collaboration/backend-top-committers.png)
+
+**Figura.** GitHub Insights del repositorio `molinex-backend`. Las vistas **Contributors** y **Top committers** muestran el historial y el conteo por integrante.
+
 <div style="page-break-after: always;"></div>
 
 ## Contenido
