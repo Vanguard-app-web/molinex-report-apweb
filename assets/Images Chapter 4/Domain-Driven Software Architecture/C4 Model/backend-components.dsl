@@ -101,6 +101,9 @@ group "Production Management" {
         productionRecordInterfaces = component "Production Record REST Interface" "ProductionRecordsController, resources and assemblers expose production-record operations and history." "ASP.NET Core Web API" {
             tags "Backend Interfaces"
         }
+        productionAclInterface = component "Production Context Facade Contract" "IProductionContextFacade is the only contract published to other bounded contexts; ProductionRecordSummary is its read contract and carries primitive values only." "C# ACL Interface and Read Contract" {
+            tags "Backend Interfaces" "ACL"
+        }
     }
     group "Application" {
         productionCommandServices = component "Production Command Services" "IProductionCommandService defines the application contract; ProductionCommandService coordinates reception, batch and production-record commands." "C# Service Interface and Internal Implementation" {
@@ -108,6 +111,9 @@ group "Production Management" {
         }
         productionQueryServices = component "Production Query Services" "IProductionQueryService defines the query contract; ProductionQueryService answers process, availability and production-history queries." "C# Service Interface and Internal Implementation" {
             tags "Backend Application Layer"
+        }
+        productionContextFacade = component "Production Context Facade" "ProductionContextFacade implements IProductionContextFacade, delegates to IProductionQueryService and translates ProductionBatch and ProductionRecord into ProductionRecordSummary without exposing aggregates or repositories." "C# ACL Facade" {
+            tags "Backend Application Layer" "ACL"
         }
     }
     group "Domain" {
@@ -141,6 +147,9 @@ group "Quality and Yield Control" {
         qualityQueryServices = component "Quality Query Services" "IQualityQueryService defines the query contract; QualityQueryService answers quality-result, yield-indicator and comparison queries." "C# Service Interface and Internal Implementation" {
             tags "Backend Application Layer"
         }
+        qualityProductionAcl = component "External Production Service" "IExternalProductionService is the outbound port; ExternalProductionService is the anti-corruption layer that calls IProductionContextFacade and translates ProductionRecordSummary into ProductionRecordId and ProductionRecordReference." "C# Outbound Service (ACL Adapter)" {
+            tags "Backend Application Layer" "ACL"
+        }
     }
     group "Domain" {
         qualityDomain = component "Quality Model and Ports" "QualityAssessment, WasteRecord, QualityDeviation, YieldIndicator and RiceComposition model quality; IQualityAssessmentRepository, IWasteRecordRepository and IQualityDeviationRepository define persistence ports." "C# Domain Model and Repository Interfaces" {
@@ -162,6 +171,9 @@ group "Asset and Maintenance Management" {
         maintenanceRecordInterfaces = component "Maintenance Record REST Interface" "MaintenanceRecordsController, resources and assemblers expose preventive, corrective and history operations." "ASP.NET Core Web API" {
             tags "Backend Interfaces"
         }
+        maintenanceAclInterface = component "Asset Maintenance Context Facade Contract" "Planned. IAssetMaintenanceContextFacade publishes machine existence and operational status to other bounded contexts using primitive values only." "C# ACL Interface" {
+            tags "Backend Interfaces" "ACL" "Planned"
+        }
     }
     group "Application" {
         maintenanceCommandServices = component "Maintenance Command Services" "IMaintenanceCommandService defines the application contract; MaintenanceCommandService coordinates machine registration and maintenance recording." "C# Service Interface and Internal Implementation" {
@@ -169,6 +181,9 @@ group "Asset and Maintenance Management" {
         }
         maintenanceQueryServices = component "Maintenance Query Services" "IMaintenanceQueryService defines the query contract; MaintenanceQueryService answers machine status, inventory and maintenance-history queries." "C# Service Interface and Internal Implementation" {
             tags "Backend Application Layer"
+        }
+        maintenanceContextFacade = component "Asset Maintenance Context Facade" "Planned. AssetMaintenanceContextFacade implements IAssetMaintenanceContextFacade, delegates to IMaintenanceQueryService and translates Machine into primitive values." "C# ACL Facade" {
+            tags "Backend Application Layer" "ACL" "Planned"
         }
     }
     group "Domain" {
@@ -198,6 +213,9 @@ group "Operational Intelligence" {
         }
         intelligenceQueryServices = component "Operational Intelligence Query Services" "IIntelligenceQueryService defines the query contract; IntelligenceQueryService answers history, anomaly, alert and recommendation queries." "C# Service Interface and Internal Implementation" {
             tags "Backend Application Layer"
+        }
+        intelligenceMachineAcl = component "External Machine Service" "Planned. IExternalMachineService is the outbound port; ExternalMachineService is the anti-corruption layer that calls IAssetMaintenanceContextFacade and translates its answers into MachineId checks." "C# Outbound Service (ACL Adapter)" {
+            tags "Backend Application Layer" "ACL" "Planned"
         }
     }
     group "Domain" {

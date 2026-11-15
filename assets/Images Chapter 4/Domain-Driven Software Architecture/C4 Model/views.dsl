@@ -98,7 +98,7 @@ component molinex.apiApplication "MolinexBackendComponents" {
     include molinex.landingPage molinex.webApplication molinex.database
     autoLayout lr
     title "Molinex Backend - Component Overview by Bounded Context"
-    description "Core, supporting and generic bounded contexts, the Shared Kernel, clients and persistence of the modular monolith."
+    description "Core, supporting and generic bounded contexts, the Shared Kernel, clients, persistence and the anti-corruption layer integrations of the modular monolith."
 }
 
 component molinex.apiApplication "MolinexBackendCommercial" {
@@ -124,8 +124,11 @@ component molinex.apiApplication "MolinexBackendProduction" {
     include molinex.apiApplication.productionRecordInterfaces molinex.apiApplication.productionCommandServices
     include molinex.apiApplication.productionQueryServices molinex.apiApplication.productionDomain
     include molinex.apiApplication.productionInfrastructure
+    include molinex.apiApplication.productionAclInterface molinex.apiApplication.productionContextFacade
+    include molinex.apiApplication.qualityProductionAcl
     autoLayout tb
     title "Molinex Backend - Production Management Components"
+    description "Production Management publishes IProductionContextFacade; the Quality and Yield Control ACL is its only cross-context consumer."
 }
 component molinex.apiApplication "MolinexBackendQuality" {
     include molinex.webApplication molinex.database
@@ -133,24 +136,31 @@ component molinex.apiApplication "MolinexBackendQuality" {
     include molinex.apiApplication.yieldAnalysisInterfaces molinex.apiApplication.qualityCommandServices
     include molinex.apiApplication.qualityQueryServices molinex.apiApplication.qualityDomain
     include molinex.apiApplication.qualityInfrastructure
+    include molinex.apiApplication.qualityProductionAcl molinex.apiApplication.productionAclInterface
     autoLayout tb
     title "Molinex Backend - Quality and Yield Control Components"
+    description "Quality and Yield Control reaches Production Management only through its ACL and the published Production context facade contract."
 }
 component molinex.apiApplication "MolinexBackendMaintenance" {
     include molinex.webApplication molinex.database
     include molinex.apiApplication.machineInterfaces molinex.apiApplication.maintenanceRecordInterfaces
     include molinex.apiApplication.maintenanceCommandServices molinex.apiApplication.maintenanceQueryServices
     include molinex.apiApplication.maintenanceDomain molinex.apiApplication.maintenanceInfrastructure
+    include molinex.apiApplication.maintenanceAclInterface molinex.apiApplication.maintenanceContextFacade
+    include molinex.apiApplication.intelligenceMachineAcl
     autoLayout tb
     title "Molinex Backend - Asset and Maintenance Management Components"
+    description "Planned integration: Asset and Maintenance Management publishes IAssetMaintenanceContextFacade for the Operational Intelligence ACL."
 }
 component molinex.apiApplication "MolinexBackendIntelligence" {
     include molinex.webApplication sensorGateway notificationService molinex.database
     include molinex.apiApplication.telemetryIngestionInterfaces molinex.apiApplication.monitoringInterfaces
     include molinex.apiApplication.intelligenceCommandServices molinex.apiApplication.intelligenceQueryServices
     include molinex.apiApplication.intelligenceDomain molinex.apiApplication.intelligenceInfrastructure
+    include molinex.apiApplication.intelligenceMachineAcl molinex.apiApplication.maintenanceAclInterface
     autoLayout tb
     title "Molinex Backend - Operational Intelligence Components"
+    description "Planned integration: Operational Intelligence reaches Asset and Maintenance Management only through its ACL and the published facade contract."
 }
 component molinex.apiApplication "MolinexBackendReporting" {
     include molinex.webApplication molinex.database
