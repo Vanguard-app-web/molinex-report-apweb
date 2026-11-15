@@ -2918,7 +2918,7 @@ La sugerencia de añadir precios a la recepción de materia prima, registrada en
 
 ### 5.4. Video About-the-Product.
 
-
+El video About-the-Product de Molinex presenta el producto desarrollado para el curso de Aplicaciones Web. [Ver el video en Microsoft Stream](https://upcedupe-my.sharepoint.com/:v:/g/personal/u202420031_upc_edu_pe/IQDe6HjgK534RoKJUdNr7jlUAaKKxeSuLTrz5p0nxDTC_Kw?email=U202424008%40upc.edu.pe&e=iyXU9p&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D).
 
 # Conclusiones
 
