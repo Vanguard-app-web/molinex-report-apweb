@@ -1,23 +1,24 @@
 @startuml
 left to right direction
+hide empty members
 
-package "Molinex.AssetMaintenanceManagement.Interfaces.REST" as Interfaces {
+package "Molinex.AssetMaintenanceManagement.Interfaces.Rest" as Interfaces {
   class MachinesController <<REST Controller>> {
-    +Create(resource : RegisterMachineResource) : ActionResult
-    +UpdateStatus(id : Guid, resource : ChangeMachineStatusResource) : ActionResult
-    +GetAll() : ActionResult
+    -commandService : IMaintenanceCommandService
+    -queryService : IMaintenanceQueryService
+    --
+    +Create(resource : RegisterMachineResource, cancellationToken : CancellationToken) : Task<IActionResult>
+    +ChangeStatus(id : long, resource : ChangeMachineStatusResource, cancellationToken : CancellationToken) : Task<IActionResult>
+    +GetAll(cancellationToken : CancellationToken) : Task<IActionResult>
   }
   class MaintenanceRecordsController <<REST Controller>> {
-    +Create(resource : RecordMaintenanceResource) : ActionResult
-    +GetHistory(machineId : Guid?) : ActionResult
+    -commandService : IMaintenanceCommandService
+    -queryService : IMaintenanceQueryService
+    --
+    +Create(resource : RecordMaintenanceResource, cancellationToken : CancellationToken) : Task<IActionResult>
+    +GetHistory(machineId : long, cancellationToken : CancellationToken) : Task<IActionResult>
   }
-  class MaintenanceResourceAssembler <<Assembler>> {
-    +{static} ToCommand(resource : RegisterMachineResource) : RegisterMachineCommand
-    +{static} ToCommand(id : Guid, resource : ChangeMachineStatusResource) : ChangeMachineStatusCommand
-    +{static} ToCommand(resource : RecordMaintenanceResource) : RecordMaintenanceCommand
-    +{static} ToResource(model : Machine) : MachineResource
-    +{static} ToResource(model : MaintenanceRecord) : MaintenanceRecordResource
-  }
+
   class RegisterMachineResource <<Request Resource>> <<(R,#FF7700)>> {
     +Code : string
     +Name : string
@@ -28,16 +29,20 @@ package "Molinex.AssetMaintenanceManagement.Interfaces.REST" as Interfaces {
     +ChangedAt : DateTimeOffset
   }
   class RecordMaintenanceResource <<Request Resource>> <<(R,#FF7700)>> {
-    +MachineId : Guid
+    +MachineId : long
     +Type : string
     +PerformedAt : DateTimeOffset
     +Description : string
-    +TechnicianId : Guid
+    +TechnicianId : long
     +TechnicianName : string
-    +AnomalyId : Guid?
+    +AnomalyId : long?
+    +Failure : string?
+    +Cause : string?
+    +ActionTaken : string?
+    +DowntimeMinutes : long?
   }
   class MachineResource <<Response Resource>> <<(R,#FF7700)>> {
-    +Id : Guid
+    +Id : long
     +Code : string
     +Name : string
     +Model : string
@@ -45,126 +50,180 @@ package "Molinex.AssetMaintenanceManagement.Interfaces.REST" as Interfaces {
     +StatusChangedAt : DateTimeOffset
   }
   class MaintenanceRecordResource <<Response Resource>> <<(R,#FF7700)>> {
-    +Id : Guid
-    +MachineId : Guid
+    +Id : long
+    +MachineId : long
     +Type : string
     +PerformedAt : DateTimeOffset
     +Description : string
-    +TechnicianId : Guid
+    +TechnicianId : long
     +TechnicianName : string
-    +AnomalyId : Guid?
+    +AnomalyId : long?
+    +Failure : string?
+    +Cause : string?
+    +ActionTaken : string?
+    +DowntimeMinutes : long?
+  }
+
+  class RegisterMachineCommandFromResourceAssembler <<Assembler>> {
+    +{static} ToCommandFromResource(resource : RegisterMachineResource) : RegisterMachineCommand
+  }
+  class ChangeMachineStatusCommandFromResourceAssembler <<Assembler>> {
+    +{static} ToCommandFromResource(machineId : long, resource : ChangeMachineStatusResource) : ChangeMachineStatusCommand
+  }
+  class RecordMaintenanceCommandFromResourceAssembler <<Assembler>> {
+    +{static} ToCommandFromResource(resource : RecordMaintenanceResource) : RecordMaintenanceCommand
+  }
+  class MachineResourceFromEntityAssembler <<Assembler>> {
+    +{static} ToResourceFromEntity(entity : Machine) : MachineResource
+  }
+  class MaintenanceRecordResourceFromEntityAssembler <<Assembler>> {
+    +{static} ToResourceFromEntity(entity : MaintenanceRecord) : MaintenanceRecordResource
   }
 }
 
 package "Molinex.AssetMaintenanceManagement.Application" as Application {
+  interface IMaintenanceCommandService <<Command Service>> {
+    +Handle(command : RegisterMachineCommand, cancellationToken : CancellationToken) : Task<Result<MachineId>>
+    +Handle(command : ChangeMachineStatusCommand, cancellationToken : CancellationToken) : Task<Result<MachineId>>
+    +Handle(command : RecordMaintenanceCommand, cancellationToken : CancellationToken) : Task<Result<MaintenanceRecordId>>
+  }
+  interface IMaintenanceQueryService <<Query Service>> {
+    +Handle(query : GetMachinesQuery, cancellationToken : CancellationToken) : Task<IEnumerable<Machine>>
+    +Handle(query : GetMachineByIdQuery, cancellationToken : CancellationToken) : Task<Machine?>
+    +Handle(query : GetMaintenanceHistoryQuery, cancellationToken : CancellationToken) : Task<IEnumerable<MaintenanceRecord>>
+  }
   class MaintenanceCommandService <<Command Service>> {
-    +HandleAsync(command : RegisterMachineCommand) : Task<MachineId>
-    +HandleAsync(command : ChangeMachineStatusCommand) : Task
-    +HandleAsync(command : RecordMaintenanceCommand) : Task<MaintenanceRecordId>
+    -machineRepository : IMachineRepository
+    -maintenanceRepository : IMaintenanceRecordRepository
+    -unitOfWork : IUnitOfWork
   }
   class MaintenanceQueryService <<Query Service>> {
-    +GetMachinesAsync() : Task<Machine[]>
-    +GetMachineStatusAsync(id : MachineId) : Task<Machine?>
-    +GetHistoryAsync(machineId : MachineId?) : Task<MaintenanceRecord[]>
+    -machineRepository : IMachineRepository
+    -maintenanceRepository : IMaintenanceRecordRepository
   }
+}
+
+package "Molinex.AssetMaintenanceManagement.Domain.Model.Commands" as Commands {
   class RegisterMachineCommand <<Command>> {
     +Code : string
     +Name : string
     +Model : string
   }
   class ChangeMachineStatusCommand <<Command>> {
-    +MachineId : Guid
+    +MachineId : long
     +Status : string
     +ChangedAt : DateTimeOffset
   }
   class RecordMaintenanceCommand <<Command>> {
-    +MachineId : Guid
+    +MachineId : long
     +Type : string
     +PerformedAt : DateTimeOffset
     +Description : string
-    +TechnicianId : Guid
+    +TechnicianId : long
     +TechnicianName : string
-    +AnomalyId : Guid?
+    +AnomalyId : long?
+    +Failure : string?
+    +Cause : string?
+    +ActionTaken : string?
+    +DowntimeMinutes : long?
   }
 }
 
-package "Molinex.AssetMaintenanceManagement.Domain.Model" as DomainModel {
+package "Molinex.AssetMaintenanceManagement.Domain.Model.Queries" as Queries {
+  class GetMachinesQuery <<Query>>
+  class GetMachineByIdQuery <<Query>> {
+    +MachineId : long
+  }
+  class GetMaintenanceHistoryQuery <<Query>> {
+    +MachineId : long
+  }
+}
+
+package "Molinex.AssetMaintenanceManagement.Domain" as Domain {
   class Machine <<Aggregate Root>> {
-    -_id : MachineId
-    -_code : MachineCode
-    -_name : MachineName
-    -_model : MachineModel
-    -_status : MachineStatus
-    -_statusChangedAt : StatusChangeDateTime
-    +Register(code, name, model) : Machine
-    +ChangeStatus(status, changedAt) : void
+    +Id : MachineId
+    +Code : MachineCode
+    +Name : MachineName
+    +Model : MachineModel
+    +Status : MachineStatus
+    +StatusChangedAt : StatusChangeDateTime
+    --
+    +{static} Register(code, name, model) : Machine
+    +ChangeStatus(status : MachineStatus, changedAt : StatusChangeDateTime) : void
   }
   class MaintenanceRecord <<Aggregate Root>> {
-    -_id : MaintenanceRecordId
-    -_machineId : MachineId
-    -_type : MaintenanceType
-    -_performedAt : MaintenanceDateTime
-    -_description : MaintenanceDescription
-    -_responsible : TechnicianReference
-    -_anomalyReference : AnomalyReference?
-    +RecordPreventive(...) : MaintenanceRecord
-    +RecordCorrective(...) : MaintenanceRecord
+    +Id : MaintenanceRecordId
+    +MachineId : MachineId
+    +Type : MaintenanceType
+    +PerformedAt : MaintenanceDateTime
+    +Description : MaintenanceDescription
+    +Responsible : TechnicianReference
+    +AnomalyReference : AnomalyReference?
+    +CorrectiveDetails : CorrectiveMaintenanceDetails?
+    --
+    +{static} RecordPreventive(machineId, performedAt, description, responsible) : MaintenanceRecord
+    +{static} RecordCorrective(machineId, performedAt, description, responsible, anomaly, details) : MaintenanceRecord
   }
+
   class MachineId <<Value Object>> {
-    -_value : Guid
+    +Value : long
   }
   class MaintenanceRecordId <<Value Object>> {
-    -_value : Guid
+    +Value : long
   }
   class MachineCode <<Value Object>> {
-    -_value : string
+    +Value : string
   }
   class MachineName <<Value Object>> {
-    -_value : string
+    +Value : string
   }
   class MachineModel <<Value Object>> {
-    -_value : string
+    +Value : string
   }
   class StatusChangeDateTime <<Value Object>> {
-    -_value : DateTimeOffset
+    +Value : DateTimeOffset
   }
   class MaintenanceDateTime <<Value Object>> {
-    -_value : DateTimeOffset
+    +Value : DateTimeOffset
   }
   class MaintenanceDescription <<Value Object>> {
-    -_value : string
+    +Value : string
+    --
     +IsBlank() : bool
   }
   class TechnicianReference <<Value Object>> {
-    -_principalId : Guid
-    -_displayName : string
+    +PrincipalId : long
+    +DisplayName : string
   }
   class AnomalyReference <<Value Object>> {
-    -_anomalyId : Guid
+    +AnomalyId : long
+  }
+  class CorrectiveMaintenanceDetails <<Value Object>> {
+    +Failure : string
+    +Cause : string
+    +ActionTaken : string
+    +DowntimeMinutes : long
+    --
+    +HasValidDowntime() : bool
   }
   enum MachineStatus <<Enumeration>> {
-    OPERATIONAL
-    REQUIRES_ATTENTION
-    UNDER_MAINTENANCE
-    OUT_OF_SERVICE
+    Operational
+    RequiresAttention
+    UnderMaintenance
+    OutOfService
   }
   enum MaintenanceType <<Enumeration>> {
-    PREVENTIVE
-    CORRECTIVE
+    Preventive
+    Corrective
   }
+
   interface IMachineRepository <<Repository>> {
-    +SaveAsync(machine : Machine) : Task
-    +FindByIdAsync(id : MachineId) : Task<Machine?>
-    +ExistsByCodeAsync(code : MachineCode) : Task<bool>
+    +ExistsByCodeAsync(code : MachineCode, cancellationToken : CancellationToken) : Task<bool>
   }
   interface IMaintenanceRecordRepository <<Repository>> {
-    +SaveAsync(record : MaintenanceRecord) : Task
-    +FindByIdAsync(id : MaintenanceRecordId) : Task<MaintenanceRecord?>
-    +FindByMachineIdAsync(id : MachineId) : Task<MaintenanceRecord[]>
+    +FindByMachineIdAsync(machineId : MachineId, cancellationToken : CancellationToken) : Task<IEnumerable<MaintenanceRecord>>
   }
-  interface IDomainEventPublisher <<Port>> {
-    +PublishAsync(event : object) : Task
-  }
+
   class MachineRegistered <<Domain Event>> {
     +MachineId : MachineId
     +OccurredAt : DateTimeOffset
@@ -181,74 +240,98 @@ package "Molinex.AssetMaintenanceManagement.Domain.Model" as DomainModel {
   }
 }
 
-package "Molinex.AssetMaintenanceManagement.Infrastructure.Persistence.EFC" as Infrastructure {
-  class MaintenanceDbContext <<EF Core DbContext>> {
-    +Machines : DbSet<Machine>
-    +MaintenanceRecords : DbSet<MaintenanceRecord>
-    +SaveChangesAsync() : Task<int>
+package "Molinex.AssetMaintenanceManagement.Infrastructure.Persistence.EntityFrameworkCore" as Infrastructure {
+  class MachineRepository <<EF Core Repository>> {
+    +ExistsByCodeAsync(code : MachineCode, cancellationToken : CancellationToken) : Task<bool>
   }
-  class MachineRepositoryAdapter <<Repository Adapter>> {
-    -_context : MaintenanceDbContext
-    +SaveAsync(machine : Machine) : Task
-    +FindByIdAsync(id : MachineId) : Task<Machine?>
-    +ExistsByCodeAsync(code : MachineCode) : Task<bool>
+  class MaintenanceRecordRepository <<EF Core Repository>> {
+    +FindByMachineIdAsync(machineId : MachineId, cancellationToken : CancellationToken) : Task<IEnumerable<MaintenanceRecord>>
   }
-  class MaintenanceRecordRepositoryAdapter <<Repository Adapter>> {
-    -_context : MaintenanceDbContext
-    +SaveAsync(record : MaintenanceRecord) : Task
-    +FindByIdAsync(id : MaintenanceRecordId) : Task<MaintenanceRecord?>
-    +FindByMachineIdAsync(id : MachineId) : Task<MaintenanceRecord[]>
-  }
-  class DomainEventPublisherAdapter <<Event Publisher Adapter>> {
-    +PublishAsync(event : object) : Task
+  class ModelBuilderExtensions <<EF Core Configuration>> {
+    +{static} ApplyAssetMaintenanceManagementConfiguration(builder : ModelBuilder) : void
   }
 }
 
-MachinesController ..> MaintenanceCommandService
-MachinesController ..> MaintenanceQueryService
-MachinesController ..> MaintenanceResourceAssembler
-MaintenanceRecordsController ..> MaintenanceCommandService
-MaintenanceRecordsController ..> MaintenanceQueryService
-MaintenanceRecordsController ..> MaintenanceResourceAssembler
-MaintenanceResourceAssembler ..> RegisterMachineResource : uses
-MaintenanceResourceAssembler ..> ChangeMachineStatusResource : uses
-MaintenanceResourceAssembler ..> RecordMaintenanceResource : uses
-MaintenanceResourceAssembler ..> MachineResource : creates
-MaintenanceResourceAssembler ..> MaintenanceRecordResource : creates
-MaintenanceResourceAssembler ..> RegisterMachineCommand : creates
-MaintenanceResourceAssembler ..> ChangeMachineStatusCommand : creates
-MaintenanceResourceAssembler ..> RecordMaintenanceCommand : creates
-MaintenanceResourceAssembler ..> Machine : uses
-MaintenanceResourceAssembler ..> MaintenanceRecord : uses
-MaintenanceCommandService ..> RegisterMachineCommand : handles
-MaintenanceCommandService ..> ChangeMachineStatusCommand : handles
-MaintenanceCommandService ..> RecordMaintenanceCommand : handles
-MaintenanceCommandService ..> IMachineRepository
-MaintenanceCommandService ..> IMaintenanceRecordRepository
-MaintenanceCommandService ..> IDomainEventPublisher
-MaintenanceQueryService ..> IMachineRepository
-MaintenanceQueryService ..> IMaintenanceRecordRepository
-Machine *-- MachineId
-Machine *-- MachineCode
-Machine *-- MachineName
-Machine *-- MachineModel
-Machine --> MachineStatus
-Machine *-- StatusChangeDateTime
-MaintenanceRecord *-- MaintenanceRecordId
-MaintenanceRecord *-- MachineId : references by identity
-MaintenanceRecord --> MaintenanceType
-MaintenanceRecord *-- MaintenanceDateTime
-MaintenanceRecord *-- MaintenanceDescription
-MaintenanceRecord *-- TechnicianReference
-MaintenanceRecord o-- AnomalyReference
+package "Molinex.Shared (reference)" as SharedReference {
+  abstract class AggregateRoot <<Shared Base Aggregate>>
+  interface IEntityId<T> <<Shared Identifier Contract>>
+  interface IEvent <<Shared Event Contract>>
+  interface IBaseRepository<TEntity> <<Shared Repository>>
+  abstract class BaseRepository<TEntity> <<Shared EF Core Repository>>
+  interface IUnitOfWork <<Shared Unit of Work>>
+  class Result<T> <<Shared Application Result>>
+  class Error <<Shared Value Object>>
+}
+
+MachinesController --> "1" IMaintenanceCommandService : delegates commands to
+MachinesController --> "1" IMaintenanceQueryService : delegates queries to
+MaintenanceRecordsController --> "1" IMaintenanceCommandService : delegates commands to
+MaintenanceRecordsController --> "1" IMaintenanceQueryService : delegates queries to
+MachinesController ..> RegisterMachineCommandFromResourceAssembler : uses
+MachinesController ..> ChangeMachineStatusCommandFromResourceAssembler : uses
+MachinesController ..> MachineResourceFromEntityAssembler : uses
+MaintenanceRecordsController ..> RecordMaintenanceCommandFromResourceAssembler : uses
+MaintenanceRecordsController ..> MaintenanceRecordResourceFromEntityAssembler : uses
+
+RegisterMachineCommandFromResourceAssembler ..> RegisterMachineResource : reads
+RegisterMachineCommandFromResourceAssembler ..> RegisterMachineCommand : creates
+ChangeMachineStatusCommandFromResourceAssembler ..> ChangeMachineStatusResource : reads
+ChangeMachineStatusCommandFromResourceAssembler ..> ChangeMachineStatusCommand : creates
+RecordMaintenanceCommandFromResourceAssembler ..> RecordMaintenanceResource : reads
+RecordMaintenanceCommandFromResourceAssembler ..> RecordMaintenanceCommand : creates
+MachineResourceFromEntityAssembler ..> Machine : reads
+MachineResourceFromEntityAssembler ..> MachineResource : creates
+MaintenanceRecordResourceFromEntityAssembler ..> MaintenanceRecord : reads
+MaintenanceRecordResourceFromEntityAssembler ..> MaintenanceRecordResource : creates
+
+MaintenanceCommandService ..|> IMaintenanceCommandService
+MaintenanceQueryService ..|> IMaintenanceQueryService
+IMaintenanceCommandService ..> RegisterMachineCommand : handles
+IMaintenanceCommandService ..> ChangeMachineStatusCommand : handles
+IMaintenanceCommandService ..> RecordMaintenanceCommand : handles
+IMaintenanceCommandService ..> Result : returns
+IMaintenanceQueryService ..> GetMachinesQuery : handles
+IMaintenanceQueryService ..> GetMachineByIdQuery : handles
+IMaintenanceQueryService ..> GetMaintenanceHistoryQuery : handles
+MaintenanceCommandService --> "1" IMachineRepository : persists machines through
+MaintenanceCommandService --> "1" IMaintenanceRecordRepository : persists maintenance through
+MaintenanceCommandService --> "1" IUnitOfWork : completes changes through
+MaintenanceQueryService --> "1" IMachineRepository : reads machines through
+MaintenanceQueryService --> "1" IMaintenanceRecordRepository : reads maintenance through
+
+Machine --|> AggregateRoot
+MaintenanceRecord --|> AggregateRoot
+MachineId ..|> IEntityId
+MaintenanceRecordId ..|> IEntityId
+Machine *-- "1" MachineId : identified by
+Machine *-- "1" MachineCode : coded by
+Machine *-- "1" MachineName : named
+Machine *-- "1" MachineModel : modeled as
+Machine --> "1" MachineStatus : has
+Machine *-- "1" StatusChangeDateTime : status changed at
+MaintenanceRecord *-- "1" MaintenanceRecordId : identified by
+MaintenanceRecord *-- "1" MachineId : references by identity
+MaintenanceRecord --> "1" MaintenanceType : typed as
+MaintenanceRecord *-- "1" MaintenanceDateTime : performed at
+MaintenanceRecord *-- "1" MaintenanceDescription : described by
+MaintenanceRecord *-- "1" TechnicianReference : performed by
+MaintenanceRecord o-- "0..1" AnomalyReference : attends
+MaintenanceRecord o-- "0..1" CorrectiveMaintenanceDetails : details correction with
+Result --> "1" Error : carries
+
 Machine ..> MachineRegistered : raises
 Machine ..> MachineStatusChanged : raises
 MaintenanceRecord ..> MaintenanceRecorded : raises
-MachineRepositoryAdapter ..|> IMachineRepository
-MaintenanceRecordRepositoryAdapter ..|> IMaintenanceRecordRepository
-DomainEventPublisherAdapter ..|> IDomainEventPublisher
-MachineRepositoryAdapter --> MaintenanceDbContext
-MaintenanceRecordRepositoryAdapter --> MaintenanceDbContext
+MachineRegistered ..|> IEvent
+MachineStatusChanged ..|> IEvent
+MaintenanceRecorded ..|> IEvent
+
+IMachineRepository --|> IBaseRepository
+IMaintenanceRecordRepository --|> IBaseRepository
+MachineRepository ..|> IMachineRepository
+MaintenanceRecordRepository ..|> IMaintenanceRecordRepository
+MachineRepository --|> BaseRepository
+MaintenanceRecordRepository --|> BaseRepository
+ModelBuilderExtensions ..> Machine : maps
+ModelBuilderExtensions ..> MaintenanceRecord : maps
 @enduml
-
-
