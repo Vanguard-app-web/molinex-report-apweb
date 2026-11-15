@@ -194,7 +194,7 @@ package "Molinex.ReportingAnalytics.Infrastructure.Messaging" as Messaging {
     +PayloadVersion : int
     +Payload : IReadOnlyDictionary<string, string>
   }
-  class PublishedDomainEventAssembler <<Anti-Corruption Layer>> {
+  class PublishedDomainEventAssembler <<ACL>> {
     +{static} ToPublishedLanguage(message : DomainEventMessage) : PublishedDomainEvent
   }
 }
